@@ -67,6 +67,7 @@ void Player::Update()
 	ImGui::InputFloat("SP", &speedY);
 	ImGui::End();
 
+#if 0
 	// Dancerにめり込まないようにする
 	// 自分の座標は、transform.position
 	// Dancerの座標を知る
@@ -95,6 +96,7 @@ void Player::Update()
 			transform.position += pushVec * pushLen;
 		}
 	}
+#endif
 	std::list<Object3D*> objects = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ"); // ドアのオブジェクトを見つける
 #if 1
 	for (auto door : objects) {
@@ -112,7 +114,6 @@ void Player::Update()
 void Player::Draw()
 {
 	Object3D::Draw(); // 継承元の関数を呼ぶ
-
 //	MATRIX4X4 tip = XMMatrixRotationRollPitchYawFromVector(VECTOR3(-33, 82, 0) * DegToRad);
 //	VECTOR3 tipPos = VECTOR3(0, 0, 1.2f) * tip;
 //	VECTOR3 tipPos = VECTOR3(0.9966, 0.6536, 0.140);

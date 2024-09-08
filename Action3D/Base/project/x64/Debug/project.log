@@ -1,8 +1,3 @@
 ﻿  Box.cpp
-C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\Src\Box.cpp(281,29): warning C4305: '+=': truncation from 'double' to 'float'
-C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\Src\Box.cpp(287,29): warning C4305: '-=': truncation from 'double' to 'float'
-C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\Src\Box.cpp(293,29): warning C4305: '+=': truncation from 'double' to 'float'
-C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\Src\Box.cpp(299,29): warning C4305: '-=': truncation from 'double' to 'float'
-C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\Src\Box.cpp(305,29): warning C4305: '-=': truncation from 'double' to 'float'
-C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\Src\Box.cpp(311,29): warning C4305: '+=': truncation from 'double' to 'float'
+C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\Src\Box.cpp(370,16): warning C4305: '=': truncation from 'double' to 'float'
   project.vcxproj -> C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\project.exe
