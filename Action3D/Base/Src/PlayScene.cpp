@@ -33,7 +33,10 @@ PlayScene::PlayScene()
 		//	obj = Instantiate<Dancer>();
 		//}
 		else if (str == "BOX") {
-			obj = Instantiate<Box>();
+			float x = csv->GetFloat(i, 4);
+			float y = csv->GetFloat(i, 5);
+			float z = csv->GetFloat(i, 6);
+			obj = new Box(x, y, z);	// ’¼•û‘Ì‚ÌŠe•Ó‚Ì’·‚³‚ð“n‚·
 		}
 		else if (str == "BALL") {
 			obj = Instantiate<Ball>();

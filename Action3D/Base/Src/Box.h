@@ -3,11 +3,13 @@
 
 class Box : public Object3D {
 public:
-	Box();
+	Box(float x, float y, float z);
 	~Box();
 	void Update() override;
-	VECTOR3 HitSphereToCube(Object3D* player);
-	VECTOR3 Hitv(Object3D* player);
+	void CubeSize(float x, float y, float z);
+	// ‰Ÿ‚µ•Ô‚·ƒxƒNƒgƒ‹‚ð•Ô‚µ‚½‚¢‚©‚çVECTOR3
+	VECTOR3 HitSphereToCubeplane(Object3D* player);
+	VECTOR3 HitSphereToCubev(Object3D* player);
 private:
 	VECTOR3 normal[6];
 	VECTOR3 ten[8];
@@ -17,6 +19,7 @@ private:
 	VECTOR3 pt[8];
 	float d[6];
 	float distance[6];
+	VECTOR3 vPos;
 
 	VECTOR3 ten0, ten1, ten2, ten3, ten4, ten5, ten6, ten7;
 	VECTOR3 plane0, plane1, plane2, plane3, plane4, plane5;
