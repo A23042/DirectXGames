@@ -63,9 +63,9 @@ void Box::CubeSize(float x, float y, float z)
 	int planePoit[6][3] = {
 		// 法線ベクトルを求めるための辺ベクトル2つと共通の頂点 
 		//　　正面　　　　右　　　　　　左　　　　　後ろ
-			{1, 0, 2}, {5, 4, 1}, {2, 3, 6}, {5, 4, 6},
+			{2, 0, 1}, {1, 4, 5}, {6, 3, 2}, {5, 4, 6},
 		//　　上　　　　　下
-			{3, 0, 7}, {2, 1, 5}
+			{7, 0, 3}, {2, 1, 5}
 	};
 
 	for (int i = 0; i < 6; i++) {
@@ -101,11 +101,25 @@ VECTOR3 Box::HitSphereToCubeplane(Object3D* player)
 	}
 
 	// 平面との距離計算
-
 	for (int i = 0; i < 6; i++) {
 		distance[i] = abs(dot(plane[i], player->Position()) + d[i]) / plane[i].Length();
 	}
 
+	int pair[6][2] = {
+		{0, 1}, {0, 4}, {2, 6},
+		{8, 9}, {3, 4}, {1, 5}
+	};
+
+	for (int i = 0; i < 6; i++) {
+		if (distance[i] <= 0.5f) {
+			if (Tpt[pair[i][0]] >= 0 && Tpt[pair[i][0]] <= 1 && Tpt[pair[i][1]] >= 0 && Tpt[pair[i][1]] <= 1) {
+				// ここに当たった面の法線ベクトルを書く
+				pushVec = plane[i] * 0.02;
+				return pushVec;
+			}
+		}
+	}
+#if 0
 	// 面1
 	if (distance[0] <= 0.5f) {	// 無限平面に接している
 		if (0 <= Tpt[0] && Tpt[0] <= 1 && 0 <= Tpt[1] && Tpt[1] <= 1) {
@@ -154,7 +168,7 @@ VECTOR3 Box::HitSphereToCubeplane(Object3D* player)
 			return pushVec;
 		}
 	}
-	
+#endif
 	HitSphereToCubeEdge(player);
 
 	return VECTOR3();
