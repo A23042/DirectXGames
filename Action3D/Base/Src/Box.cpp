@@ -119,56 +119,6 @@ VECTOR3 Box::HitSphereToCubeplane(Object3D* player)
 			}
 		}
 	}
-#if 0
-	// 面1
-	if (distance[0] <= 0.5f) {	// 無限平面に接している
-		if (0 <= Tpt[0] && Tpt[0] <= 1 && 0 <= Tpt[1] && Tpt[1] <= 1) {
-			//transform.position.z += 0.02f;
-			pushVec.z = 0.02;
-			return pushVec;
-		}
-	}
-	// 面2
-	if (distance[1] <= 0.5f) {
-		if (0 <= Tpt[0] && Tpt[0]<= 1 && 0 <= Tpt[4] && Tpt[4] <= 1) {
-			//transform.position.x -= 0.02;
-			pushVec.x = -0.02f;
-			return pushVec;
-		}
-	}
-	// 面3
-	if (distance[2] <= 0.5f) {
-		if (0 <= Tpt[2] && Tpt[2] <= 1 && 0 <= Tpt[6] && Tpt[6] <= 1) {
-			//transform.position.x += 0.02;
-			pushVec.x = 0.02f;
-			return pushVec;
-		}
-	}
-	// 面4
-	if (distance[3] <= 0.5f) {
-		if (0 <= Tpt[8] && Tpt[8] <= 1 && 0 <= Tpt[9] && Tpt[9] <= 1) {
-			//transform.position.z -= 0.02;
-			pushVec.z = -0.02f;
-			return pushVec;
-		}
-	}
-	// 面5
-	if (distance[4] <= 0.5f) {
-		if (0 <= Tpt[3] && Tpt[3] <= 1 && 0 <= Tpt[4] && Tpt[4] <= 1) {
-			//transform.position.y -= 0.02;
-			pushVec.y = -0.02f;
-			return pushVec;
-		}
-	}
-	// 面6
-	if (distance[5] <= 0.5f) {
-		if (0 <= Tpt[1] && Tpt[1] <= 1 && 0 <= Tpt[5] && Tpt[5] <= 1) {
-			//transform.position.y += 0.02;
-			pushVec.y = 0.02f;
-			return pushVec;
-		}
-	}
-#endif
 	HitSphereToCubeEdge(player);
 
 	return VECTOR3();
@@ -182,176 +132,38 @@ VECTOR3 Box::HitSphereToCubeEdge(Object3D* player)
 		{4}, {5}, {6}, {7}
 	};
 
+	// 辺と球との距離計算
 	for (int i = 0; i < 12; i++) {
 		distanceV[i] = edge[i] * dot(edge[i], pt[TptPoint[i]]) / edge[i].Length() - pt[TptPoint[i]];
 	}
 
-	// 辺0
-	if (0 <= Tpt[0] && Tpt[0] <= 1) {
-		if (distanceV[0].Length() <= 0.5f) {
-			//transform.position.z += 0.02f;
-			//transform.position.x -= 0.02f;
+	int pair[12][2] = {
+		{0, 1}, {0, 5}, {0, 2}, {0, 4},
+		{4, 1}, {1, 5}, {5, 2}, {2, 4},
+		{3, 1}, {3, 5}, {3, 2}, {3, 4}
+	};
 
-			pushVec = VECTOR3(-0.02, 0, 0.02);
-			return pushVec;
+	for (int i = 0; i < 12; i++) {
+		if (0 <= Tpt[i] && Tpt[i] <= 1) {
+			if (distanceV[i].Length() <= 0.5f) {
+				VECTOR3 vNormal = (plane[pair[i][0]] + plane[pair[i][1]]) / 2;
+				pushVec = normalize(vNormal) * 0.02;
+				return pushVec;
+			}
 		}
 	}
-	// 辺1
-	if (0 <= Tpt[1] && Tpt[1] <= 1) {
-		if (distanceV[1].Length() <= 0.5f) {
-			//transform.position.y += 0.02f;
-			//transform.position.z += 0.02f;
-
-			pushVec = VECTOR3(0, 0.02, 0.02);
-			return pushVec;
-		}
-	}
-	// 辺2
-	if (0 <= Tpt[2] && Tpt[2] <= 1) {
-		if (distanceV[2].Length() <= 0.5f) {
-			//transform.position.z += 0.02f;
-			//transform.position.x += 0.02f;
-
-			pushVec = VECTOR3(0.02, 0, 0.02);
-			return pushVec;
-		}
-	}
-	// 辺3
-	if (0 <= Tpt[3] && Tpt[3] <= 1) {
-		if (distanceV[3].Length() <= 0.5f) {
-			//transform.position.y -= 0.02f;
-			//transform.position.z += 0.02f;
-
-			pushVec = VECTOR3(0, -0.02, 0.02);
-			return pushVec;
-		}
-	}
-	// 辺4
-	if (0 <= Tpt[4] && Tpt[4] <= 1) {
-		if (distanceV[4].Length() <= 0.5f) {
-			//transform.position.y -= 0.02f;
-			//transform.position.x -= 0.02f;
-
-			pushVec = VECTOR3(-0.02, -0.02, 0);
-			return pushVec;
-		}
-	}
-	// 辺5
-	if (0 <= Tpt[5] && Tpt[5] <= 1) {
-		if (distanceV[5].Length() <= 0.5f) {
-			//transform.position.y += 0.02f;
-			//transform.position.x -= 0.02f;
-
-			pushVec = VECTOR3(-0.02, 0.02, 0);
-			return pushVec;
-		}
-	}
-	// 辺6
-	if (0 <= Tpt[6] && Tpt[6] <= 1) {
-		if (distanceV[6].Length() <= 0.5f) {
-			//transform.position.y += 0.02f;
-			//transform.position.x += 0.02f;
-
-			pushVec = VECTOR3(0.02, 0.02, 0);
-			return pushVec;
-		}
-	}
-	// 辺7
-	if (0 <= Tpt[7] && Tpt[7] <= 1) {
-		if (distanceV[7].Length() <= 0.5f) {
-			//transform.position.y -= 0.02f;
-			//transform.position.x += 0.02f;
-
-			pushVec = VECTOR3(0.02, -0.02, 0);
-			return pushVec;
-		}
-	}
-	// 辺8
-	if (0 <= Tpt[8] && Tpt[8] <= 1) {
-		if (distanceV[8].Length() <= 0.5f) {
-			//transform.position.z -= 0.02f;
-			//transform.position.x -= 0.02f;
-
-			pushVec = VECTOR3(-0.02, 0, -0.02);
-			return pushVec;
-		}
-	}
-	// 辺9
-	if (0 <= Tpt[9] && Tpt[9] <= 1) {
-		if (distanceV[9].Length() <= 0.5f) {
-			//transform.position.y += 0.02f;
-			//transform.position.z -= 0.02f;
-
-			pushVec = VECTOR3(0, 0.02, -0.02);
-			return pushVec;
-		}
-	}
-	// 辺10
-	if (0 <= Tpt[10] && Tpt[10] <= 1) {
-		if (distanceV[10].Length() <= 0.5f) {
-			//transform.position.z -= 0.02f;
-			//transform.position.x += 0.02f;
-
-			pushVec = VECTOR3(0.02, 0, -0.02);
-			return pushVec;
-		}
-	}
-	// 辺11
-	if (0 <= Tpt[11] && Tpt[11] <= 1) {
-		if (distanceV[11].Length() <= 0.5f) {
-			//transform.position.y -= 0.02f;
-			//transform.position.z -= 0.02f;
-
-			pushVec = VECTOR3(0, -0.02, -0.02);
-			return pushVec;
-		}
-	}
+	
 	HitSphereToCubeVertices(player);
 	return VECTOR3();
 }
 
 VECTOR3 Box::HitSphereToCubeVertices(Object3D* player)
 {
-
-	// 頂点0
-	if (pt[0].Length() <= 0.5f) {
-		pushVec = VECTOR3(-0.02, -0.02, 0.02);
-		return pushVec;
-	}
-	// 頂点1
-	if (pt[1].Length() <= 0.5f) {
-		pushVec = VECTOR3(-0.02, 0.02, 0.02);
-		return pushVec;
-	}
-	// 頂点2
-	if (pt[2].Length() <= 0.5f) {
-		pushVec = VECTOR3(0.02, 0.02, 0.02);
-		return pushVec;
-	}
-	// 頂点3
-	if (pt[3].Length() <= 0.5f) {
-		pushVec = VECTOR3(0.02, -0.02, 0.02);
-		return pushVec;
-	}
-	// 頂点4
-	if (pt[4].Length() <= 0.5f) {
-		pushVec = VECTOR3(-0.02, -0.02, -0.02);
-		return pushVec;
-	}
-	// 頂点5
-	if (pt[5].Length() <= 0.5f) {
-		pushVec = VECTOR3(-0.02, 0.02, -0.02);
-		return pushVec;
-	}
-	// 頂点6
-	if (pt[6].Length() <= 0.5f) {
-		pushVec = VECTOR3(0.02, 0.02, -0.02);
-		return pushVec;
-	}
-	// 頂点7
-	if (pt[7].Length() <= 0.5f) {
-		pushVec = VECTOR3(0.02, -0.02, -0.02);
-		return pushVec;
+	for (int i = 0; i < 8; i++) {
+		if (pt[i].Length() <= 0.5f) {
+			pushVec = normalize(pt[i]) * -0.02f;
+			return pushVec;
+		}
 	}
 
 	return VECTOR3();
