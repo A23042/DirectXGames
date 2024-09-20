@@ -11,7 +11,8 @@ public:
 	void Draw() override;
 
 	SphereCollider Collider() override;
-
+	VECTOR3 SetMove(VECTOR3 move);
+	VECTOR3 GetMove();
 private:
 	float speedY; // Yの速度
 
@@ -33,6 +34,6 @@ private:
 	void UpdateOnGround();
 	void UpdateJump();
 	void UpdateAttack();
-
+	VECTOR3 move;
 	int frame; // アニメーションのフレームを数える
 };

@@ -1,5 +1,6 @@
 #pragma once
 #include "Object3D.h"
+#include "Player.h"
 
 class Box : public Object3D {
 public:
@@ -8,9 +9,14 @@ public:
 	void Update() override;
 	void CubeSize(float x, float y, float z);
 	// 押し返すベクトルを返したいからVECTOR3
-	VECTOR3 HitSphereToCubeplane(Object3D* player);
-	VECTOR3 HitSphereToCubeEdge(Object3D* player);
-	VECTOR3 HitSphereToCubeVertices(Object3D* player);
+	// 平面の衝突判定
+	VECTOR3 HitSphereToCubeplane(Player* player);
+	// 辺の衝突判定
+	VECTOR3 HitSphereToCubeEdge(Player* player);
+	// 頂点の衝突判定
+	VECTOR3 HitSphereToCubeVertices(Player* player);
+	// 跳ね返りベクトルの計算
+	VECTOR3 ReflectionVec(Player* player, VECTOR3 normal);
 
 private:
 	VECTOR3 normal[6];

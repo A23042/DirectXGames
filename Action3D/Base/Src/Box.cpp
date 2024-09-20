@@ -1,5 +1,4 @@
 #include "Box.h"
-#include "Player.h"
 
 Box::Box(float x, float y, float z)
 {
@@ -9,7 +8,7 @@ Box::Box(float x, float y, float z)
 
 	meshCol = new MeshCollider();
 	meshCol->MakeFromMesh(mesh);
-
+	
 	vPos = VECTOR3(x / 2, y / 2, z / 2);
 
 	ten[0] = VECTOR3(transform.position.x + vPos.x, transform.position.y + vPos.y, transform.position.z - vPos.z);
@@ -31,7 +30,7 @@ void Box::Update()
 	for (Player* player : playeres) {
 		CubeSize(vPos.x, vPos.y, vPos.z);
 		HitSphereToCubeplane(player);
-		transform.position += pushVec;
+		//transform.position += pushVec;
 	}
 }
 
@@ -78,9 +77,9 @@ void Box::CubeSize(float x, float y, float z)
 	return ;
 }
 
-VECTOR3 Box::HitSphereToCubeplane(Object3D* player)
+VECTOR3 Box::HitSphereToCubeplane(Player* player)
 {
-	pushVec = VECTOR3(0, 0, 0);
+	//pushVec = VECTOR3(0, 0, 0);
 
 	// 球の中心点から各頂点へのベクトル
 	for (int i = 0; i < 8; i++) {
@@ -114,6 +113,7 @@ VECTOR3 Box::HitSphereToCubeplane(Object3D* player)
 		if (distance[i] <= 0.5f) {
 			if (Tpt[pair[i][0]] >= 0 && Tpt[pair[i][0]] <= 1 && Tpt[pair[i][1]] >= 0 && Tpt[pair[i][1]] <= 1) {
 				// ここに当たった面の法線ベクトルを書く
+				ReflectionVec(player, plane[i]);
 				pushVec = plane[i] * 0.02;
 				return pushVec;
 			}
@@ -124,7 +124,7 @@ VECTOR3 Box::HitSphereToCubeplane(Object3D* player)
 	return VECTOR3();
 }
 
-VECTOR3 Box::HitSphereToCubeEdge(Object3D* player)
+VECTOR3 Box::HitSphereToCubeEdge(Player* player)
 {
 	int TptPoint[12] = {
 		{0}, {1}, {2}, {3},
@@ -148,6 +148,7 @@ VECTOR3 Box::HitSphereToCubeEdge(Object3D* player)
 			if (distanceV[i].Length() <= 0.5f) {
 				VECTOR3 vNormal = (plane[pair[i][0]] + plane[pair[i][1]]) / 2;
 				pushVec = normalize(vNormal) * 0.02;
+				ReflectionVec(player, normalize(vNormal));
 				return pushVec;
 			}
 		}
@@ -157,15 +158,27 @@ VECTOR3 Box::HitSphereToCubeEdge(Object3D* player)
 	return VECTOR3();
 }
 
-VECTOR3 Box::HitSphereToCubeVertices(Object3D* player)
+VECTOR3 Box::HitSphereToCubeVertices(Player* player)
 {
 	for (int i = 0; i < 8; i++) {
 		if (pt[i].Length() <= 0.5f) {
 			pushVec = normalize(pt[i]) * -0.02f;
+			ReflectionVec(player, normalize(pt[i]));
 			return pushVec;
 		}
 	}
 
+	return VECTOR3();
+}
+
+// 反射させるための関数
+// 当たったときの法線ベクトルを受け取り跳ね返りベクトルを計算する
+VECTOR3 Box::ReflectionVec(Player* player, VECTOR3 normal)
+{
+	float ip = dot(player->GetMove(), normal);
+	VECTOR3 a = ip * normal * 2;
+	VECTOR3 b = player->GetMove() - a;
+	player->SetMove(b);
 	return VECTOR3();
 }
 

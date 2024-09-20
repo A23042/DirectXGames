@@ -8,7 +8,7 @@ namespace { // このcpp以外では使えない
 	// C++の定数定義（型が付く）
 	static const float JumpPower = 0.3f;
 	static const float RotationSpeed = 3.0f; // 回転速度(度)
-	static const float MoveSpeed = 0.1f;
+	static const float MoveSpeed = 0.02f;
 };
 
 Player::Player()
@@ -50,7 +50,7 @@ Player::~Player()
 
 void Player::Update()
 {
-	animator->Update(); // 毎フレーム、Updateを呼ぶ
+	//animator->Update(); // 毎フレーム、Updateを呼ぶ
 	switch (state) {
 	case sOnGround:
 		UpdateOnGround();
@@ -134,8 +134,21 @@ SphereCollider Player::Collider()
 	return col;
 }
 
+VECTOR3 Player::SetMove(VECTOR3 move)
+{
+	this->move = move;
+	return VECTOR3();
+}
+
+VECTOR3 Player::GetMove()
+{
+	return this->move;
+}
+
 void Player::UpdateOnGround()
 {
+	transform.position += move;
+
 	if (GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_W)) {
 		// 三角関数でやる場合
 //		position.z += cosf(rotation.y) * 0.1;
@@ -143,8 +156,9 @@ void Player::UpdateOnGround()
 		// 行列でやる場合
 		VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
 		MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
-		VECTOR3 move = forward * rotY; // キャラの向いてる方への移動量
-		transform.position += move;
+		//VECTOR3 move = forward * rotY; // キャラの向いてる方への移動量
+		move = forward * rotY;
+		//transform.position += move;
 //		animator->MergePlay(aRun);
 	} else if (GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_S)) {
 		// 三角関数でやる場合
@@ -153,8 +167,9 @@ void Player::UpdateOnGround()
 		// 行列でやる場合
 		VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
 		MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
-		VECTOR3 move = forward * rotY; // キャラの向いてる方への移動量
-		transform.position -= move;
+		//VECTOR3 move = forward * rotY; // キャラの向いてる方への移動量
+		move = -forward * rotY;
+		//transform.position -= move;
 		animator->MergePlay(aRun);
 	}
 	else {

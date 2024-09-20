@@ -1,4 +1,81 @@
-﻿  Box.cpp
-C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\Src\Box.cpp(117,26): warning C4305: 'argument': truncation from 'double' to 'const float'
-C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\Src\Box.cpp(150,36): warning C4305: 'argument': truncation from 'double' to 'const float'
-  project.vcxproj -> C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\project.exe
+﻿  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\DisplaceSkinMesh_DS.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\DisplaceSkinMesh_HS.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\DisplaceSkinMesh_PS.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\DisplaceSkinMesh_VS.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\DisplaceStaticMesh_DS.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\DisplaceStaticMesh_HS.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\DisplaceStaticMesh_PS.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\DisplaceStaticMesh_VS.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\DisplaceWave_DS.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\DisplaceWave_HS.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\DisplaceWave_PS.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\DisplaceWave_VS.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\Effect3D_GS_POINT.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\Effect3D_PS.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\Effect3D_VS_BILL.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\Effect3D_VS_BILLMESH.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\Effect3D_VS_POINT.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\FbxSkinMesh_PS.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\FbxSkinMesh_VS.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\FbxStaticMesh_PS.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\FbxStaticMesh_VS.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\Simple_PS.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\Simple_VS.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\Sprite3D_PS.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\Sprite3D_VS.cso
+  compilation object save succeeded; see C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\Sprite3D_VS_BILL.cso
+  imgui.cpp
+  imgui_demo.cpp
+  imgui_draw.cpp
+  imgui_impl_dx11.cpp
+  imgui_impl_win32.cpp
+  imgui_widgets.cpp
+  Animator.cpp
+  Ball.cpp
+  BBox.cpp
+  Box.cpp
+C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\Src\Box.cpp(117,26): warning C4305: 'argument': truncation from 'double' to 'const float'
+C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\Src\Box.cpp(150,36): warning C4305: 'argument': truncation from 'double' to 'const float'
+  Camera.cpp
+  Collision.cpp
+  CsvReader.cpp
+C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\Src\CsvReader.cpp(75,17): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\Src\CsvReader.cpp(81,30): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+  Dancer.cpp
+  DInput.cpp
+  Direct3D.cpp
+  Displace.cpp
+  Door.cpp
+  FbxMesh.cpp
+  GameMain.cpp
+  Generating Code...
+  Compiling...
+  Ground.cpp
+  Main.cpp
+  MainControl.cpp
+  MeshCollider.cpp
+  MyImgui.cpp
+  MyMath.cpp
+  OBJECT3D.CPP
+  ObjectManager.cpp
+  Player.cpp
+C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\Src\Player.cpp(219,43): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\Src\Player.cpp(219,35): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\Src\Player.cpp(219,27): warning C4305: 'argument': truncation from 'double' to 'float'
+  PlayScene.cpp
+  ResourceManager.cpp
+  ResultScene.cpp
+  ResultScore.cpp
+  SceneBase.cpp
+  SceneFactory.cpp
+  SceneManager.cpp
+  Score.cpp
+  ScoreDraw.cpp
+  Shader.cpp
+  Sprite3D.cpp
+  Generating Code...
+  Compiling...
+  TitleScene.cpp
+  XAudio.cpp
+  Generating Code...
+  project.vcxproj -> C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\project.exe
