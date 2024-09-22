@@ -19,7 +19,7 @@ Box::Box(float x, float y, float z)
 	ten[5] = VECTOR3(transform.position.x + vPos.x, transform.position.y - vPos.y, transform.position.z + vPos.z);
 	ten[6] = VECTOR3(transform.position.x - vPos.x, transform.position.y - vPos.y, transform.position.z + vPos.z);
 	ten[7] = VECTOR3(transform.position.x - vPos.x, transform.position.y + vPos.y, transform.position.z + vPos.z);
-
+	
 }
 
 void Box::Update()
@@ -29,8 +29,8 @@ void Box::Update()
 		ObjectManager::FindGameObjects<Player>();
 	for (Player* player : playeres) {
 		CubeSize(vPos.x, vPos.y, vPos.z);
-		HitSphereToCubeplane(player);
-		//transform.position += pushVec;
+		HitSphereToCubeplane(player->sphere);
+		transform.position += pushVec;
 	}
 }
 
@@ -77,13 +77,13 @@ void Box::CubeSize(float x, float y, float z)
 	return ;
 }
 
-VECTOR3 Box::HitSphereToCubeplane(Player* player)
+VECTOR3 Box::HitSphereToCubeplane(Player::Sphere sphere)
 {
-	//pushVec = VECTOR3(0, 0, 0);
+	pushVec = VECTOR3(0, 0, 0);
 
 	// 球の中心点から各頂点へのベクトル
 	for (int i = 0; i < 8; i++) {
-		pt[i] = player->Position() - ten[i];
+		pt[i] = sphere.center - ten[i];
 	}
 
 	// 球の中心点から辺に垂線を下ろしたときに辺の範囲内にあるかどうか
@@ -101,7 +101,7 @@ VECTOR3 Box::HitSphereToCubeplane(Player* player)
 
 	// 平面との距離計算
 	for (int i = 0; i < 6; i++) {
-		distance[i] = abs(dot(plane[i], player->Position()) + d[i]) / plane[i].Length();
+		distance[i] = abs(dot(plane[i], sphere.center) + d[i]) / plane[i].Length();
 	}
 
 	int pair[6][2] = {
@@ -110,21 +110,19 @@ VECTOR3 Box::HitSphereToCubeplane(Player* player)
 	};
 
 	for (int i = 0; i < 6; i++) {
-		if (distance[i] <= 0.5f) {
+		if (distance[i] < 0.5f) {
 			if (Tpt[pair[i][0]] >= 0 && Tpt[pair[i][0]] <= 1 && Tpt[pair[i][1]] >= 0 && Tpt[pair[i][1]] <= 1) {
 				// ここに当たった面の法線ベクトルを書く
-				ReflectionVec(player, plane[i]);
-				pushVec = plane[i] * 0.02;
+				ReflectionVec(sphere, plane[i]);
+				pushVec = plane[i] * (sphere.radius - distance[i]);
 				return pushVec;
 			}
 		}
 	}
-	HitSphereToCubeEdge(player);
-
-	return VECTOR3();
+	HitSphereToCubeEdge(sphere);
 }
 
-VECTOR3 Box::HitSphereToCubeEdge(Player* player)
+VECTOR3 Box::HitSphereToCubeEdge(Player::Sphere sphere)
 {
 	int TptPoint[12] = {
 		{0}, {1}, {2}, {3},
@@ -145,25 +143,25 @@ VECTOR3 Box::HitSphereToCubeEdge(Player* player)
 
 	for (int i = 0; i < 12; i++) {
 		if (0 <= Tpt[i] && Tpt[i] <= 1) {
-			if (distanceV[i].Length() <= 0.5f) {
+			if (distanceV[i].Length() < 0.5f) {
 				VECTOR3 vNormal = (plane[pair[i][0]] + plane[pair[i][1]]) / 2;
-				pushVec = normalize(vNormal) * 0.02;
-				ReflectionVec(player, normalize(vNormal));
+				ReflectionVec(sphere, normalize(vNormal));
+				pushVec = normalize(vNormal) * (sphere.radius - distanceV[i].Length());
 				return pushVec;
 			}
 		}
 	}
 	
-	HitSphereToCubeVertices(player);
+	HitSphereToCubeVertices(sphere);
 	return VECTOR3();
 }
 
-VECTOR3 Box::HitSphereToCubeVertices(Player* player)
+VECTOR3 Box::HitSphereToCubeVertices(Player::Sphere sphere)
 {
 	for (int i = 0; i < 8; i++) {
-		if (pt[i].Length() <= 0.5f) {
-			pushVec = normalize(pt[i]) * -0.02f;
-			ReflectionVec(player, normalize(pt[i]));
+		if (pt[i].Length() < 0.5f) {
+			ReflectionVec(sphere, normalize(pt[i]));
+			pushVec = normalize(ten[i] - sphere.center) * (sphere.radius - pt[i].Length());
 			return pushVec;
 		}
 	}
@@ -173,12 +171,12 @@ VECTOR3 Box::HitSphereToCubeVertices(Player* player)
 
 // 反射させるための関数
 // 当たったときの法線ベクトルを受け取り跳ね返りベクトルを計算する
-VECTOR3 Box::ReflectionVec(Player* player, VECTOR3 normal)
+VECTOR3 Box::ReflectionVec(Player::Sphere sphere, VECTOR3 normal)
 {
-	float ip = dot(player->GetMove(), normal);
+	float ip = dot(sphere.velocity, normal);
 	VECTOR3 a = ip * normal * 2;
-	VECTOR3 b = player->GetMove() - a;
-	player->SetMove(b);
+	VECTOR3 b = sphere.velocity - a;
+	sphere.velocity = b;
 	return VECTOR3();
 }
 

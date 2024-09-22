@@ -11,8 +11,15 @@ public:
 	void Draw() override;
 
 	SphereCollider Collider() override;
-	VECTOR3 SetMove(VECTOR3 move);
-	VECTOR3 GetMove();
+
+	struct Sphere
+	{
+		VECTOR3 velocity = VECTOR3(0, 0, 0);
+		VECTOR3 center = VECTOR3(0, 0, 0);
+		float radius = 0.0f;
+	};
+	Sphere sphere;
+
 private:
 	float speedY; // Yの速度
 
@@ -36,4 +43,6 @@ private:
 	void UpdateAttack();
 	VECTOR3 move;
 	int frame; // アニメーションのフレームを数える
+
+	
 };

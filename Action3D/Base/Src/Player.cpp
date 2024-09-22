@@ -8,7 +8,7 @@ namespace { // このcpp以外では使えない
 	// C++の定数定義（型が付く）
 	static const float JumpPower = 0.3f;
 	static const float RotationSpeed = 3.0f; // 回転速度(度)
-	static const float MoveSpeed = 0.02f;
+	static const float MoveSpeed = 0.05f;
 };
 
 Player::Player()
@@ -34,6 +34,11 @@ Player::Player()
 	transform.rotation = VECTOR3(0, 0, 0);
 	state = sOnGround;
 	speedY = 0;
+
+	move = VECTOR3(0, 0, 0);
+
+	sphere.center = transform.position;
+	sphere.radius = 0.5f;
 }
 
 Player::~Player()
@@ -50,6 +55,7 @@ Player::~Player()
 
 void Player::Update()
 {
+	
 	//animator->Update(); // 毎フレーム、Updateを呼ぶ
 	switch (state) {
 	case sOnGround:
@@ -66,6 +72,9 @@ void Player::Update()
 	ImGui::InputInt("State", (int*)(&state));
 	ImGui::InputFloat("SP", &speedY);
 	ImGui::End();
+
+	transform.position += move;
+	sphere.center = transform.position;
 
 #if 0
 	// Dancerにめり込まないようにする
@@ -99,16 +108,18 @@ void Player::Update()
 #endif
 	std::list<Object3D*> objects = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ"); // ドアのオブジェクトを見つける
 #if 1
-	for (auto door : objects) {
+	for (auto object : objects) {
 		SphereCollider coll;
 		coll.center = transform.position + VECTOR3(0, 0, 0); // 自分の球を作る
-		coll.radius = 0.49f;
+		coll.radius = 0.5f;
 		VECTOR3 push;
-		if (door->HitSphereToMesh(coll, &push)) {
-			transform.position += push;
+		if (object->HitSphereToMesh(coll, &push)) {
+			//transform.position += push;
+			move = push;
 		}
 	}
 #endif
+
 }
 
 void Player::Draw()
@@ -134,21 +145,10 @@ SphereCollider Player::Collider()
 	return col;
 }
 
-VECTOR3 Player::SetMove(VECTOR3 move)
-{
-	this->move = move;
-	return VECTOR3();
-}
-
-VECTOR3 Player::GetMove()
-{
-	return this->move;
-}
-
 void Player::UpdateOnGround()
 {
-	transform.position += move;
-
+	//transform.position += move;
+	move = VECTOR3(0, 0, 0);
 	if (GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_W)) {
 		// 三角関数でやる場合
 //		position.z += cosf(rotation.y) * 0.1;
@@ -157,9 +157,9 @@ void Player::UpdateOnGround()
 		VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
 		MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
 		//VECTOR3 move = forward * rotY; // キャラの向いてる方への移動量
-		move = forward * rotY;
+		transform.position += forward * rotY;
 		//transform.position += move;
-//		animator->MergePlay(aRun);
+		sphere.center = transform.position;
 	} else if (GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_S)) {
 		// 三角関数でやる場合
 //		position.z -= cosf(rotation.y) * 0.1;
@@ -168,9 +168,9 @@ void Player::UpdateOnGround()
 		VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
 		MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
 		//VECTOR3 move = forward * rotY; // キャラの向いてる方への移動量
-		move = -forward * rotY;
-		//transform.position -= move;
-		animator->MergePlay(aRun);
+		transform.position += -forward * rotY;
+		//transform.position += move;
+		sphere.center = transform.position;
 	}
 	else {
 		animator->MergePlay(aIdle);
@@ -184,20 +184,18 @@ void Player::UpdateOnGround()
 	//if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_SPACE)) {
 	if (GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_SPACE)) {
 		transform.position.y += 0.1f;
+		sphere.center = transform.position;
 		//speedY = JumpPower;
 		//state = sJump;
 	}
 	else if (GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_LSHIFT)) {
 		transform.position.y -= 0.1f;
+		sphere.center = transform.position;
 		//speedY = JumpPower;
 		//state = sJump;
 	}
-/*
-	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_N)) { // 攻撃ボタン
-		animator->MergePlay(aAttack1);
-		state = sAttack;
-	}
-*/
+
+
 }
 
 void Player::UpdateJump()

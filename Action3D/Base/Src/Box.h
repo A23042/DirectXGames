@@ -10,13 +10,14 @@ public:
 	void CubeSize(float x, float y, float z);
 	// 押し返すベクトルを返したいからVECTOR3
 	// 平面の衝突判定
-	VECTOR3 HitSphereToCubeplane(Player* player);
+	VECTOR3 HitSphereToCubeplane(Player::Sphere sphere);
 	// 辺の衝突判定
-	VECTOR3 HitSphereToCubeEdge(Player* player);
+	VECTOR3 HitSphereToCubeEdge(Player::Sphere sphere);
 	// 頂点の衝突判定
-	VECTOR3 HitSphereToCubeVertices(Player* player);
-	// 跳ね返りベクトルの計算
-	VECTOR3 ReflectionVec(Player* player, VECTOR3 normal);
+	VECTOR3 HitSphereToCubeVertices(Player::Sphere sphere);
+
+	// 跳ね返りベクトルの計算(仮途中)
+	VECTOR3 ReflectionVec(Player::Sphere sphere, VECTOR3 normal);
 
 private:
 	VECTOR3 normal[6];

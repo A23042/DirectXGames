@@ -66,10 +66,10 @@ PlayScene::~PlayScene()
 void PlayScene::Update()
 {
 	// Dancer‚ª‘S–Å‚µ‚½‚çTitleScene
-	std::list<Dancer*> dancers = ObjectManager::FindGameObjects<Dancer>();
-	if (dancers.size() == 0) {
+	//std::list<Dancer*> dancers = ObjectManager::FindGameObjects<Dancer>();
+	//if (dancers.size() == 0) {
 		//SceneManager::ChangeScene("TitleScene");
-	}
+	//}
 	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_R)) {
 		SceneManager::ChangeScene("ResultScene");
 	}
