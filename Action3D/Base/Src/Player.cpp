@@ -116,6 +116,7 @@ void Player::Update()
 		if (object->HitSphereToMesh(coll, &push)) {
 			//transform.position += push;
 			move = push;
+			//sphere.center = transform.position;
 		}
 	}
 #endif

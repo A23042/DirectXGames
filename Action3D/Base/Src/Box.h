@@ -20,17 +20,18 @@ public:
 	VECTOR3 ReflectionVec(Player::Sphere sphere, VECTOR3 normal);
 
 private:
-	VECTOR3 normal[6];
-	VECTOR3 ten[8];
-	VECTOR3 plane[6];
-	VECTOR3 v[12];
-	VECTOR3 edge[12];
-	VECTOR3 pt[8];
-	float d[6];
-	float distance[6];
-	VECTOR3 distanceV[12];
-	VECTOR3 vPos;
-	float Tpt[12];
+	VECTOR3 normal[6] = {};
+	VECTOR3 ten[8] = {};
+	VECTOR3 plane[6] = {};
+	VECTOR3 v[12] = {};
+	VECTOR3 edge[12] = {};
+	VECTOR3 pt[8] = {};
+	float d[6] = {};
+	float distance[6] = {};
+	VECTOR3 distanceV[12] = {};
+	VECTOR3 vPos = {};
+	float Tpt[12] = {};
 
 	VECTOR3 pushVec;
+	VECTOR3 HitPoint;
 };
