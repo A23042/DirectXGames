@@ -1,6 +1,12 @@
 ﻿  Ball.cpp
   Box.cpp
+  Camera.cpp
+  Dancer.cpp
   PlayScene.cpp
+  Player.cpp
+C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\Src\Player.cpp(232,43): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\Src\Player.cpp(232,35): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\Src\Player.cpp(232,27): warning C4305: 'argument': truncation from 'double' to 'float'
   Generating Code...
 C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\Src\Box.cpp(131,1): warning C4715: 'Box::HitSphereToCubeplane': not all control paths return a value
   project.vcxproj -> C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\project.exe

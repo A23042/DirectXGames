@@ -2,6 +2,7 @@
 #include "../Libs/Imgui/imgui.h"
 #include "Dancer.h"
 #include "Door.h"
+#include "Box.h"
 
 namespace { // このcpp以外では使えない
 	static const float Gravity = 0.025f; // 重力加速度(正の値)
@@ -13,6 +14,10 @@ namespace { // このcpp以外では使えない
 
 Player::Player()
 {
+	sphere.center = transform.position;
+	sphere.radius = 0.5f;
+	sphere.velocity = VECTOR3(0, 0, 0);
+
 	animator = new Animator(); // インスタンスを作成
 
 	mesh = new CFbxMesh();
@@ -37,8 +42,6 @@ Player::Player()
 
 	move = VECTOR3(0, 0, 0);
 
-	sphere.center = transform.position;
-	sphere.radius = 0.5f;
 }
 
 Player::~Player()
@@ -72,9 +75,15 @@ void Player::Update()
 	ImGui::InputInt("State", (int*)(&state));
 	ImGui::InputFloat("SP", &speedY);
 	ImGui::End();
-
-	transform.position += move;
+	
+	transform.position += sphere.velocity;
 	sphere.center = transform.position;
+
+	ImGui::Begin("VELOCITY");
+	ImGui::InputFloat("X", &sphere.velocity.x);
+	ImGui::InputFloat("Y", &sphere.velocity.y);
+	ImGui::InputFloat("Z", &sphere.velocity.z);
+	ImGui::End();
 
 #if 0
 	// Dancerにめり込まないようにする
@@ -114,11 +123,12 @@ void Player::Update()
 		coll.radius = 0.5f;
 		VECTOR3 push;
 		if (object->HitSphereToMesh(coll, &push)) {
-			//transform.position += push;
 			move = push;
+			//transform.position += move;
 			//sphere.center = transform.position;
 		}
 	}
+
 #endif
 
 }
@@ -146,6 +156,12 @@ SphereCollider Player::Collider()
 	return col;
 }
 
+void Player::PushVec(VECTOR3 pushVec)
+{
+	transform.position += pushVec;
+	return;
+}
+
 void Player::UpdateOnGround()
 {
 	//transform.position += move;
@@ -157,9 +173,8 @@ void Player::UpdateOnGround()
 		// 行列でやる場合
 		VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
 		MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
-		//VECTOR3 move = forward * rotY; // キャラの向いてる方への移動量
-		transform.position += forward * rotY;
-		//transform.position += move;
+		sphere.velocity = forward * rotY; // キャラの向いてる方への移動速度
+		//transform.position += forward * rotY;	//キャラの向いている方向への移動量
 		sphere.center = transform.position;
 	} else if (GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_S)) {
 		// 三角関数でやる場合
@@ -168,9 +183,8 @@ void Player::UpdateOnGround()
 		// 行列でやる場合
 		VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
 		MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
-		//VECTOR3 move = forward * rotY; // キャラの向いてる方への移動量
-		transform.position += -forward * rotY;
-		//transform.position += move;
+		sphere.velocity = -forward * rotY; // キャラの向いてる方への移動速度
+		//transform.position += -forward * rotY; // キャラの向いてる方への移動量
 		sphere.center = transform.position;
 	}
 	else {

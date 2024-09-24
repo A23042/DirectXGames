@@ -30,9 +30,9 @@ void Box::Update()
 	std::list<Player*> playeres =
 		ObjectManager::FindGameObjects<Player>();
 	for (Player* player : playeres) {
-		CubeSize(vPos.x, vPos.y, vPos.z);
-		HitSphereToCubeplane(player->sphere);
-		transform.position += pushVec;
+		CubeSize(vPos.x, vPos.y, vPos.z);		// 直方体のサイズと位置
+		HitSphereToCubeplane(player->sphere);	// 面->辺->頂点の衝突判定
+		player->PushVec(-pushVec);	// プレイヤーをめり込んだ量だけもどす
 
 		ImGui::Begin("HitPoint");
 		ImGui::InputFloat("X", &HitPoint.x);
@@ -86,7 +86,7 @@ void Box::CubeSize(float x, float y, float z)
 }
 
 // 面との衝突
-VECTOR3 Box::HitSphereToCubeplane(Player::Sphere sphere)
+VECTOR3 Box::HitSphereToCubeplane(Sphere& sphere)
 {
 	pushVec = VECTOR3(0, 0, 0);
 
@@ -131,7 +131,7 @@ VECTOR3 Box::HitSphereToCubeplane(Player::Sphere sphere)
 }
 
 // 辺との衝突
-VECTOR3 Box::HitSphereToCubeEdge(Player::Sphere sphere)
+VECTOR3 Box::HitSphereToCubeEdge(Sphere& sphere)
 {
 	int TptPoint[12] = {
 		{0}, {1}, {2}, {3},
@@ -148,10 +148,12 @@ VECTOR3 Box::HitSphereToCubeEdge(Player::Sphere sphere)
 	// 辺と球との距離計算
 	for (int i = 0; i < 12; i++) {
 		distanceV[i] = edge[i] * dot(edge[i], pt[TptPoint[i]]) / edge[i].Length() - pt[TptPoint[i]];
-		//　垂線をおろせるか
-		if (0 <= Tpt[i] && Tpt[i] <= 1) {
-			if (distanceV[i].Length() < sphere.radius) {
-				VECTOR3 vNormal = normalize(plane[pair[i][0]] + plane[pair[i][1]]) / 2;	// 辺の法線ベクトル
+		if (distanceV[i].Length() < sphere.radius) {
+			//　垂線をおろせるか
+			if (0 <= Tpt[i] && Tpt[i] <= 1) {
+				//VECTOR3 vNormal = normalize(plane[pair[i][0]] + plane[pair[i][1]]) / 2;	// 辺の法線ベクトル
+				VECTOR3 vNormal = normalize(distanceV[i]);	// 辺の法線ベクトル
+
 				HitPoint = sphere.center - vNormal * distanceV[i].Length();	// 衝突点
 				ReflectionVec(sphere, vNormal);
 				pushVec = vNormal * (sphere.radius - distanceV[i].Length());
@@ -165,7 +167,7 @@ VECTOR3 Box::HitSphereToCubeEdge(Player::Sphere sphere)
 }
 
 // 頂点との衝突
-VECTOR3 Box::HitSphereToCubeVertices(Player::Sphere sphere)
+VECTOR3 Box::HitSphereToCubeVertices(Sphere& sphere)
 {
 	for (int i = 0; i < 8; i++) {
 		if (pt[i].Length() < sphere.radius) {
@@ -180,7 +182,7 @@ VECTOR3 Box::HitSphereToCubeVertices(Player::Sphere sphere)
 
 // 反射させるための関数(未実装)
 // 当たったときの法線ベクトルを受け取り跳ね返りベクトルを計算する
-VECTOR3 Box::ReflectionVec(Player::Sphere sphere, VECTOR3 normal)
+VECTOR3 Box::ReflectionVec(Sphere& sphere, VECTOR3 normal)
 {
 	float ip = dot(sphere.velocity, normal);
 	VECTOR3 a = ip * normal * 2;

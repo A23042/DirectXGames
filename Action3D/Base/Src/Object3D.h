@@ -55,6 +55,14 @@ public:
 		return transform.scale;
 	};
 
+	// ãÖëÃópÇÃç\ë¢ëÃ
+	struct Sphere
+	{
+		VECTOR3 velocity = VECTOR3(0, 0, 0);
+		VECTOR3 center = VECTOR3(0, 0, 0);
+		float radius = 0.0f;
+	}sphere;
+
 	void SetPosition(const VECTOR3& pos);
 	void SetPosition(float x, float y, float z);
 	void SetRotation(const VECTOR3& pos);
