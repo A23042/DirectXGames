@@ -10,6 +10,7 @@ Box::Box(float x, float y, float z)
 	meshCol->MakeFromMesh(mesh);
 	
 	vPos = VECTOR3(x / 2, y / 2, z / 2);
+	transform.scale = VECTOR3(x, y, z);
 
 	ten[0] = VECTOR3(transform.position.x + vPos.x, transform.position.y + vPos.y, transform.position.z - vPos.z);
 	ten[1] = VECTOR3(transform.position.x + vPos.x, transform.position.y - vPos.y, transform.position.z - vPos.z);
@@ -64,7 +65,8 @@ void Box::CubeSize(float x, float y, float z)
 	// 辺の長さを１で作成
 	for (int i = 0; i < 12; i++) {
 		//	gpt				点　頂点パーツの左				頂点パーツの右
-		edge[i] = normalize(ten[edgePoint[i][1]] - ten[edgePoint[i][0]]);
+		//edge[i] = normalize(ten[edgePoint[i][1]] - ten[edgePoint[i][0]]);
+		edge[i] = ten[edgePoint[i][1]] - ten[edgePoint[i][0]];
 	}
 
 	int planePoit[6][3] = {
@@ -103,7 +105,7 @@ VECTOR3 Box::HitSphereToCubeplane(Sphere& sphere)
 	// 球の中心点から辺に垂線を下ろしたときに辺の範囲内にあるかどうか
 	// 1~0が範囲内
 	for (int i = 0; i < 12; i++) {
-		Tpt[i] = dot(edge[i], pt[TptPoint[i]]) / edge[i].Length();
+		Tpt[i] = dot(edge[i], pt[TptPoint[i]]) / edge[i].LengthSquare();
 	}
 
 	int pair[6][2] = {
@@ -147,7 +149,7 @@ VECTOR3 Box::HitSphereToCubeEdge(Sphere& sphere)
 
 	// 辺と球との距離計算
 	for (int i = 0; i < 12; i++) {
-		distanceV[i] = edge[i] * dot(edge[i], pt[TptPoint[i]]) / edge[i].Length() - pt[TptPoint[i]];
+		distanceV[i] = edge[i] * dot(edge[i], pt[TptPoint[i]]) / edge[i].LengthSquare() - pt[TptPoint[i]];
 		if (distanceV[i].Length() < sphere.radius) {
 			//　垂線をおろせるか
 			if (0 <= Tpt[i] && Tpt[i] <= 1) {
