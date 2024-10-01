@@ -22,8 +22,8 @@ Box::Box(float x, float y, float z, float rotX, float rotY, float rotZ)
 	pushVec = VECTOR3(0, 0, 0);
 	HitPoint = VECTOR3(0, 0, 0);
 
-	e = 0.8f;	// 反発係数	1で減衰なし
-	f = 0.9f;	// 摩擦		1で減衰なし
+	e = 0.9f;	// 反発係数	1で減衰なし
+	f = 1.0f;	// 摩擦		1で減衰なし
 }
 
 void Box::Update()
@@ -135,7 +135,7 @@ VECTOR3 Box::HitSphereToCubeplane(Sphere& sphere)
 		distance[i] = abs(dot(plane[i], sphere.center) + d[i]) / plane[i].Length();
 
 		// 衝突していたらあとの距離計算を省く
-		if (distance[i] < sphere.radius) {
+		if (distance[i] <= sphere.radius) {
 			// 無限平面に衝突していたら辺に垂線を下ろせるか
 			if (Tpt[pair[i][0]] >= 0 && Tpt[pair[i][0]] <= 1 && Tpt[pair[i][1]] >= 0 && Tpt[pair[i][1]] <= 1) {
 				HitPoint = sphere.center - plane[i] * distance[i];	// 衝突点
@@ -167,7 +167,7 @@ VECTOR3 Box::HitSphereToCubeEdge(Sphere& sphere)
 	// 辺と球との距離計算
 	for (int i = 0; i < 12; i++) {
 		distanceV[i] = edge[i] * dot(edge[i], pt[TptPoint[i]]) / edge[i].LengthSquare() - pt[TptPoint[i]];
-		if (distanceV[i].Length() < sphere.radius) {
+		if (distanceV[i].Length() <= sphere.radius) {
 			//　垂線をおろせるか
 			if (0 <= Tpt[i] && Tpt[i] <= 1) {
 				//VECTOR3 vNormal = normalize(plane[pair[i][0]] + plane[pair[i][1]]) / 2;	// 辺の法線ベクトル
@@ -203,11 +203,12 @@ VECTOR3 Box::HitSphereToCubeVertices(Sphere& sphere)
 // 当たったときの法線ベクトルを受け取り跳ね返りベクトルを計算する
 VECTOR3 Box::ReflectionVec(Sphere& sphere, VECTOR3 normal)
 {
-	VECTOR3 a = dot(sphere.velocity, normal) * normal * 2;
-	VECTOR3 b = sphere.velocity - a;
-	sphere.velocity.y = b.y * e;
-	sphere.velocity.x = b.x * f;
-	sphere.velocity.z = b.z * f;
+	// 法線方向に反発係数をかける
+	VECTOR3 refNormal = dot(sphere.velocity, normal) * normal * 2; // 二倍にしてから引くことで反転させられる
+	VECTOR3 b = sphere.velocity - refNormal;
+	b *= e;
+
+	sphere.velocity = b;
 	return VECTOR3();
 }
 
