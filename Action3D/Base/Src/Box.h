@@ -4,7 +4,7 @@
 
 class Box : public Object3D {
 public:
-	Box(float x, float y, float z);
+	Box(float x, float y, float z, float rotX, float rotY, float rotZ);
 	~Box();
 	void Update() override;
 	void CubeSize(float x, float y, float z);
@@ -34,4 +34,6 @@ private:
 
 	VECTOR3 pushVec;
 	VECTOR3 HitPoint;
+
+	XMMATRIX rotationMatrix;
 };

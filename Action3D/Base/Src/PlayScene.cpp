@@ -36,7 +36,11 @@ PlayScene::PlayScene()
 			float x = csv->GetFloat(i, 4);
 			float y = csv->GetFloat(i, 5);
 			float z = csv->GetFloat(i, 6);
-			obj = new Box(x, y, z);	// ’¼•û‘Ì‚ÌŠe•Ó‚Ì’·‚³‚ð“n‚·
+			float rotX = csv->GetFloat(i, 7);
+			float rotY = csv->GetFloat(i, 8);
+			float rotZ = csv->GetFloat(i, 9);
+
+			obj = new Box(x, y, z, rotX, rotY, rotZ);	// ’¼•û‘Ì‚ÌŠe•Ó‚Ì’·‚³‚ð“n‚·
 		}
 		else if (str == "BALL") {
 			obj = Instantiate<Ball>();

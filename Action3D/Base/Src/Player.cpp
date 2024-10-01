@@ -9,7 +9,7 @@ namespace { // このcpp以外では使えない
 	// C++の定数定義（型が付く）
 	static const float JumpPower = 0.3f;
 	static const float RotationSpeed = 3.0f; // 回転速度(度)
-	static const float MoveSpeed = 0.05f;
+	static const float MoveSpeed = 0.1f;
 };
 
 Player::Player()

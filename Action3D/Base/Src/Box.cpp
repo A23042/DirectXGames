@@ -1,8 +1,8 @@
 #include "Box.h"
 
-Box::Box(float x, float y, float z)
+Box::Box(float x, float y, float z, float rotX, float rotY, float rotZ)
 {
-	SetTag("STAGEOBJ");
+	//SetTag("STAGEOBJ");
 	mesh = new CFbxMesh();
 	mesh->Load("Data/Object/box00.mesh");
 
@@ -12,14 +12,12 @@ Box::Box(float x, float y, float z)
 	vPos = VECTOR3(x / 2, y / 2, z / 2);
 	transform.scale = VECTOR3(x, y, z);
 
-	ten[0] = VECTOR3(transform.position.x + vPos.x, transform.position.y + vPos.y, transform.position.z - vPos.z);
-	ten[1] = VECTOR3(transform.position.x + vPos.x, transform.position.y - vPos.y, transform.position.z - vPos.z);
-	ten[2] = VECTOR3(transform.position.x - vPos.x, transform.position.y - vPos.y, transform.position.z - vPos.z);
-	ten[3] = VECTOR3(transform.position.x - vPos.x, transform.position.y + vPos.y, transform.position.z - vPos.z);
-	ten[4] = VECTOR3(transform.position.x + vPos.x, transform.position.y + vPos.y, transform.position.z + vPos.z);
-	ten[5] = VECTOR3(transform.position.x + vPos.x, transform.position.y - vPos.y, transform.position.z + vPos.z);
-	ten[6] = VECTOR3(transform.position.x - vPos.x, transform.position.y - vPos.y, transform.position.z + vPos.z);
-	ten[7] = VECTOR3(transform.position.x - vPos.x, transform.position.y + vPos.y, transform.position.z + vPos.z);	
+	// 回転角をラジアンに変換し、回転行列を作成
+	transform.rotation.x += rotX / 180.0f * XM_PI;
+	transform.rotation.y += rotY / 180.0f * XM_PI;
+	transform.rotation.z += rotZ / 180.0f * XM_PI;
+
+	rotationMatrix = XMMatrixRotationRollPitchYaw(transform.rotation.x, transform.rotation.y, transform.rotation.z);
 
 	pushVec = VECTOR3(0, 0, 0);
 	HitPoint = VECTOR3(0, 0, 0);
@@ -46,15 +44,31 @@ void Box::Update()
 void Box::CubeSize(float x, float y, float z)
 {
 	// 立方体の各頂点座標
-	ten[0] = VECTOR3(transform.position.x + vPos.x, transform.position.y + vPos.y, transform.position.z - vPos.z);
-	ten[1] = VECTOR3(transform.position.x + vPos.x, transform.position.y - vPos.y, transform.position.z - vPos.z);
-	ten[2] = VECTOR3(transform.position.x - vPos.x, transform.position.y - vPos.y, transform.position.z - vPos.z);
-	ten[3] = VECTOR3(transform.position.x - vPos.x, transform.position.y + vPos.y, transform.position.z - vPos.z);
-	ten[4] = VECTOR3(transform.position.x + vPos.x, transform.position.y + vPos.y, transform.position.z + vPos.z);
-	ten[5] = VECTOR3(transform.position.x + vPos.x, transform.position.y - vPos.y, transform.position.z + vPos.z);
-	ten[6] = VECTOR3(transform.position.x - vPos.x, transform.position.y - vPos.y, transform.position.z + vPos.z);
-	ten[7] = VECTOR3(transform.position.x - vPos.x, transform.position.y + vPos.y, transform.position.z + vPos.z);
+	ten[0] = VECTOR3(vPos.x, vPos.y, -vPos.z);
+	ten[1] = VECTOR3(vPos.x, -vPos.y, -vPos.z);
+	ten[2] = VECTOR3(-vPos.x, -vPos.y, -vPos.z);
+	ten[3] = VECTOR3(-vPos.x, vPos.y, -vPos.z);
+	ten[4] = VECTOR3(vPos.x, vPos.y, vPos.z);
+	ten[5] = VECTOR3(vPos.x, -vPos.y, vPos.z);
+	ten[6] = VECTOR3(-vPos.x, -vPos.y, vPos.z);
+	ten[7] = VECTOR3(-vPos.x, vPos.y, vPos.z);
+
+	// 回転させるテスト
+	//transform.rotation.y += 1.0f / 180.0f * XM_PI;
 	
+	// 回転を顧慮する
+	rotationMatrix = XMMatrixRotationRollPitchYaw(transform.rotation.x, transform.rotation.y, transform.rotation.z);
+
+	// 各頂点に回転行列を掛ける
+	for (int i = 0; i < 8; i++) {
+		ten[i] *= rotationMatrix;
+	}
+
+	// transform.positionを各頂点に加算
+	for (int i = 0; i < 8; i++) {
+		ten[i] += transform.position;
+	}
+
 	// 各辺の頂点パーツ
 	int edgePoint[12][2] = {
 		{0, 1}, {1, 2}, {2, 3}, {3, 0},//正面：右、　下、　左、　下
