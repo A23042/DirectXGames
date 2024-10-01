@@ -8,6 +8,7 @@ Door::Door()
 
 	meshCol = new MeshCollider();
 	meshCol->MakeFromMesh(mesh);
+	transform.position;
 }
 
 Door::~Door()

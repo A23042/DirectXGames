@@ -36,4 +36,7 @@ private:
 	VECTOR3 HitPoint;
 
 	XMMATRIX rotationMatrix;
+
+	float e;	// ”½”­ŒW”
+	float f;	// –€C
 };

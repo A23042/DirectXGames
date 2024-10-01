@@ -5,19 +5,15 @@
 #include "Box.h"
 
 namespace { // このcpp以外では使えない
-	static const float Gravity = 0.025f; // 重力加速度(正の値)
+	static const float Gravity = 9.8f * 2; // 重力加速度(正の値)
 	// C++の定数定義（型が付く）
 	static const float JumpPower = 0.3f;
 	static const float RotationSpeed = 3.0f; // 回転速度(度)
-	static const float MoveSpeed = 0.1f;
+	static const float MoveSpeed = 0.8f;
 };
 
 Player::Player()
 {
-	sphere.center = transform.position;
-	sphere.radius = 0.5f;
-	sphere.velocity = VECTOR3(0, 0, 0);
-
 	animator = new Animator(); // インスタンスを作成
 
 	mesh = new CFbxMesh();
@@ -35,12 +31,12 @@ Player::Player()
 	animator->SetPlaySpeed(1.0f);
 	*/
 
-	transform.position = VECTOR3(0, 0, 0);
-	transform.rotation = VECTOR3(0, 0, 0);
 	state = sOnGround;
-	speedY = 0;
+	//speedY = 0;
 
-	move = VECTOR3(0, 0, 0);
+	sphere.center = transform.position;
+	sphere.radius = 0.5f;
+	sphere.velocity = VECTOR3(0, 0, 0);
 
 }
 
@@ -58,7 +54,11 @@ Player::~Player()
 
 void Player::Update()
 {
-	
+	sphere.velocity.y -= Gravity * SceneManager::DeltaTime();
+
+	sphere.center += sphere.velocity * SceneManager::DeltaTime();
+	transform.position = sphere.center;
+
 	//animator->Update(); // 毎フレーム、Updateを呼ぶ
 	switch (state) {
 	case sOnGround:
@@ -71,13 +71,11 @@ void Player::Update()
 		UpdateAttack();
 		break;
 	}
-	ImGui::Begin("Sample");
-	ImGui::InputInt("State", (int*)(&state));
-	ImGui::InputFloat("SP", &speedY);
+	ImGui::Begin("POSITION");
+	ImGui::InputFloat("X", &transform.position.x);
+	ImGui::InputFloat("Y", &transform.position.y);
+	ImGui::InputFloat("Z", &transform.position.z);
 	ImGui::End();
-	
-	transform.position += sphere.velocity;
-	sphere.center = transform.position;
 
 	ImGui::Begin("VELOCITY");
 	ImGui::InputFloat("X", &sphere.velocity.x);
@@ -115,8 +113,8 @@ void Player::Update()
 		}
 	}
 #endif
+#if 0
 	std::list<Object3D*> objects = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ"); // ドアのオブジェクトを見つける
-#if 1
 	for (auto object : objects) {
 		SphereCollider coll;
 		coll.center = transform.position + VECTOR3(0, 0, 0); // 自分の球を作る
@@ -157,15 +155,15 @@ SphereCollider Player::Collider()
 }
 
 void Player::PushVec(VECTOR3 pushVec)
-{
-	transform.position += pushVec;
+{	
+	sphere.center += pushVec;
+	transform.position = sphere.center;
 	return;
 }
 
 void Player::UpdateOnGround()
 {
 	//transform.position += move;
-	move = VECTOR3(0, 0, 0);
 	if (GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_W)) {
 		// 三角関数でやる場合
 //		position.z += cosf(rotation.y) * 0.1;
@@ -173,9 +171,7 @@ void Player::UpdateOnGround()
 		// 行列でやる場合
 		VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
 		MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
-		sphere.velocity = forward * rotY; // キャラの向いてる方への移動速度
-		//transform.position += forward * rotY;	//キャラの向いている方向への移動量
-		sphere.center = transform.position;
+		sphere.velocity += forward * rotY; // キャラの向いてる方への移動速度
 	} else if (GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_S)) {
 		// 三角関数でやる場合
 //		position.z -= cosf(rotation.y) * 0.1;
@@ -183,9 +179,8 @@ void Player::UpdateOnGround()
 		// 行列でやる場合
 		VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
 		MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
-		sphere.velocity = -forward * rotY; // キャラの向いてる方への移動速度
-		//transform.position += -forward * rotY; // キャラの向いてる方への移動量
-		sphere.center = transform.position;
+		sphere.velocity += -forward * rotY; // キャラの向いてる方への移動速度
+
 	}
 	else {
 		animator->MergePlay(aIdle);
@@ -198,16 +193,18 @@ void Player::UpdateOnGround()
 	}
 	//if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_SPACE)) {
 	if (GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_SPACE)) {
-		transform.position.y += 0.1f;
-		sphere.center = transform.position;
+		//transform.position.y += 0.1f;
+		//sphere.center = transform.position;
 		//speedY = JumpPower;
-		//state = sJump;
+		state = sJump;
+		//sphere.velocity.y += 15.0f * SceneManager::DeltaTime();
 	}
 	else if (GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_LSHIFT)) {
-		transform.position.y -= 0.1f;
-		sphere.center = transform.position;
+		//transform.position.y -= 0.1f;
+		//sphere.center = transform.position;
 		//speedY = JumpPower;
 		//state = sJump;
+		sphere.velocity.y -= 10.0f * SceneManager::DeltaTime();
 	}
 
 
@@ -215,13 +212,8 @@ void Player::UpdateOnGround()
 
 void Player::UpdateJump()
 {
-	transform.position.y += speedY;
-	speedY -= Gravity;
-	if (transform.position.y <= 0) {
-		// ジャンプ終了
-		transform.position.y = 0;
-		state = sOnGround;
-	}
+	sphere.velocity.y = 3.0f;
+	state = sOnGround();
 }
 
 void Player::UpdateAttack()

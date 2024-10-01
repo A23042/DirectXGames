@@ -21,6 +21,9 @@ Box::Box(float x, float y, float z, float rotX, float rotY, float rotZ)
 
 	pushVec = VECTOR3(0, 0, 0);
 	HitPoint = VECTOR3(0, 0, 0);
+
+	e = 0.8f;	// 反発係数	1で減衰なし
+	f = 0.9f;	// 摩擦		1で減衰なし
 }
 
 void Box::Update()
@@ -33,11 +36,11 @@ void Box::Update()
 		HitSphereToCubeplane(player->sphere);	// 面->辺->頂点の衝突判定
 		player->PushVec(-pushVec);	// プレイヤーをめり込んだ量だけもどす
 
-		ImGui::Begin("HitPoint");
+		/*ImGui::Begin("HitPoint");
 		ImGui::InputFloat("X", &HitPoint.x);
 		ImGui::InputFloat("Y", &HitPoint.y);
 		ImGui::InputFloat("Z", &HitPoint.z);
-		ImGui::End();
+		ImGui::End();*/
 	}
 }
 
@@ -196,14 +199,15 @@ VECTOR3 Box::HitSphereToCubeVertices(Sphere& sphere)
 	return VECTOR3();
 }
 
-// 反射させるための関数(未実装)
+// 反射させるための関数
 // 当たったときの法線ベクトルを受け取り跳ね返りベクトルを計算する
 VECTOR3 Box::ReflectionVec(Sphere& sphere, VECTOR3 normal)
 {
-	float ip = dot(sphere.velocity, normal);
-	VECTOR3 a = ip * normal * 2;
+	VECTOR3 a = dot(sphere.velocity, normal) * normal * 2;
 	VECTOR3 b = sphere.velocity - a;
-	sphere.velocity = b;
+	sphere.velocity.y = b.y * e;
+	sphere.velocity.x = b.x * f;
+	sphere.velocity.z = b.z * f;
 	return VECTOR3();
 }
 

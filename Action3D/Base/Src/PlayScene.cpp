@@ -20,7 +20,9 @@ PlayScene::PlayScene()
 	for (int i = 1; i < csv->GetLines(); i++) { // ‚Ps‚¸‚Â“Ç‚Þ
 		std::string str = csv->GetString(i, 0); // PLAYER‚ª“ü‚é
 		Object3D* obj = nullptr;
-		if (str == "PLAYER") {
+		if (str == "#") {
+			continue;
+		}else if (str == "PLAYER") {
 			obj = Instantiate<Player>();
 		}
 		else if (str == "GROUND") {
@@ -52,6 +54,7 @@ PlayScene::PlayScene()
 		float y = csv->GetFloat(i, 2);
 		float z = csv->GetFloat(i, 3);
 		obj->SetPosition(x, y, z);
+		obj->Position();
 	}
 	Instantiate<Camera>();
 	Score* sc = ObjectManager::FindGameObject<Score>();

@@ -1,8 +1,8 @@
 #include "Camera.h"
 #include "Player.h"
 //                                      後方視点　　　　　　真上視点
-static const VECTOR3 CameraPos[] = { VECTOR3(0, 2, -5), VECTOR3(0, 10, -0.5) };
-static const VECTOR3 LookPos[] =   { VECTOR3(0, 1,  5), VECTOR3(0,  1,  1  ) };
+static const VECTOR3 CameraPos[] = { VECTOR3(0, 1, -8), VECTOR3(0, 10, -0.5) };
+static const VECTOR3 LookPos[] =   { VECTOR3(0, 0,  5), VECTOR3(0,  1,  1  ) };
 static const float CHANGE_TIME_LIMIT = 0.5f; // 秒
 
 Camera::Camera()
@@ -35,7 +35,7 @@ void Camera::Update()
 	Player* player = ObjectManager::FindGameObject<Player>();
 	MATRIX4X4 rotY = XMMatrixRotationY(player->Rotation().y);
 	MATRIX4X4 trans = XMMatrixTranslation(
-		player->Position().x, 0.0f, player->Position().z);
+		player->Position().x, player->Position().y / 7.0f + 0.0f, player->Position().z);
 	MATRIX4X4 m = rotY * trans;
 	// プレイヤーが回転・移動してない時のカメラ位置に
 	// プレイヤーの回転・移動行列を掛けると、
@@ -60,7 +60,7 @@ void Camera::Update()
 	camVec = XMVector3Normalize(camVec) * (camVec.Length() + 0.2f);
 	end = start + camVec;
 
-	std::list<Object3D*> grounds = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ");
+	std::list<Object3D*> grounds = ObjectManager::FindGameObjects<Object3D>();
 	for (Object3D* g : grounds)
 	{
 		VECTOR3 hit;

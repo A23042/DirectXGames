@@ -3,12 +3,11 @@
 
 Ball::Ball()
 {
-	SetTag("STAGEOBJ");
+	//SetTag("STAGEOBJ");
 	mesh = new CFbxMesh();
 	mesh->Load("Data/Object/ball01.mesh");
 
-	meshCol = new MeshCollider();
-	meshCol->MakeFromMesh(mesh);
+	
 }
 
 Ball::~Ball()
@@ -27,5 +26,12 @@ void Ball::Update()
 		VECTOR3 boxCenter = boxes->Position();
 		
 	}
+}
+
+void Ball::PushVec(VECTOR3 pushVec)
+{
+	sphere.center += pushVec;
+	transform.position = sphere.center;
+	return;
 }
 

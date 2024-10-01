@@ -34,7 +34,6 @@ private:
 	void UpdateOnGround();
 	void UpdateJump();
 	void UpdateAttack();
-	VECTOR3 move;
 	int frame; // アニメーションのフレームを数える
 
 };

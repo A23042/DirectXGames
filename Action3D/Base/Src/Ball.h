@@ -6,4 +6,5 @@ public:
 	Ball();
 	~Ball();
 	void Update() override;
+	void PushVec(VECTOR3 pushVec);
 };
