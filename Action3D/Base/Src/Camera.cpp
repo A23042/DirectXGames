@@ -35,7 +35,7 @@ void Camera::Update()
 	Player* player = ObjectManager::FindGameObject<Player>();
 	MATRIX4X4 rotY = XMMatrixRotationY(player->Rotation().y);
 	MATRIX4X4 trans = XMMatrixTranslation(
-		player->Position().x, player->Position().y / 7.0f + 0.0f, player->Position().z);
+		player->Position().x, player->Position().y / 2.0f + 0.0f, player->Position().z);
 	MATRIX4X4 m = rotY * trans;
 	// プレイヤーが回転・移動してない時のカメラ位置に
 	// プレイヤーの回転・移動行列を掛けると、
@@ -53,7 +53,7 @@ void Camera::Update()
 		lookPosition = look * m;
 	}
 	// カメラが壁にめり込まないようにする
-	VECTOR3 start = player->Position() + VECTOR3(0, 1.5f, 0);
+	VECTOR3 start = player->Position() + VECTOR3(0, 0, 0);
 	VECTOR3 end = transform.position;
 	// startからendに向かうベクトルを作り、長さに0.2を加える
 	VECTOR3 camVec = end - start;
