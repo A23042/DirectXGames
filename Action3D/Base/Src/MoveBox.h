@@ -1,0 +1,21 @@
+#pragma once
+#include "Box.h"
+
+class MoveBox : public Box {
+public:
+	//MoveBox(float x, float y, float z, float rotX, float rotY, float rotZ);
+	MoveBox(VECTOR3 size = VECTOR3(0, 0, 0), VECTOR3 rot = VECTOR3(0, 0, 0), VECTOR3 move = VECTOR3(0,0,0));
+	~MoveBox();
+	void Update() override;
+private:
+	VECTOR3 vPos;
+	VECTOR3 pushVec;
+	VECTOR3 refVec;
+
+	XMMATRIX rotationMatrix;
+
+	float e;	// îΩî≠åWêî
+	float f;	// ñÄéC
+
+	VECTOR3 moveMax, moveMin;	// à⁄ìÆêßå¿
+};

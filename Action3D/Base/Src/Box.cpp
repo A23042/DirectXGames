@@ -1,6 +1,6 @@
 #include "Box.h"
 
-Box::Box(float x, float y, float z, float rotX, float rotY, float rotZ)
+Box::Box(VECTOR3 size, VECTOR3 rot)
 {
 	//SetTag("STAGEOBJ");
 	mesh = new CFbxMesh();
@@ -9,21 +9,21 @@ Box::Box(float x, float y, float z, float rotX, float rotY, float rotZ)
 	meshCol = new MeshCollider();
 	meshCol->MakeFromMesh(mesh);
 	
-	vPos = VECTOR3(x / 2, y / 2, z / 2);
-	transform.scale = VECTOR3(x, y, z);
+	vPos = VECTOR3(size.x / 2, size.y / 2, size.z / 2);
+	transform.scale = size;
 
 	// 回転角をラジアンに変換し、回転行列を作成
-	transform.rotation.x += rotX / 180.0f * XM_PI;
-	transform.rotation.y += rotY / 180.0f * XM_PI;
-	transform.rotation.z += rotZ / 180.0f * XM_PI;
+	transform.rotation.x += rot.x / 180.0f * XM_PI;
+	transform.rotation.y += rot.y / 180.0f * XM_PI;
+	transform.rotation.z += rot.z / 180.0f * XM_PI;
 
 	rotationMatrix = XMMatrixRotationRollPitchYaw(transform.rotation.x, transform.rotation.y, transform.rotation.z);
 
 	pushVec = VECTOR3(0, 0, 0);
 	HitPoint = VECTOR3(0, 0, 0);
 
-	e = 0.9f;	// 反発係数	1で減衰なし
-	f = 0.9f;	// 摩擦		1で減衰なし
+	e = 1.0f;	// 反発係数	1で減衰なし
+	f = 1.0f;	// 摩擦		1で減衰なし
 	refVec = VECTOR3(0, 0, 0);
 }
 
@@ -34,7 +34,7 @@ void Box::Update()
 	for (Player* player : playeres) {
 		refVec = VECTOR3(0, 0, 0);
 		CubeSize(vPos.x, vPos.y, vPos.z);		// 直方体のサイズと位置
-		HitSphereToCubeplane(player->sphere);	// 面->辺->頂点の衝突判定
+		pushVec = HitSphereToCubeplane(player->sphere, refVec);	// 面->辺->頂点の衝突判定
 		player->PushVec(-pushVec, refVec);	// プレイヤーをめり込んだ量だけもどす
 
 		/*ImGui::Begin("HitPoint");
@@ -48,14 +48,14 @@ void Box::Update()
 void Box::CubeSize(float x, float y, float z)
 {
 	// 立方体の各頂点座標
-	ten[0] = VECTOR3(vPos.x, vPos.y, -vPos.z);
-	ten[1] = VECTOR3(vPos.x, -vPos.y, -vPos.z);
-	ten[2] = VECTOR3(-vPos.x, -vPos.y, -vPos.z);
-	ten[3] = VECTOR3(-vPos.x, vPos.y, -vPos.z);
-	ten[4] = VECTOR3(vPos.x, vPos.y, vPos.z);
-	ten[5] = VECTOR3(vPos.x, -vPos.y, vPos.z);
-	ten[6] = VECTOR3(-vPos.x, -vPos.y, vPos.z);
-	ten[7] = VECTOR3(-vPos.x, vPos.y, vPos.z);
+	ten[0] = VECTOR3(x, y, -z);
+	ten[1] = VECTOR3(x, -y, -z);
+	ten[2] = VECTOR3(-x, -y, -z);
+	ten[3] = VECTOR3(-x, y, -z);
+	ten[4] = VECTOR3(x, y, z);
+	ten[5] = VECTOR3(x, -y, z);
+	ten[6] = VECTOR3(-x, -y, z);
+	ten[7] = VECTOR3(-x, y, z);
 
 	// 回転させるテスト
 	//transform.rotation.y += 1.0f / 180.0f * XM_PI;
@@ -106,7 +106,7 @@ void Box::CubeSize(float x, float y, float z)
 }
 
 // 面との衝突
-VECTOR3 Box::HitSphereToCubeplane(Sphere& sphere)
+VECTOR3 Box::HitSphereToCubeplane(Sphere& sphere, VECTOR3 &refVec)
 {
 	pushVec = VECTOR3(0, 0, 0);
 
@@ -140,18 +140,18 @@ VECTOR3 Box::HitSphereToCubeplane(Sphere& sphere)
 			// 無限平面に衝突していたら辺に垂線を下ろせるか
 			if (Tpt[pair[i][0]] >= 0 && Tpt[pair[i][0]] <= 1 && Tpt[pair[i][1]] >= 0 && Tpt[pair[i][1]] <= 1) {
 				HitPoint = sphere.center - plane[i] * distance[i];	// 衝突点
-				ReflectionVec(sphere, plane[i]);	// 球体を反射させる
+				refVec = ReflectionVec(sphere, plane[i]);	// 球体を反射させる
 				pushVec = plane[i] * (sphere.radius - distance[i]);	// めり込みを解除するための計算
 				return pushVec;
 			}
 		}
 	}
 
-	HitSphereToCubeEdge(sphere);
+	HitSphereToCubeEdge(sphere, refVec);
 }
 
 // 辺との衝突
-VECTOR3 Box::HitSphereToCubeEdge(Sphere& sphere)
+VECTOR3 Box::HitSphereToCubeEdge(Sphere& sphere, VECTOR3& refVec)
 {
 	int TptPoint[12] = {
 		{0}, {1}, {2}, {3},
@@ -175,23 +175,23 @@ VECTOR3 Box::HitSphereToCubeEdge(Sphere& sphere)
 				VECTOR3 vNormal = normalize(distanceV[i]);	// 辺の法線ベクトル
 
 				HitPoint = sphere.center - vNormal * distanceV[i].Length();	// 衝突点
-				ReflectionVec(sphere, vNormal);
+				refVec = ReflectionVec(sphere, vNormal);
 				pushVec = vNormal * (sphere.radius - distanceV[i].Length());
 				return pushVec;
 			}
 		}
 	}
 	
-	HitSphereToCubeVertices(sphere);
+	HitSphereToCubeVertices(sphere, refVec);
 	return VECTOR3();
 }
 
 // 頂点との衝突
-VECTOR3 Box::HitSphereToCubeVertices(Sphere& sphere)
+VECTOR3 Box::HitSphereToCubeVertices(Sphere& sphere, VECTOR3& refVec)
 {
 	for (int i = 0; i < 8; i++) {
 		if (pt[i].Length() < sphere.radius) {
-			ReflectionVec(sphere, normalize(pt[i]));
+			refVec = ReflectionVec(sphere, normalize(pt[i]));
 			pushVec = normalize(ten[i] - sphere.center) * (sphere.radius - pt[i].Length());
 			return pushVec;
 		}
@@ -213,8 +213,7 @@ VECTOR3 Box::ReflectionVec(Sphere& sphere, VECTOR3 normal)
 	// 埋め込みを解除->反射	〇
 	// 反射->埋め込み解除		×
 	//sphere.velocity = b;
-	refVec = b;
-	return VECTOR3(refVec);
+	return VECTOR3(b);
 }
 
 Box::~Box()

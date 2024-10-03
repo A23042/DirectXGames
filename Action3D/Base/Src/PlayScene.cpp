@@ -11,6 +11,7 @@
 #include "ScoreDraw.h"
 #include "Box.h"
 #include "Ball.h"
+#include "MoveBox.h"
 
 PlayScene::PlayScene()
 {
@@ -35,14 +36,30 @@ PlayScene::PlayScene()
 		//	obj = Instantiate<Dancer>();
 		//}
 		else if (str == "BOX") {
-			float x = csv->GetFloat(i, 4);
+			//float x = csv->GetFloat(i, 4);
+			//float y = csv->GetFloat(i, 5);
+			//float z = csv->GetFloat(i, 6);
+			//float rotX = csv->GetFloat(i, 7);
+			//float rotY = csv->GetFloat(i, 8);
+			//float rotZ = csv->GetFloat(i, 9);
+			VECTOR3 size = VECTOR3(csv->GetFloat(i, 4), csv->GetFloat(i, 5), csv->GetFloat(i, 6));
+			VECTOR3 rot = VECTOR3(csv->GetFloat(i, 7), csv->GetFloat(i, 8), csv->GetFloat(i, 9));
+			obj = new Box(size, rot);	// ’¼•û‘Ì‚ÌŠe•Ó‚Ì’·‚³‚Æ‰ñ“]—Ê‚ğ“n‚·
+		}
+		else if (str == "MBox") {
+			/*float x = csv->GetFloat(i, 4);
 			float y = csv->GetFloat(i, 5);
 			float z = csv->GetFloat(i, 6);
 			float rotX = csv->GetFloat(i, 7);
 			float rotY = csv->GetFloat(i, 8);
 			float rotZ = csv->GetFloat(i, 9);
-
-			obj = new Box(x, y, z, rotX, rotY, rotZ);	// ’¼•û‘Ì‚ÌŠe•Ó‚Ì’·‚³‚ğ“n‚·
+			float moveX = csv->GetFloat(i, 10);
+			float moveX = csv->GetFloat(i, 11);
+			float moveX = csv->GetFloat(i, 12);*/
+			VECTOR3 size = VECTOR3(csv->GetFloat(i, 4), csv->GetFloat(i, 6), csv->GetFloat(i, 6));
+			VECTOR3 rot = VECTOR3(csv->GetFloat(i, 7), csv->GetFloat(i, 8), csv->GetFloat(i, 9));
+			VECTOR3 move = VECTOR3(csv->GetFloat(i, 10), csv->GetFloat(i, 11), csv->GetFloat(i, 12));
+			obj = new MoveBox(size, rot, move);	// ’¼•û‘Ì‚ÌŠe•Ó‚Ì’·‚³‚Æ‰ñ“]—ÊAˆÚ“®—Ê‚ğ“n‚·
 		}
 		else if (str == "BALL") {
 			obj = Instantiate<Ball>();

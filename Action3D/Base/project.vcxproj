@@ -305,6 +305,7 @@
     <ClInclude Include="Src\MeshCollider.h" />
     <ClInclude Include="Src\MyImgui.h" />
     <ClInclude Include="Src\MyMath.h" />
+    <ClInclude Include="Src\MoveBox.h" />
     <ClInclude Include="Src\Object3D.h" />
     <ClInclude Include="Src\ObjectManager.h" />
     <ClInclude Include="Src\Player.h" />
@@ -350,6 +351,7 @@
     <ClCompile Include="Src\MeshCollider.cpp" />
     <ClCompile Include="Src\MyImgui.cpp" />
     <ClCompile Include="Src\MyMath.cpp" />
+    <ClCompile Include="Src\MoveBox.cpp" />
     <ClCompile Include="SRC\OBJECT3D.CPP" />
     <ClCompile Include="Src\ObjectManager.cpp" />
     <ClCompile Include="Src\Player.cpp" />
