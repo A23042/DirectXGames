@@ -37,7 +37,6 @@ Player::Player()
 	sphere.center = transform.position;
 	sphere.radius = 0.5f;
 	sphere.velocity = VECTOR3(0, 0, 0);
-
 }
 
 Player::~Player()
@@ -154,10 +153,13 @@ SphereCollider Player::Collider()
 	return col;
 }
 
-void Player::PushVec(VECTOR3 pushVec)
+void Player::PushVec(VECTOR3 pushVec, VECTOR3 RefVec)
 {	
 	sphere.center += pushVec;
 	transform.position = sphere.center;
+	if (RefVec.Length() > 0) {
+		sphere.velocity = RefVec;
+	}
 	return;
 }
 

@@ -1,65 +1,65 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\",
+  "WorkspaceRootPath": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Box.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Box.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|solutionrelative:Src\\Box.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Camera.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|solutionrelative:Src\\Camera.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Player.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|solutionrelative:Src\\Player.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Box.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Box.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|solutionrelative:Src\\Box.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Player.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Player.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|solutionrelative:Src\\Player.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Ball.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|solutionrelative:Src\\Ball.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Player.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|solutionrelative:Src\\Player.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Ball.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|solutionrelative:Src\\Ball.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Camera.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|solutionrelative:Src\\Camera.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\PlayScene.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\PlayScene.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|solutionrelative:Src\\PlayScene.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Door.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|solutionrelative:Src\\Door.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\PlayScene.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\PlayScene.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|solutionrelative:Src\\PlayScene.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Dancer.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Ball.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|solutionrelative:Src\\Ball.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Ball.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|solutionrelative:Src\\Ball.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Door.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|solutionrelative:Src\\Door.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Dancer.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|solutionrelative:Src\\Dancer.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Object3D.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Object3D.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|solutionrelative:Src\\Object3D.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\FbxMesh.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\FbxMesh.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|solutionrelative:Src\\FbxMesh.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Dancer.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Dancer.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|solutionrelative:Src\\Dancer.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Door.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Door.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{C277B78C-CCEF-4617-A5A8-77FA17C26BBB}|project.vcxproj|solutionrelative:Src\\Door.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
@@ -74,26 +74,27 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 1,
               "Title": "Box.h",
-              "DocumentMoniker": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Box.h",
+              "DocumentMoniker": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Box.h",
               "RelativeDocumentMoniker": "Src\\Box.h",
-              "ToolTip": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Box.h",
+              "ToolTip": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Box.h",
               "RelativeToolTip": "Src\\Box.h",
-              "ViewState": "AQIAAAYAAAAAAAAAAAAAACgAAAAPAAAA",
+              "ViewState": "AQIAACEAAAAAAAAAAAAAACoAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2024-07-10T12:48:32.479Z",
-              "IsPinned": true
+              "IsPinned": true,
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Box.cpp",
-              "DocumentMoniker": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Box.cpp",
+              "DocumentMoniker": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Box.cpp",
               "RelativeDocumentMoniker": "Src\\Box.cpp",
-              "ToolTip": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Box.cpp",
+              "ToolTip": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Box.cpp",
               "RelativeToolTip": "Src\\Box.cpp",
-              "ViewState": "AQIAALwAAAAAAAAAAAAAANAAAAAIAAAA",
+              "ViewState": "AQIAAA8AAAAAAAAAAAAAANMAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2024-07-10T12:48:31.358Z",
               "IsPinned": true,
@@ -101,50 +102,51 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "Player.h",
-              "DocumentMoniker": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Player.h",
+              "DocumentMoniker": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Player.h",
               "RelativeDocumentMoniker": "Src\\Player.h",
-              "ToolTip": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Player.h",
+              "ToolTip": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Player.h",
               "RelativeToolTip": "Src\\Player.h",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA4AAAAfAAAA",
+              "ViewState": "AQIAAAMAAAAAAAAAAAAAAA4AAAAtAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2024-07-10T12:47:10.048Z",
-              "IsPinned": true
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Player.cpp",
+              "DocumentMoniker": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Player.cpp",
+              "RelativeDocumentMoniker": "Src\\Player.cpp",
+              "ToolTip": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Player.cpp",
+              "RelativeToolTip": "Src\\Player.cpp",
+              "ViewState": "AQIAAEEAAAAAAAAAAIAwwEwAAAALAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-08-30T04:23:32.308Z",
+              "IsPinned": true,
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "Player.cpp",
-              "DocumentMoniker": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Player.cpp",
-              "RelativeDocumentMoniker": "Src\\Player.cpp",
-              "ToolTip": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Player.cpp",
-              "RelativeToolTip": "Src\\Player.cpp",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAcAAAAmAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2024-08-30T04:23:32.308Z",
-              "IsPinned": true
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
               "Title": "Camera.cpp",
-              "DocumentMoniker": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Camera.cpp",
+              "DocumentMoniker": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Camera.cpp",
               "RelativeDocumentMoniker": "Src\\Camera.cpp",
-              "ToolTip": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Camera.cpp",
+              "ToolTip": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Camera.cpp",
               "RelativeToolTip": "Src\\Camera.cpp",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA0AAAAAAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAACUAAAAwAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2024-10-01T09:59:47.021Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-10-01T09:59:47.021Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 11,
               "Title": "Object3D.h",
-              "DocumentMoniker": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Object3D.h",
+              "DocumentMoniker": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Object3D.h",
               "RelativeDocumentMoniker": "Src\\Object3D.h",
-              "ToolTip": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Object3D.h",
+              "ToolTip": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Object3D.h",
               "RelativeToolTip": "Src\\Object3D.h",
               "ViewState": "AQIAACYAAAAAAAAAAAAAAD8AAAAJAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
@@ -154,9 +156,9 @@
               "$type": "Document",
               "DocumentIndex": 12,
               "Title": "FbxMesh.h",
-              "DocumentMoniker": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\FbxMesh.h",
+              "DocumentMoniker": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\FbxMesh.h",
               "RelativeDocumentMoniker": "Src\\FbxMesh.h",
-              "ToolTip": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\FbxMesh.h",
+              "ToolTip": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\FbxMesh.h",
               "RelativeToolTip": "Src\\FbxMesh.h",
               "ViewState": "AQIAAFMAAAAAAAAAAAAhwGgAAAABAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
@@ -166,9 +168,9 @@
               "$type": "Document",
               "DocumentIndex": 14,
               "Title": "Door.h",
-              "DocumentMoniker": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Door.h",
+              "DocumentMoniker": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Door.h",
               "RelativeDocumentMoniker": "Src\\Door.h",
-              "ToolTip": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Door.h",
+              "ToolTip": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Door.h",
               "RelativeToolTip": "Src\\Door.h",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAYAAAAJAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
@@ -176,11 +178,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "Door.cpp",
-              "DocumentMoniker": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Door.cpp",
+              "DocumentMoniker": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Door.cpp",
               "RelativeDocumentMoniker": "Src\\Door.cpp",
-              "ToolTip": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Door.cpp",
+              "ToolTip": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Door.cpp",
               "RelativeToolTip": "Src\\Door.cpp",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAQAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
@@ -190,9 +192,9 @@
               "$type": "Document",
               "DocumentIndex": 13,
               "Title": "Dancer.h",
-              "DocumentMoniker": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Dancer.h",
+              "DocumentMoniker": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Dancer.h",
               "RelativeDocumentMoniker": "Src\\Dancer.h",
-              "ToolTip": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Dancer.h",
+              "ToolTip": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Dancer.h",
               "RelativeToolTip": "Src\\Dancer.h",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
@@ -202,9 +204,9 @@
               "$type": "Document",
               "DocumentIndex": 10,
               "Title": "Dancer.cpp",
-              "DocumentMoniker": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Dancer.cpp",
+              "DocumentMoniker": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Dancer.cpp",
               "RelativeDocumentMoniker": "Src\\Dancer.cpp",
-              "ToolTip": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Dancer.cpp",
+              "ToolTip": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Dancer.cpp",
               "RelativeToolTip": "Src\\Dancer.cpp",
               "ViewState": "AQIAABUAAAAAAAAAAAAAADUAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
@@ -212,11 +214,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 8,
               "Title": "Ball.h",
-              "DocumentMoniker": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Ball.h",
+              "DocumentMoniker": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Ball.h",
               "RelativeDocumentMoniker": "Src\\Ball.h",
-              "ToolTip": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Ball.h",
+              "ToolTip": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Ball.h",
               "RelativeToolTip": "Src\\Ball.h",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAgAAAAfAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
@@ -224,11 +226,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 6,
               "Title": "PlayScene.h",
-              "DocumentMoniker": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\PlayScene.h",
+              "DocumentMoniker": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\PlayScene.h",
               "RelativeDocumentMoniker": "Src\\PlayScene.h",
-              "ToolTip": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\PlayScene.h",
+              "ToolTip": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\PlayScene.h",
               "RelativeToolTip": "Src\\PlayScene.h",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
@@ -236,23 +238,23 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 5,
               "Title": "PlayScene.cpp",
-              "DocumentMoniker": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\PlayScene.cpp",
+              "DocumentMoniker": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\PlayScene.cpp",
               "RelativeDocumentMoniker": "Src\\PlayScene.cpp",
-              "ToolTip": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\PlayScene.cpp",
+              "ToolTip": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\PlayScene.cpp",
               "RelativeToolTip": "Src\\PlayScene.cpp",
-              "ViewState": "AQIAAAkAAAAAAAAAAAAQwBcAAAAMAAAA",
+              "ViewState": "AQIAABYAAAAAAAAAAAAUwCUAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2024-07-10T12:46:51.699Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 7,
               "Title": "Ball.cpp",
-              "DocumentMoniker": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Ball.cpp",
+              "DocumentMoniker": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Ball.cpp",
               "RelativeDocumentMoniker": "Src\\Ball.cpp",
-              "ToolTip": "C:\\Users\\matsu\\Documents\\A23042\\DirectXGameRepo\\Action3D\\Base\\Src\\Ball.cpp",
+              "ToolTip": "C:\\Users\\A23042\\Documents\\A23042\\DrirectXGameD\\Action3D\\Base\\Src\\Ball.cpp",
               "RelativeToolTip": "Src\\Ball.cpp",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAB4AAAAJAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",

@@ -23,18 +23,19 @@ Box::Box(float x, float y, float z, float rotX, float rotY, float rotZ)
 	HitPoint = VECTOR3(0, 0, 0);
 
 	e = 0.9f;	// ”½”­ŒW”	1‚ÅŒ¸Š‚È‚µ
-	f = 1.0f;	// –€C		1‚ÅŒ¸Š‚È‚µ
+	f = 0.9f;	// –€C		1‚ÅŒ¸Š‚È‚µ
+	refVec = VECTOR3(0, 0, 0);
 }
 
 void Box::Update()
 {
-
 	std::list<Player*> playeres =
 		ObjectManager::FindGameObjects<Player>();
 	for (Player* player : playeres) {
+		refVec = VECTOR3(0, 0, 0);
 		CubeSize(vPos.x, vPos.y, vPos.z);		// ’¼•û‘Ì‚ÌƒTƒCƒY‚ÆˆÊ’u
 		HitSphereToCubeplane(player->sphere);	// –Ê->•Ó->’¸“_‚ÌÕ“Ë”»’è
-		player->PushVec(-pushVec);	// ƒvƒŒƒCƒ„[‚ğ‚ß‚è‚ñ‚¾—Ê‚¾‚¯‚à‚Ç‚·
+		player->PushVec(-pushVec, refVec);	// ƒvƒŒƒCƒ„[‚ğ‚ß‚è‚ñ‚¾—Ê‚¾‚¯‚à‚Ç‚·
 
 		/*ImGui::Begin("HitPoint");
 		ImGui::InputFloat("X", &HitPoint.x);
@@ -204,12 +205,16 @@ VECTOR3 Box::HitSphereToCubeVertices(Sphere& sphere)
 VECTOR3 Box::ReflectionVec(Sphere& sphere, VECTOR3 normal)
 {
 	// –@ü•ûŒü‚É”½”­ŒW”‚ğ‚©‚¯‚é
-	VECTOR3 refNormal = dot(sphere.velocity, normal) * normal * 2; // “ñ”{‚É‚µ‚Ä‚©‚çˆø‚­‚±‚Æ‚Å”½“]‚³‚¹‚ç‚ê‚é
-	VECTOR3 b = sphere.velocity - refNormal;
-	b *= e;
-
-	sphere.velocity = b;
-	return VECTOR3();
+	VECTOR3 refNormal = dot(sphere.velocity, normal) * normal ; // “ñ”{‚É‚µ‚Ä‚©‚çˆø‚­‚±‚Æ‚Å”½“]‚³‚¹‚ç‚ê‚é
+	//VECTOR3 b = sphere.velocity - refNormal;
+	VECTOR3 refSessen = sphere.velocity - refNormal;
+	VECTOR3 b = -refNormal * e + refSessen * f;
+	// ‡”Ô‚ÌC³
+	// –„‚ß‚İ‚ğ‰ğœ->”½Ë	Z
+	// ”½Ë->–„‚ß‚İ‰ğœ		~
+	//sphere.velocity = b;
+	refVec = b;
+	return VECTOR3(refVec);
 }
 
 Box::~Box()

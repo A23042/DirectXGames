@@ -1,3 +1,11 @@
-﻿  Box.cpp
-C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\Src\Box.cpp(150,1): warning C4715: 'Box::HitSphereToCubeplane': not all control paths return a value
-  project.vcxproj -> C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\project.exe
+﻿  Ball.cpp
+  Box.cpp
+  PlayScene.cpp
+  Player.cpp
+C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\Src\Player.cpp(218,10): warning C4353: nonstandard extension used: constant 0 as function expression.  Use '__noop' function intrinsic instead
+C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\Src\Player.cpp(226,43): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\Src\Player.cpp(226,35): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\Src\Player.cpp(226,27): warning C4305: 'argument': truncation from 'double' to 'float'
+  Generating Code...
+C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\Src\Box.cpp(151,1): warning C4715: 'Box::HitSphereToCubeplane': not all control paths return a value
+  project.vcxproj -> C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\project.exe

@@ -12,7 +12,7 @@ public:
 
 	SphereCollider Collider() override;
 	
-	void PushVec(VECTOR3 pushVec);
+	void PushVec(VECTOR3 pushVec, VECTOR3 RefVec);
 private:
 	float speedY; // Y‚Ì‘¬“x
 

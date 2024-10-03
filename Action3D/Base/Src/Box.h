@@ -39,4 +39,5 @@ private:
 
 	float e;	// ”½”­ŒW”
 	float f;	// –€C
+	VECTOR3 refVec;
 };
