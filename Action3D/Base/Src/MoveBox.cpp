@@ -1,7 +1,7 @@
 #include "MoveBox.h"
 #include "Player.h"
 
-MoveBox::MoveBox(VECTOR3 size, VECTOR3 rot, VECTOR3 move)
+MoveBox::MoveBox(VECTOR3 size, VECTOR3 rot, VECTOR3 move, VECTOR3 moveSpeed)
 {
 	mesh = new CFbxMesh();
 	mesh->Load("Data/Object/box00.mesh");
@@ -14,6 +14,8 @@ MoveBox::MoveBox(VECTOR3 size, VECTOR3 rot, VECTOR3 move)
 	transform.rotation.y += rot.y / 180.0f * XM_PI;
 	transform.rotation.z += rot.z / 180.0f * XM_PI;
 	rotationMatrix = XMMatrixRotationRollPitchYaw(transform.rotation.x, transform.rotation.y, transform.rotation.z);
+
+	this->move = moveSpeed;
 
 	moveMax = transform.position + move;
 	moveMin = transform.position - move;
@@ -31,7 +33,15 @@ MoveBox::~MoveBox()
 
 void MoveBox::Update()
 {
+	transform.position += move;
 	// ‚±‚±‚ÅXYZ‚²‚Æ§ŒÀ‚Ü‚Å“®‚©‚·
+	if (transform.position.x >= moveMax.x) {
+		move.x *= -1;
+	}
+	else if(transform.position.x <= moveMin.x){
+		move.x *= -1;
+	}
+
 #if 1
 	std::list<Player*> playeres =
 		ObjectManager::FindGameObjects<Player>();

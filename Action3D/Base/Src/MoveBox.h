@@ -4,7 +4,12 @@
 class MoveBox : public Box {
 public:
 	//MoveBox(float x, float y, float z, float rotX, float rotY, float rotZ);
-	MoveBox(VECTOR3 size = VECTOR3(0, 0, 0), VECTOR3 rot = VECTOR3(0, 0, 0), VECTOR3 move = VECTOR3(0,0,0));
+	MoveBox(
+		VECTOR3 size = VECTOR3(0, 0, 0),
+		VECTOR3 rot = VECTOR3(0, 0, 0),
+		VECTOR3 move = VECTOR3(0,0,0),
+		VECTOR3 moveSpeed = VECTOR3(0, 0, 0)
+	);
 	~MoveBox();
 	void Update() override;
 private:
@@ -18,4 +23,5 @@ private:
 	float f;	// ñÄéC
 
 	VECTOR3 moveMax, moveMin;	// à⁄ìÆêßå¿
+	VECTOR3 move;
 };
