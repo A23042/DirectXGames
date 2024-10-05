@@ -1,6 +1,5 @@
 #pragma once
 #include "Object3D.h"
-#include "Player.h"
 
 class Box : public Object3D {
 public:
@@ -19,7 +18,7 @@ public:
 	VECTOR3 HitSphereToCubeVertices(Sphere& sphere, VECTOR3& refVec);
 
 	// ’µ‚Ë•Ô‚èƒxƒNƒgƒ‹‚ÌŒvZ(‰¼“r’†)
-	VECTOR3 ReflectionVec(Sphere& sphere, VECTOR3 normal);
+	virtual VECTOR3 ReflectionVec(Sphere& sphere, VECTOR3 normal);
 
 private:
 	VECTOR3 normal[6] = {};
@@ -39,7 +38,5 @@ private:
 
 	XMMATRIX rotationMatrix;
 
-	float e;	// ”½”­ŒW”
-	float f;	// –€C
 	VECTOR3 refVec;
 };

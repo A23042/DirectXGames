@@ -11,16 +11,15 @@ public:
 		VECTOR3 moveSpeed = VECTOR3(0, 0, 0)
 	);
 	~MoveBox();
+	void Start() override;
 	void Update() override;
+	VECTOR3 ReflectionVec(Sphere& sphere, VECTOR3 normal) override;
 private:
 	VECTOR3 vPos;
 	VECTOR3 pushVec;
 	VECTOR3 refVec;
 
 	XMMATRIX rotationMatrix;
-
-	float e;	// ”½”­ŒW”
-	float f;	// –€C
 
 	VECTOR3 moveMax, moveMin;	// ˆÚ“®§ŒÀ
 	VECTOR3 move;

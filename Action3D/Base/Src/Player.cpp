@@ -5,7 +5,7 @@
 #include "Box.h"
 
 namespace { // このcpp以外では使えない
-	static const float Gravity = 9.8f * 2; // 重力加速度(正の値)
+	static const float Gravity = 9.8f * 3; // 重力加速度(正の値)
 	// C++の定数定義（型が付く）
 	static const float JumpPower = 0.3f;
 	static const float RotationSpeed = 3.0f; // 回転速度(度)
@@ -49,6 +49,11 @@ Player::~Player()
 		delete animator;
 		animator = nullptr;
 	}
+}
+
+void Player::Start()
+{
+	sphere.center = transform.position;
 }
 
 void Player::Update()
@@ -194,19 +199,19 @@ void Player::UpdateOnGround()
 		transform.rotation.y += RotationSpeed / 180.0f * XM_PI;
 	}
 	//if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_SPACE)) {
-	if (GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_SPACE)) {
+	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_SPACE)) {
 		//transform.position.y += 0.1f;
 		//sphere.center = transform.position;
 		//speedY = JumpPower;
 		state = sJump;
 		//sphere.velocity.y += 15.0f * SceneManager::DeltaTime();
 	}
-	else if (GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_LSHIFT)) {
+	else if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_LSHIFT)) {
 		//transform.position.y -= 0.1f;
 		//sphere.center = transform.position;
 		//speedY = JumpPower;
 		//state = sJump;
-		sphere.velocity.y -= 10.0f * SceneManager::DeltaTime();
+		//sphere.velocity.y -= 10.0f * SceneManager::DeltaTime();
 	}
 
 
@@ -214,7 +219,7 @@ void Player::UpdateOnGround()
 
 void Player::UpdateJump()
 {
-	sphere.velocity.y = 3.0f;
+	sphere.velocity.y = 10.0f;
 	state = sOnGround();
 }
 

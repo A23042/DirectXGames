@@ -1,5 +1,6 @@
 #include "MoveBox.h"
 #include "Player.h"
+// 平行移動Boxオブジェクト
 
 MoveBox::MoveBox(VECTOR3 size, VECTOR3 rot, VECTOR3 move, VECTOR3 moveSpeed)
 {
@@ -23,24 +24,55 @@ MoveBox::MoveBox(VECTOR3 size, VECTOR3 rot, VECTOR3 move, VECTOR3 moveSpeed)
 	pushVec = VECTOR3(0, 0, 0);
 	refVec = VECTOR3(0, 0, 0);
 
-	e = 0.6f;	// 反発係数	1で減衰なし
-	f = 0.99f;	// 摩擦		1で減衰なし
+	pObj.e = 0.6f;	// 反発係数	1で減衰なし
+	pObj.f = 0.99f;	// 摩擦		1で減衰なし
+
+	pObj.velocity = VECTOR3(0, 0, 0);
 }
 
 MoveBox::~MoveBox()
 {
 }
 
+void MoveBox::Start()
+{
+	pObj.center = transform.position;
+}
+
 void MoveBox::Update()
 {
-	transform.position += move;
+	pObj.center += pObj.velocity * SceneManager::DeltaTime();
+	transform.position = pObj.center;
+
 	// ここでXYZごと制限まで動かす
-	if (transform.position.x >= moveMax.x) {
-		move.x *= -1;
+	if(moveMax.x > 0)
+	{
+		if (transform.position.x >= moveMax.x) {
+			move.x *= -1;
+		}
+		else if (transform.position.x <= moveMin.x) {
+			move.x *= -1;
+		}
 	}
-	else if(transform.position.x <= moveMin.x){
-		move.x *= -1;
+	if (moveMax.y > 0)
+	{
+		if (transform.position.y >= moveMax.y) {
+			move.y *= -1;
+		}
+		else if (transform.position.y <= moveMin.y) {
+			move.y *= -1;
+		}
 	}
+	if (moveMax.z > 0)
+	{
+		if (transform.position.z >= moveMax.z) {
+			move.z *= -1;
+		}
+		else if (transform.position.z <= moveMin.z) {
+			move.z *= -1;
+		}
+	}
+	pObj.velocity = move;
 
 #if 1
 	std::list<Player*> playeres =
@@ -48,8 +80,23 @@ void MoveBox::Update()
 	for (Player* player : playeres) {
 		VECTOR3 refVec = VECTOR3(0, 0, 0);
 		Box::CubeSize(vPos.x, vPos.y, vPos.z);		// 直方体のサイズと位置
-		pushVec = Box::HitSphereToCubeplane(player->sphere, refVec);	// 面->辺->頂点の衝突判定
+		pushVec = HitSphereToCubeplane(player->sphere, refVec);	// 面->辺->頂点の衝突判定
 		player->PushVec(-pushVec, refVec);	// プレイヤーをめり込んだ量だけもどす
 	}
 #endif
+}
+
+VECTOR3 MoveBox::ReflectionVec(Sphere& sphere, VECTOR3 normal)
+{
+	// 法線ベクトルの方向の速度を考慮する
+	VECTOR3 pushVecNormal = dot(pObj.velocity, normal) * normal;
+	// 法線方向に反発係数をかける
+	VECTOR3 refNormal = dot(sphere.velocity, normal) * normal - pushVecNormal;
+	//VECTOR3 b = sphere.velocity - refNormal;
+	VECTOR3 refSessen = sphere.velocity - refNormal;
+	VECTOR3 b = -refNormal * pObj.e + refSessen * pObj.f;
+	// 順番の修正
+	// 埋め込みを解除->反射	〇
+	// 反射->埋め込み解除		×
+	return VECTOR3(b);
 }

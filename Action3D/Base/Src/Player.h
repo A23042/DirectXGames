@@ -7,6 +7,7 @@ class Player : public Object3D {
 public:
 	Player();
 	~Player();
+	void Start() override;
 	void Update() override;
 	void Draw() override;
 

@@ -55,12 +55,19 @@ public:
 		return transform.scale;
 	};
 
-	// 球体用の構造体
-	struct Sphere
+	// 物理演算適用させるオブジェクト
+	struct PhysicsObject
 	{
-		VECTOR3 velocity = VECTOR3(0, 0, 0);
-		VECTOR3 center = VECTOR3(0, 0, 0);
-		float radius = 0.0f;
+		VECTOR3 velocity = VECTOR3(0, 0, 0);	// 速度
+		VECTOR3 center = VECTOR3(0, 0, 0);		// 中心点
+		float e;	// 反発係数
+		float f;	// 摩擦
+	}pObj;
+
+	// 球体用の構造体
+	struct Sphere : PhysicsObject
+	{
+		float radius = 0.0f;	// 半径
 	}sphere;
 
 	void SetPosition(const VECTOR3& pos);

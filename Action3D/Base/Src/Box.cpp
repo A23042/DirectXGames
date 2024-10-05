@@ -1,4 +1,6 @@
 #include "Box.h"
+#include "Player.h"
+// “®‚©‚È‚¢BoxƒIƒuƒWƒFƒNƒg
 
 Box::Box(VECTOR3 size, VECTOR3 rot)
 {
@@ -22,8 +24,8 @@ Box::Box(VECTOR3 size, VECTOR3 rot)
 	pushVec = VECTOR3(0, 0, 0);
 	HitPoint = VECTOR3(0, 0, 0);
 
-	e = 1.0f;	// ”½”­ŒW”	1‚ÅŒ¸Š‚È‚µ
-	f = 1.0f;	// –€C		1‚ÅŒ¸Š‚È‚µ
+	pObj.e = 1.0f;	// ”½”­ŒW”	1‚ÅŒ¸Š‚È‚µ
+	pObj.f = 1.0f;	// –€C		1‚ÅŒ¸Š‚È‚µ
 	refVec = VECTOR3(0, 0, 0);
 }
 
@@ -205,14 +207,12 @@ VECTOR3 Box::HitSphereToCubeVertices(Sphere& sphere, VECTOR3& refVec)
 VECTOR3 Box::ReflectionVec(Sphere& sphere, VECTOR3 normal)
 {
 	// –@ü•ûŒü‚É”½”­ŒW”‚ğ‚©‚¯‚é
-	VECTOR3 refNormal = dot(sphere.velocity, normal) * normal ; // “ñ”{‚É‚µ‚Ä‚©‚çˆø‚­‚±‚Æ‚Å”½“]‚³‚¹‚ç‚ê‚é
-	//VECTOR3 b = sphere.velocity - refNormal;
+	VECTOR3 refNormal = dot(sphere.velocity, normal) * normal ;
 	VECTOR3 refSessen = sphere.velocity - refNormal;
-	VECTOR3 b = -refNormal * e + refSessen * f;
+	VECTOR3 b = -refNormal * pObj.e + refSessen * pObj.f;
 	// ‡”Ô‚ÌC³
 	// –„‚ß‚İ‚ğ‰ğœ->”½Ë	Z
 	// ”½Ë->–„‚ß‚İ‰ğœ		~
-	//sphere.velocity = b;
 	return VECTOR3(b);
 }
 

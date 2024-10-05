@@ -56,7 +56,7 @@ PlayScene::PlayScene()
 			float moveX = csv->GetFloat(i, 10);
 			float moveX = csv->GetFloat(i, 11);
 			float moveX = csv->GetFloat(i, 12);*/
-			VECTOR3 size = VECTOR3(csv->GetFloat(i, 4), csv->GetFloat(i, 6), csv->GetFloat(i, 6));
+			VECTOR3 size = VECTOR3(csv->GetFloat(i, 4), csv->GetFloat(i, 5), csv->GetFloat(i, 6));
 			VECTOR3 rot = VECTOR3(csv->GetFloat(i, 7), csv->GetFloat(i, 8), csv->GetFloat(i, 9));
 			VECTOR3 move = VECTOR3(csv->GetFloat(i, 10), csv->GetFloat(i, 11), csv->GetFloat(i, 12));
 			VECTOR3 moveSpeed = VECTOR3(csv->GetFloat(i, 13), csv->GetFloat(i, 14), csv->GetFloat(i, 15));
