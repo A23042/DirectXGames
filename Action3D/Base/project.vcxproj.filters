@@ -57,6 +57,9 @@
     <Filter Include="ソース ファイル\09_ResultScene">
       <UniqueIdentifier>{4d53d914-e8e9-457d-90dc-2d3af8e24ed0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\10_MapEditScene">
+      <UniqueIdentifier>{83848451-33aa-4c66-b32d-f49c5202475e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Hlsl\DisplaceSkinMesh.hlsli">
@@ -315,6 +318,12 @@
     <ClInclude Include="Src\MoveBox.h">
       <Filter>ソース ファイル\08_PlayScene</Filter>
     </ClInclude>
+    <ClInclude Include="Src\MapEditScene.h">
+      <Filter>ソース ファイル\10_MapEditScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\StageEdit.h">
+      <Filter>ソース ファイル\10_MapEditScene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Main.cpp">
@@ -445,6 +454,12 @@
     </ClCompile>
     <ClCompile Include="Src\MoveBox.cpp">
       <Filter>ソース ファイル\08_PlayScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\MapEditScene.cpp">
+      <Filter>ソース ファイル\10_MapEditScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\StageEdit.cpp">
+      <Filter>ソース ファイル\10_MapEditScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

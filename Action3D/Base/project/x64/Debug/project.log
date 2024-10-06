@@ -1,6 +1,4 @@
-﻿  Player.cpp
-C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\Src\Player.cpp(223,10): warning C4353: nonstandard extension used: constant 0 as function expression.  Use '__noop' function intrinsic instead
-C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\Src\Player.cpp(231,43): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\Src\Player.cpp(231,35): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\Src\Player.cpp(231,27): warning C4305: 'argument': truncation from 'double' to 'float'
+﻿  MapEditScene.cpp
+  ResultScene.cpp
+  Generating Code...
   project.vcxproj -> C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\project.exe

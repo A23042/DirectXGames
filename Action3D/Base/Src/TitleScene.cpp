@@ -26,6 +26,10 @@ void TitleScene::Update()
 			CheckKey(KD_TRG, DIK_P)) {
 		SceneManager::ChangeScene("PlayScene");
 	}
+	if (GameDevice()->m_pDI->
+		CheckKey(KD_TRG, DIK_E)) {
+		SceneManager::ChangeScene("MapEditScene");
+	}
 }
 
 void TitleScene::Draw()

@@ -4,6 +4,7 @@
 #include "TitleScene.h"
 #include "PlayScene.h"
 #include "ResultScene.h"
+#include "MapEditScene.h"
 
 SceneBase* SceneFactory::CreateFirst()
 {
@@ -21,6 +22,9 @@ SceneBase * SceneFactory::Create(const std::string & name)
 	}
 	if (name == "ResultScene") {
 		return new ResultScene();
+	}
+	if (name == "MapEditScene") {
+		return new MapEditScene();
 	}
 	assert(false);
 	return nullptr;
