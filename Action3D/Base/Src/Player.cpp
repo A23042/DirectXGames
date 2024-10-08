@@ -37,6 +37,10 @@ Player::Player()
 	sphere.center = transform.position;
 	sphere.radius = 0.5f;
 	sphere.velocity = VECTOR3(0, 0, 0);
+
+	// サイズ調整
+	//transform.scale = VECTOR3(2, 2, 2);
+	sphere.radius *= transform.scale.x;
 }
 
 Player::~Player()
@@ -56,6 +60,7 @@ void Player::Start()
 	sphere.center = transform.position;
 }
 
+// プレイヤー同士の衝突判定もしたい
 void Player::Update()
 {
 	sphere.velocity.y -= Gravity * SceneManager::DeltaTime();
@@ -133,6 +138,24 @@ void Player::Update()
 
 #endif
 
+	// プレイヤー同士の衝突判定
+	std::list<Player*> players = ObjectManager::FindGameObjects<Player>();
+	for (auto player : players) {
+		Sphere tSph = player->sphere;
+		VECTOR3 nVec = tSph.center - sphere.center;
+		// 衝突
+		if (nVec.LengthSquare() <= tSph.radius + sphere.radius) {
+
+			VECTOR3 pushVec = normalize(tSph.center - sphere.center) * (sphere.radius + tSph.radius - nVec.Length());
+			sphere.center -= pushVec;
+			transform.position = sphere.center;
+			VECTOR3 refNormal = dot(sphere.velocity, nVec) * nVec;
+			VECTOR3 refSessen = sphere.velocity - refNormal;
+			VECTOR3 b = -refNormal + refSessen;
+			sphere.velocity = b;
+			//tSph.velocity = -b / 2;
+		}
+	}
 }
 
 void Player::Draw()

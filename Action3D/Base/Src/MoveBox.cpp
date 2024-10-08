@@ -24,7 +24,7 @@ MoveBox::MoveBox(VECTOR3 size, VECTOR3 rot, VECTOR3 move, VECTOR3 moveSpeed)
 	pushVec = VECTOR3(0, 0, 0);
 	refVec = VECTOR3(0, 0, 0);
 
-	pObj.e = 0.6f;	// ”½”­ŒW”	1‚ÅŒ¸Š‚È‚µ
+	pObj.e = 0.5f;	// ”½”­ŒW”	1‚ÅŒ¸Š‚È‚µ
 	pObj.f = 0.99f;	// –€ŽC		1‚ÅŒ¸Š‚È‚µ
 
 	pObj.velocity = VECTOR3(0, 0, 0);
