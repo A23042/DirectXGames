@@ -24,7 +24,7 @@ Box::Box(VECTOR3 size, VECTOR3 rot)
 	pushVec = VECTOR3(0, 0, 0);
 	HitPoint = VECTOR3(0, 0, 0);
 
-	pObj.e = 1.0f;	// ”½”­ŒW”	1‚ÅŒ¸Š‚È‚µ
+	pObj.e = 0.9f;	// ”½”­ŒW”	1‚ÅŒ¸Š‚È‚µ
 	pObj.f = 1.0f;	// –€ŽC		1‚ÅŒ¸Š‚È‚µ
 	refVec = VECTOR3(0, 0, 0);
 }

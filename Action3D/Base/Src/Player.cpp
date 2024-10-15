@@ -41,6 +41,8 @@ Player::Player()
 	// サイズ調整
 	//transform.scale = VECTOR3(2, 2, 2);
 	sphere.radius *= transform.scale.x;
+
+
 }
 
 Player::~Player()
@@ -141,20 +143,35 @@ void Player::Update()
 	// プレイヤー同士の衝突判定
 	std::list<Player*> players = ObjectManager::FindGameObjects<Player>();
 	for (auto player : players) {
-		Sphere tSph = player->sphere;
-		VECTOR3 nVec = tSph.center - sphere.center;
+		if (player != this) {
+			Sphere tSph = player->sphere;
+		VECTOR3 nVec = tSph.center - this->sphere.center;
+		float rsum = tSph.radius + this->sphere.radius;
 		// 衝突
-		if (nVec.LengthSquare() <= tSph.radius + sphere.radius) {
+		if (nVec.LengthSquare() <= rsum * rsum) {
 
-			VECTOR3 pushVec = normalize(tSph.center - sphere.center) * (sphere.radius + tSph.radius - nVec.Length());
-			sphere.center -= pushVec;
-			transform.position = sphere.center;
-			VECTOR3 refNormal = dot(sphere.velocity, nVec) * nVec;
-			VECTOR3 refSessen = sphere.velocity - refNormal;
-			VECTOR3 b = -refNormal + refSessen;
-			sphere.velocity = b;
+			VECTOR3 pushVec = normalize(tSph.center - this->sphere.center) * (this->sphere.radius + tSph.radius - nVec.Length());
+			this->sphere.center -= pushVec;
+			transform.position = this->sphere.center;
+			// 法線ベクトルの方向の速度を考慮する
+			VECTOR3 tPushVecNormal = dot(tSph.velocity, nVec) * nVec;
+			VECTOR3 thisPushVecNormal = dot(this->sphere.velocity, nVec) * nVec;
+
+			VECTOR3 tRefNormal = dot(tSph.velocity, nVec) * nVec - thisPushVecNormal;
+			VECTOR3 thisRefNormal = dot(this->sphere.velocity, nVec) * nVec - tPushVecNormal;
+
+			VECTOR3 tRefSessen = tSph.velocity - tRefNormal;
+			VECTOR3 thisRefSessen = this->sphere.velocity - thisRefNormal;
+
+			VECTOR3 b = -thisRefNormal - thisRefSessen;
+			VECTOR3 c = -tRefNormal - tRefSessen;
+
+			this->sphere.velocity = b;
+			tSph.velocity = c;
 			//tSph.velocity = -b / 2;
 		}
+		}
+		
 	}
 }
 

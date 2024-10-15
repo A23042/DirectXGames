@@ -1,7 +1,9 @@
 #include "MapEditScene.h"
+#include "StageEdit.h"
 
 MapEditScene::MapEditScene()
 {
+	new StageEdit();
 }
 
 MapEditScene::~MapEditScene()
