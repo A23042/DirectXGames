@@ -4,6 +4,7 @@
 
 MoveBox::MoveBox(VECTOR3 size, VECTOR3 rot, VECTOR3 move, VECTOR3 moveSpeed)
 {
+	SetTag("STAGEOBJ");
 	mesh = new CFbxMesh();
 	mesh->Load("Data/Object/box00.mesh");
 
@@ -23,10 +24,6 @@ MoveBox::MoveBox(VECTOR3 size, VECTOR3 rot, VECTOR3 move, VECTOR3 moveSpeed)
 
 	pushVec = VECTOR3(0, 0, 0);
 	refVec = VECTOR3(0, 0, 0);
-
-	pObj.e = 0.5f;	// 反発係数	1で減衰なし
-	pObj.f = 0.99f;	// 摩擦		1で減衰なし
-
 	pObj.velocity = VECTOR3(0, 0, 0);
 }
 
@@ -74,12 +71,13 @@ void MoveBox::Update()
 	}
 	pObj.velocity = move;
 
-#if 1
+	Box::CubeSize(vPos.x, vPos.y, vPos.z);		// 直方体のサイズと位置
+
+#if 0
 	std::list<Player*> playeres =
 		ObjectManager::FindGameObjects<Player>();
 	for (Player* player : playeres) {
 		VECTOR3 refVec = VECTOR3(0, 0, 0);
-		Box::CubeSize(vPos.x, vPos.y, vPos.z);		// 直方体のサイズと位置
 		pushVec = HitSphereToCubeplane(player->sphere, refVec);	// 面->辺->頂点の衝突判定
 		player->PushVec(-pushVec, refVec);	// プレイヤーをめり込んだ量だけもどす
 	}

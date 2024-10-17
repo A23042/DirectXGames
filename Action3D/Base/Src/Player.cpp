@@ -3,6 +3,8 @@
 #include "Dancer.h"
 #include "Door.h"
 #include "Box.h"
+#include "MoveBox.h"
+#include "Ball.h"
 
 namespace { // このcpp以外では使えない
 	static const float Gravity = 9.8f * 3; // 重力加速度(正の値)
@@ -41,8 +43,6 @@ Player::Player()
 	// サイズ調整
 	//transform.scale = VECTOR3(2, 2, 2);
 	sphere.radius *= transform.scale.x;
-
-
 }
 
 Player::~Player()
@@ -62,13 +62,27 @@ void Player::Start()
 	sphere.center = transform.position;
 }
 
-// プレイヤー同士の衝突判定もしたい
 void Player::Update()
 {
 	sphere.velocity.y -= Gravity * SceneManager::DeltaTime();
 
 	sphere.center += sphere.velocity * SceneManager::DeltaTime();
 	transform.position = sphere.center;
+
+	std::list<Box*> boxes = ObjectManager::FindGameObjects<Box>();
+	for (Box* box : boxes) {
+		VECTOR3 refVec = VECTOR3(0, 0, 0);
+		VECTOR3 pushVec = VECTOR3(0, 0, 0);
+		pushVec = box->HitSphereToCubeplane(this->sphere, refVec);
+		PushVec(-pushVec, refVec);
+	}
+	std::list<MoveBox*> mboxes = ObjectManager::FindGameObjects<MoveBox>();
+	for (MoveBox* mbox : mboxes) {
+		VECTOR3 refVec = VECTOR3(0, 0, 0);
+		VECTOR3 pushVec = VECTOR3(0, 0, 0);
+		pushVec = mbox->HitSphereToCubeplane(this->sphere, refVec);
+		PushVec(-pushVec, refVec);
+	}
 
 	//animator->Update(); // 毎フレーム、Updateを呼ぶ
 	switch (state) {
@@ -94,6 +108,9 @@ void Player::Update()
 	ImGui::InputFloat("Z", &sphere.velocity.z);
 	ImGui::End();
 
+	
+
+	// ダンサーとめり込まないようにする
 #if 0
 	// Dancerにめり込まないようにする
 	// 自分の座標は、transform.position
@@ -124,6 +141,7 @@ void Player::Update()
 		}
 	}
 #endif
+	// ステージオブジェクトと衝突判定
 #if 0
 	std::list<Object3D*> objects = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ"); // ドアのオブジェクトを見つける
 	for (auto object : objects) {
@@ -139,40 +157,71 @@ void Player::Update()
 	}
 
 #endif
-
+	// プレイヤー同士の衝突(いらないかも)
+#if 0
 	// プレイヤー同士の衝突判定
-	std::list<Player*> players = ObjectManager::FindGameObjects<Player>();
+	std::list<Ball*> players = ObjectManager::FindGameObjects<Ball>();
 	for (auto player : players) {
-		if (player != this) {
 			Sphere tSph = player->sphere;
-		VECTOR3 nVec = tSph.center - this->sphere.center;
-		float rsum = tSph.radius + this->sphere.radius;
-		// 衝突
+			VECTOR3 nVec = tSph.center - this->sphere.center;
+			float rsum = tSph.radius + this->sphere.radius;
+			// 衝突
 		if (nVec.LengthSquare() <= rsum * rsum) {
+			normalize(nVec);
+			// めり込み解消
+			VECTOR3 pushVec = nVec * (this->sphere.radius + tSph.radius - (tSph.center - this->sphere.center).Length());
+			this->sphere.center -= pushVec / 2.0f;
+			tSph.center += pushVec / 2.0f;
+			player->SetPosition(tSph.center);
+			//b
+			VECTOR3 refNormal = dot(tSph.velocity, nVec) * nVec;
+			// 法線方向に反発係数をかける
+			VECTOR3 refSessen = sphere.velocity - refNormal;
 
-			VECTOR3 pushVec = normalize(tSph.center - this->sphere.center) * (this->sphere.radius + tSph.radius - nVec.Length());
-			this->sphere.center -= pushVec;
-			transform.position = this->sphere.center;
-			// 法線ベクトルの方向の速度を考慮する
-			VECTOR3 tPushVecNormal = dot(tSph.velocity, nVec) * nVec;
-			VECTOR3 thisPushVecNormal = dot(this->sphere.velocity, nVec) * nVec;
+			//c
+			VECTOR3 CrefNormal = dot(this->sphere.velocity, nVec) * nVec;
+			// 法線方向に反発係数をかける
+			VECTOR3 CrefSessen = tSph.velocity - CrefNormal;
 
-			VECTOR3 tRefNormal = dot(tSph.velocity, nVec) * nVec - thisPushVecNormal;
-			VECTOR3 thisRefNormal = dot(this->sphere.velocity, nVec) * nVec - tPushVecNormal;
+			// ふたつの反発係数と摩擦係数の平均
+			float e2 = (this->sphere.e + tSph.e) / 2;
+			float f2 = (1.0f - this->sphere.f + 1.0f - tSph.f) / 2;
 
-			VECTOR3 tRefSessen = tSph.velocity - tRefNormal;
-			VECTOR3 thisRefSessen = this->sphere.velocity - thisRefNormal;
-
-			VECTOR3 b = -thisRefNormal - thisRefSessen;
-			VECTOR3 c = -tRefNormal - tRefSessen;
-
-			this->sphere.velocity = b;
+			VECTOR3 b = -refNormal *e2 + refSessen * f2;
+			VECTOR3 c = -CrefNormal * e2 + CrefSessen * f2;
+			//this->sphere.velocity = b;
 			tSph.velocity = c;
-			//tSph.velocity = -b / 2;
+#if 0
+				normalize(nVec);
+				VECTOR3 pushVec = normalize(tSph.center - this->sphere.center) * (this->sphere.radius + tSph.radius - nVec.Length());
+				this->sphere.center -= pushVec;
+				transform.position = this->sphere.center;
+	
+				// 法線方向
+				VECTOR3 tPushVecNormal = dot(tSph.velocity, nVec) * nVec;
+				VECTOR3 tRefNormal = dot(this->sphere.velocity, nVec) * nVec - tPushVecNormal;
+				VECTOR3 tRefSessen = this->sphere.velocity - tRefNormal;
+
+				VECTOR3 thisPushVecNormal = dot(this->sphere.velocity, nVec) * nVec;
+				VECTOR3 thisRefNormal = dot(tSph.velocity, nVec) * nVec - thisPushVecNormal;
+				VECTOR3 thisRefSessen = tSph.velocity - thisRefNormal;
+
+				// ふたつの反発係数と摩擦係数の平均
+				float e2 = (this->sphere.e + tSph.e) / 2;
+				float f2 = (1.0f - this->sphere.f + 1.0f - tSph.f) / 2;
+
+				VECTOR3 b = -tRefNormal * e2 - tRefSessen * f2;
+				VECTOR3 c = -thisRefNormal * e2 - thisRefSessen * f2;
+
+				this->sphere.velocity = b;
+				tSph.velocity = c;
+
+
+			}
+#endif
 		}
-		}
-		
 	}
+#endif
 }
 
 void Player::Draw()
@@ -211,12 +260,12 @@ void Player::PushVec(VECTOR3 pushVec, VECTOR3 RefVec)
 void Player::UpdateOnGround()
 {
 	//transform.position += move;
-	if (GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_W)) {
+	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_W)) {
 		// 三角関数でやる場合
 //		position.z += cosf(rotation.y) * 0.1;
 //		position.x += sinf(rotation.y) * 0.1;
 		// 行列でやる場合
-		VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
+		VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * 20); // 回転してない時の移動量
 		MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
 		sphere.velocity += forward * rotY; // キャラの向いてる方への移動速度
 	} else if (GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_S)) {

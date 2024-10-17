@@ -68,6 +68,7 @@ public:
 	struct Sphere : PhysicsObject
 	{
 		float radius = 0.0f;	// ”¼Œa
+		float mass = 0.0f;
 	}sphere;
 
 	void SetPosition(const VECTOR3& pos);

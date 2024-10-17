@@ -49,7 +49,6 @@ VECTOR3 StageEdit::GetWorldPos()
 	// マウス座標取得　原点はウィンドウの左上
 	POINT mousePos;
 	GetCursorPos(&mousePos);
-
 	ScreenToClient(GameDevice()->m_pMain->m_hWnd, &mousePos);
 	
 	// カメラからマウス座標にRayを飛ばしてLineToMeshで衝突したオブジェクトを Object* obj に入れる

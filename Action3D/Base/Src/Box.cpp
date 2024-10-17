@@ -1,10 +1,11 @@
 #include "Box.h"
 #include "Player.h"
+#include "Ball.h"
 // 動かないBoxオブジェクト
 
 Box::Box(VECTOR3 size, VECTOR3 rot)
 {
-	//SetTag("STAGEOBJ");
+	SetTag("STAGEOBJ");
 	mesh = new CFbxMesh();
 	mesh->Load("Data/Object/box00.mesh");
 
@@ -23,14 +24,16 @@ Box::Box(VECTOR3 size, VECTOR3 rot)
 
 	pushVec = VECTOR3(0, 0, 0);
 	HitPoint = VECTOR3(0, 0, 0);
-
-	pObj.e = 0.9f;	// 反発係数	1で減衰なし
-	pObj.f = 1.0f;	// 摩擦		1で減衰なし
 	refVec = VECTOR3(0, 0, 0);
 }
 
 void Box::Update()
 {
+	CubeSize(vPos.x, vPos.y, vPos.z);
+
+	// 衝突判定の関数呼び出しはそれぞれのクラスで行う
+#if 0
+	// プレイヤーとの衝突判定
 	std::list<Player*> playeres =
 		ObjectManager::FindGameObjects<Player>();
 	for (Player* player : playeres) {
@@ -38,13 +41,16 @@ void Box::Update()
 		CubeSize(vPos.x, vPos.y, vPos.z);		// 直方体のサイズと位置
 		pushVec = HitSphereToCubeplane(player->sphere, refVec);	// 面->辺->頂点の衝突判定
 		player->PushVec(-pushVec, refVec);	// プレイヤーをめり込んだ量だけもどす
-
-		/*ImGui::Begin("HitPoint");
-		ImGui::InputFloat("X", &HitPoint.x);
-		ImGui::InputFloat("Y", &HitPoint.y);
-		ImGui::InputFloat("Z", &HitPoint.z);
-		ImGui::End();*/
 	}
+	// Ballとの衝突判定
+	std::list<Ball*> balls = ObjectManager::FindGameObjects<Ball>();
+	for (Ball* ball : balls) {
+		refVec = VECTOR3(0, 0, 0);
+		CubeSize(vPos.x, vPos.y, vPos.z);		// 直方体のサイズと位置
+		pushVec = HitSphereToCubeplane(ball->sphere, refVec);	// 面->辺->頂点の衝突判定
+		ball->PushVec(-pushVec, refVec);	// プレイヤーをめり込んだ量だけもどす
+	}
+#endif
 }
 
 void Box::CubeSize(float x, float y, float z)
@@ -209,7 +215,8 @@ VECTOR3 Box::ReflectionVec(Sphere& sphere, VECTOR3 normal)
 	// 法線方向に反発係数をかける
 	VECTOR3 refNormal = dot(sphere.velocity, normal) * normal ;
 	VECTOR3 refSessen = sphere.velocity - refNormal;
-	VECTOR3 b = -refNormal * pObj.e + refSessen * pObj.f;
+	float e2 = (this->pObj.e + sphere.e) / 2;
+	VECTOR3 b = -refNormal * e2 + refSessen * pObj.f;
 	// 順番の修正
 	// 埋め込みを解除->反射	〇
 	// 反射->埋め込み解除		×

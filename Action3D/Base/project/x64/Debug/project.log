@@ -1,6 +1,10 @@
-﻿  Player.cpp
-C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\Src\Player.cpp(263,10): warning C4353: nonstandard extension used: constant 0 as function expression.  Use '__noop' function intrinsic instead
-C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\Src\Player.cpp(271,43): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\Src\Player.cpp(271,35): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\Src\Player.cpp(271,27): warning C4305: 'argument': truncation from 'double' to 'float'
+﻿  Box.cpp
+  MoveBox.cpp
+  Player.cpp
+C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\Src\Player.cpp(312,10): warning C4353: nonstandard extension used: constant 0 as function expression.  Use '__noop' function intrinsic instead
+C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\Src\Player.cpp(320,43): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\Src\Player.cpp(320,35): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\Src\Player.cpp(320,27): warning C4305: 'argument': truncation from 'double' to 'float'
+  Generating Code...
+C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\Src\Box.cpp(159,1): warning C4715: 'Box::HitSphereToCubeplane': not all control paths return a value
   project.vcxproj -> C:\Users\A23042\Documents\A23042\DrirectXGameD\Action3D\Base\x64\Debug\project.exe
