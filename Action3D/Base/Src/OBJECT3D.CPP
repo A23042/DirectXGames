@@ -127,3 +127,31 @@ VECTOR3 Object3D::HitSphereToCubeplane(Sphere& sphere, VECTOR3& refVec)
 {
 	return VECTOR3();
 }
+
+// PlayerとBallの衝突判定を書く
+VECTOR3 Object3D::HitPlayerToSphere(Sphere& sphere, VECTOR3& pushVec)
+{
+	// PlayerとBallの距離計算
+	VECTOR3 vec = sphere.center - this->sphere.center;
+	float rsum = sphere.radius + this->sphere.radius;
+	VECTOR3 normal = normalize(vec);
+
+	// 衝突していたら
+	// めり込み解除ベクトルの計算
+	if (vec.LengthSquare() < rsum * rsum) {
+		float pushLen = rsum - vec.Length();		// 押し出す長さ
+		pushVec = normal * pushLen;// 押し出すベクトルに長さを掛ける
+		// 反射ベクトルの計算
+		// 法線方向に反発係数をかける
+		// 法線方向に垂直なベクトルに摩擦係数を計算
+		VECTOR3 refNormal = dot(sphere.velocity, normal) * normal;
+		VECTOR3 refSessen = sphere.velocity - refNormal;
+		// 衝突したふたつのオブジェクトの反発係数と摩擦を考慮する
+		float e2 = (this->pObj.e + sphere.e) / 2;
+		float f2 = (this->pObj.f + sphere.f) / 2;
+		VECTOR3 b = -refNormal * e2 + refSessen * f2;
+
+		return b;
+	}
+	return VECTOR3();
+}

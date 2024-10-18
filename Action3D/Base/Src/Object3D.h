@@ -108,8 +108,12 @@ public:
 	/// <returns>重なり量</returns>
 	virtual float HitSphereToSphere(const SphereCollider& target, bool withY=true);
 
-	// 定義だけ
+	// 球体とBoxの衝突判定
+	// 定義だけ書いてBox.cppで中をオーバーライド
 	virtual VECTOR3 HitSphereToCubeplane(Sphere& sphere, VECTOR3& refVec);
+
+	// BallとPlayerの衝突判定
+	virtual VECTOR3 HitPlayerToSphere(Sphere& sphere, VECTOR3& pushVec);
 protected:
 	CFbxMesh* mesh;
 	MeshCollider* meshCol;

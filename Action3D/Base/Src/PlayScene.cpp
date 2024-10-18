@@ -56,10 +56,10 @@ PlayScene::PlayScene()
 				obj->pObj.f = f;
 			}
 			else if (str == "BALL") {
-				obj = Instantiate<Ball>();
 				float e = csv->GetFloat(i, 5);
 				float f = csv->GetFloat(i, 6);
 				float mass = csv->GetFloat(i, 7);
+				obj = Instantiate<Ball>();
 				obj->sphere.e = e;
 				obj->sphere.f = f;
 				obj->sphere.mass = mass;

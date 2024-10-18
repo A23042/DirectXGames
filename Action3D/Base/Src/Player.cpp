@@ -83,7 +83,13 @@ void Player::Update()
 	}
 	// Ball
 	std::list<Ball*> balles = ObjectManager::FindGameObjects<Ball>();
-	
+	for (Ball* ball : balles) {
+		VECTOR3 refVec = VECTOR3(0, 0, 0);
+		VECTOR3 pushVec = VECTOR3(0, 0, 0);
+		refVec = ball->HitPlayerToSphere(this->sphere, pushVec);
+		PushVec(pushVec, refVec);
+		ball->PushVec(-pushVec, -refVec);
+	}
 
 	//animator->Update(); // –ˆƒtƒŒ[ƒ€AUpdate‚ğŒÄ‚Ô
 	switch (state) {

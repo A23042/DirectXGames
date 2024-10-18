@@ -15,11 +15,7 @@ Ball::Ball()
 	mesh = new CFbxMesh();
 	mesh->Load("Data/Object/ball01.mesh");
 
-	sphere.center = transform.position;
-
 	sphere.radius = 0.5f;
-	sphere.e = 1.0f;
-	sphere.f = 1.0f;
 }
 
 Ball::~Ball()
