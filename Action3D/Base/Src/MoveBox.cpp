@@ -91,7 +91,9 @@ VECTOR3 MoveBox::ReflectionVec(Sphere& sphere, VECTOR3 normal)
 	// –@ü•ûŒü‚É”½”­ŒW”‚ð‚©‚¯‚é
 	VECTOR3 refNormal = dot(sphere.velocity, normal) * normal - pushVecNormal;
 	VECTOR3 refSessen = sphere.velocity - refNormal;
-	VECTOR3 b = -refNormal * pObj.e + refSessen * pObj.f;
+	float e2 = (this->pObj.e + sphere.e) / 2;
+	float f2 = (this->pObj.f + sphere.f) / 2;
+	VECTOR3 b = -refNormal * e2 + refSessen * f2;
 	// ‡”Ô‚ÌC³
 	// –„‚ßž‚Ý‚ð‰ðœ->”½ŽË	Z
 	// ”½ŽË->–„‚ßž‚Ý‰ðœ		~

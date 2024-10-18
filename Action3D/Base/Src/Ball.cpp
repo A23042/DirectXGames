@@ -43,6 +43,7 @@ void Ball::Update()
 	sphere.center += sphere.velocity * SceneManager::DeltaTime();
 	transform.position = sphere.center;
 
+	// Box‚Æ‚ÌÕ“Ë”»’è
 	std::list<Box*> boxes = ObjectManager::FindGameObjects<Box>();
 	for (Box* box : boxes) {
 		VECTOR3 refVec = VECTOR3(0, 0, 0);

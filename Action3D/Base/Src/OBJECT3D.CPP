@@ -122,3 +122,8 @@ float Object3D::HitSphereToSphere(const SphereCollider& target, bool withY)
 	}
 	return 0.0f;
 }
+
+VECTOR3 Object3D::HitSphereToCubeplane(Sphere& sphere, VECTOR3& refVec)
+{
+	return VECTOR3();
+}

@@ -17,7 +17,7 @@ PlayScene::PlayScene()
 {
 	// テキストファイルの読み方
 	CsvReader* csv = new CsvReader("Data/map00.csv");
-	//assert(csv->GetLines() > 0);
+	assert(csv->GetLines() > 0);
 	for (int i = 1; i < csv->GetLines(); i++) { // １行ずつ読む
 		std::string str = csv->GetString(i, 0); // PLAYERが入る
 		Object3D* obj = nullptr;
@@ -35,22 +35,7 @@ PlayScene::PlayScene()
 				obj->sphere.f = f;
 				obj->sphere.mass = mass;
 			}
-			else if (str == "GROUND") {
-				obj = Instantiate<Ground>();
-			}
-			else if (str == "DOOR") {
-				obj = Instantiate<Door>();
-			}
-			//else if (str == "DANCER") {
-			//	obj = Instantiate<Dancer>();
-			//}
 			else if (str == "BOX") {
-				//float x = csv->GetFloat(i, 4);
-				//float y = csv->GetFloat(i, 5);
-				//float z = csv->GetFloat(i, 6);
-				//float rotX = csv->GetFloat(i, 7);
-				//float rotY = csv->GetFloat(i, 8);
-				//float rotZ = csv->GetFloat(i, 9);
 				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
 				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
 				float e = csv->GetFloat(i, 11);
@@ -60,15 +45,6 @@ PlayScene::PlayScene()
 				obj->pObj.f = f;
 			}
 			else if (str == "MBox") {
-				/*float x = csv->GetFloat(i, 4);
-				float y = csv->GetFloat(i, 5);
-				float z = csv->GetFloat(i, 6);
-				float rotX = csv->GetFloat(i, 7);
-				float rotY = csv->GetFloat(i, 8);
-				float rotZ = csv->GetFloat(i, 9);
-				float moveX = csv->GetFloat(i, 10);
-				float moveX = csv->GetFloat(i, 11);
-				float moveX = csv->GetFloat(i, 12);*/
 				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
 				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
 				VECTOR3 move = VECTOR3(csv->GetFloat(i, 11), csv->GetFloat(i, 12), csv->GetFloat(i, 13));
@@ -81,10 +57,16 @@ PlayScene::PlayScene()
 			}
 			else if (str == "BALL") {
 				obj = Instantiate<Ball>();
+				float e = csv->GetFloat(i, 5);
+				float f = csv->GetFloat(i, 6);
+				float mass = csv->GetFloat(i, 7);
+				obj->sphere.e = e;
+				obj->sphere.f = f;
+				obj->sphere.mass = mass;
 			}
-			//else {
-			//	assert(false);
-			//}
+			else {
+				assert(false);
+			}
 			float x = csv->GetFloat(i, 2);
 			float y = csv->GetFloat(i, 3);
 			float z = csv->GetFloat(i, 4);

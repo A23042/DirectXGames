@@ -213,10 +213,13 @@ VECTOR3 Box::HitSphereToCubeVertices(Sphere& sphere, VECTOR3& refVec)
 VECTOR3 Box::ReflectionVec(Sphere& sphere, VECTOR3 normal)
 {
 	// 法線方向に反発係数をかける
+	// 法線方向に垂直なベクトルに摩擦係数を計算
 	VECTOR3 refNormal = dot(sphere.velocity, normal) * normal ;
 	VECTOR3 refSessen = sphere.velocity - refNormal;
+	// 衝突したふたつのオブジェクトの反発係数と摩擦を考慮する
 	float e2 = (this->pObj.e + sphere.e) / 2;
-	VECTOR3 b = -refNormal * e2 + refSessen * pObj.f;
+	float f2 = (this->pObj.f + sphere.f) / 2;
+	VECTOR3 b = -refNormal * e2 + refSessen * f2;
 	// 順番の修正
 	// 埋め込みを解除->反射	〇
 	// 反射->埋め込み解除		×

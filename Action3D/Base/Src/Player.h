@@ -15,7 +15,7 @@ public:
 	
 	void PushVec(VECTOR3 pushVec, VECTOR3 RefVec);
 private:
-	float speedY; // Yの速度
+	//float speedY; // Yの速度
 
 	Animator* animator; // 部品のインスタンスをポインター型で準備
 	enum AnimID {
@@ -35,6 +35,6 @@ private:
 	void UpdateOnGround();
 	void UpdateJump();
 	void UpdateAttack();
-	int frame; // アニメーションのフレームを数える
+	//int frame; // アニメーションのフレームを数える
 
 };

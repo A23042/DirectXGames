@@ -65,24 +65,25 @@ void Player::Start()
 void Player::Update()
 {
 	sphere.velocity.y -= Gravity * SceneManager::DeltaTime();
-
+	// 速度成分を坂の時考慮する
+	// 面の法線に垂直なベクトル成分に進む
 	sphere.center += sphere.velocity * SceneManager::DeltaTime();
 	transform.position = sphere.center;
 
-	std::list<Box*> boxes = ObjectManager::FindGameObjects<Box>();
-	for (Box* box : boxes) {
+	// ここで空間分割を使って処理負荷の軽減をする？
+	// 空間分割よくわかってない
+
+	// 各Boxとの衝突判定
+	std::list<Object3D*> objes = ObjectManager::FindGameObjects<Object3D>();
+	for (Object3D* obj : objes) {
 		VECTOR3 refVec = VECTOR3(0, 0, 0);
 		VECTOR3 pushVec = VECTOR3(0, 0, 0);
-		pushVec = box->HitSphereToCubeplane(this->sphere, refVec);
+		pushVec = obj->HitSphereToCubeplane(this->sphere, refVec);
 		PushVec(-pushVec, refVec);
 	}
-	std::list<MoveBox*> mboxes = ObjectManager::FindGameObjects<MoveBox>();
-	for (MoveBox* mbox : mboxes) {
-		VECTOR3 refVec = VECTOR3(0, 0, 0);
-		VECTOR3 pushVec = VECTOR3(0, 0, 0);
-		pushVec = mbox->HitSphereToCubeplane(this->sphere, refVec);
-		PushVec(-pushVec, refVec);
-	}
+	// Ball
+	std::list<Ball*> balles = ObjectManager::FindGameObjects<Ball>();
+	
 
 	//animator->Update(); // 毎フレーム、Updateを呼ぶ
 	switch (state) {

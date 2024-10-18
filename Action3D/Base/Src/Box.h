@@ -11,7 +11,7 @@ public:
 	void CubeSize(float x = 0, float y = 0, float z = 0);
 	// 押し返すベクトルを返したいからVECTOR3
 	// 平面の衝突判定
-	VECTOR3 HitSphereToCubeplane(Sphere& sphere, VECTOR3 &refVec);
+	VECTOR3 HitSphereToCubeplane(Sphere& sphere, VECTOR3 &refVec) override;
 	// 辺の衝突判定
 	VECTOR3 HitSphereToCubeEdge(Sphere& sphere, VECTOR3& refVec);
 	// 頂点の衝突判定

@@ -107,6 +107,9 @@ public:
 	/// <param name="withY">false‚É‚·‚é‚ÆY‚ÌÀ•W·‚ğ–³‹‚·‚é</param>
 	/// <returns>d‚È‚è—Ê</returns>
 	virtual float HitSphereToSphere(const SphereCollider& target, bool withY=true);
+
+	// ’è‹`‚¾‚¯
+	virtual VECTOR3 HitSphereToCubeplane(Sphere& sphere, VECTOR3& refVec);
 protected:
 	CFbxMesh* mesh;
 	MeshCollider* meshCol;
