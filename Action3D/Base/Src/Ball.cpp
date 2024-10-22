@@ -16,6 +16,7 @@ Ball::Ball()
 	mesh->Load("Data/Object/ball01.mesh");
 
 	sphere.radius = 0.5f;
+	sphere.isPlayer = false;
 }
 
 Ball::~Ball()

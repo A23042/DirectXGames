@@ -160,10 +160,25 @@ namespace ObjectManager {
 	void SetVisible(GameObject* obj, bool visible = true);
 
 	/// <summary>
+	/// Drawに描画回数を設定する
+	/// </summary>
+	/// <param name="times">描画回数</param>
+	void SetDrawTimes(int times);
+
+	/// <summary>
+	/// 現在の描画回数を返す
+	/// </summary>
+	/// <returns></returns>
+	int DrawCounter();
+
+	/// <summary>
 	/// 指定のオブジェクトが存在するかを調べる
 	/// Activeでも、非Activeでも、存在していればtrueとなる
 	/// </summary>
 	/// <param name="obj">GameObjectのインスタンス</param>
 	/// <returns>存在すれtrue</returns>
 	bool IsExist(GameObject* obj);
+
+	void SetEyeDist(GameObject* obj, const float& distQIn, const int idx);
+
 };

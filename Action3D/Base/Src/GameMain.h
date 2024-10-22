@@ -56,6 +56,8 @@ public:
 	VECTOR3         m_vLookatPt;	//注視位置
 	MATRIX4X4       m_mView;
 	MATRIX4X4       m_mProj;
+	MATRIX4X4       m_mProjStandard;	  // 標準
+	MATRIX4X4       m_mProjVerticalLong;  // 縦長
 	VECTOR3         m_vLightDir;	//ディレクショナルライトの方向
 public:
 	// メソッド

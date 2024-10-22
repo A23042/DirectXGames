@@ -69,6 +69,7 @@ public:
 	{
 		float radius = 0.0f;	// îºåa
 		float mass = 0.0f;
+		bool isPlayer = false;
 	}sphere;
 
 	void SetPosition(const VECTOR3& pos);
@@ -113,7 +114,9 @@ public:
 	virtual VECTOR3 HitSphereToCubeplane(Sphere& sphere, VECTOR3& refVec);
 
 	// BallÇ∆PlayerÇÃè’ìÀîªíË
-	virtual VECTOR3 HitPlayerToSphere(Sphere& sphere, VECTOR3& pushVec);
+	//virtual VECTOR3 HitPlayerToSphere(Sphere& sphere, VECTOR3& pushVec);
+	virtual BOOL HitPlayerToSphere(Sphere& sphere, VECTOR3& pushVec);
+
 protected:
 	CFbxMesh* mesh;
 	MeshCollider* meshCol;

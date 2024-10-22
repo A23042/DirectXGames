@@ -37,4 +37,6 @@ private:
 	void UpdateAttack();
 	//int frame; // アニメーションのフレームを数える
 
+	VECTOR3 sumVelocity;
+
 };

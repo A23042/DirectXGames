@@ -5,27 +5,35 @@
 #include "PlayScene.h"
 #include "ResultScene.h"
 #include "MapEditScene.h"
+#include "SplitScreen.h"
 
 SceneBase* SceneFactory::CreateFirst()
 {
+	SplitScreen* ss = SingleInstantiate<SplitScreen>();
+	ss->SetSingleScreen();
 	return new TitleScene();
-	return nullptr;
 }
 
 SceneBase * SceneFactory::Create(const std::string & name)
 {
 	if (name == "TitleScene") {
+		ObjectManager::FindGameObject<SplitScreen>()->SetSingleScreen();
 		return new TitleScene();
 	}
 	if (name == "PlayScene") {
+		//ObjectManager::FindGameObject<SplitScreen>()->SetMultiScreen();
+		ObjectManager::FindGameObject<SplitScreen>()->SetSingleScreen();
 		return new PlayScene();
 	}
 	if (name == "ResultScene") {
+		ObjectManager::FindGameObject<SplitScreen>()->SetSingleScreen();
 		return new ResultScene();
 	}
 	if (name == "MapEditScene") {
+		ObjectManager::FindGameObject<SplitScreen>()->SetSingleScreen();
 		return new MapEditScene();
 	}
+	
 	assert(false);
 	return nullptr;
 }

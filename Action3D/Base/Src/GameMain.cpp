@@ -130,7 +130,11 @@ HRESULT CGameMain::Init()
 
 	// プロジェクショントランスフォーム（射影変換）の初期値
 	//m_mProj = XMMatrixPerspectiveFovLH((FLOAT)(XM_PI / 4), (FLOAT)WINDOW_WIDTH / (FLOAT)WINDOW_HEIGHT, 0.1f, 1000.0);
-	m_mProj = XMMatrixPerspectiveFovLH(XMConvertToRadians(38.0f), (FLOAT)WINDOW_WIDTH / (FLOAT)WINDOW_HEIGHT, 0.1f, 1000.0);
+	//m_mProj = XMMatrixPerspectiveFovLH(XMConvertToRadians(38.0f), (FLOAT)WINDOW_WIDTH / (FLOAT)WINDOW_HEIGHT, 0.1f, 1000.0);
+	m_mProjStandard = XMMatrixPerspectiveFovLH(XMConvertToRadians(38.0f), (FLOAT)WINDOW_WIDTH / (FLOAT)WINDOW_HEIGHT, 0.1f, 1000.0);
+	m_mProjVerticalLong = XMMatrixPerspectiveFovLH(XMConvertToRadians(38.0f), ((FLOAT)WINDOW_WIDTH / 2) / (FLOAT)WINDOW_HEIGHT, 0.1f, 1000.0);
+
+	m_mProj = m_mProjStandard;
 
 	// ビュートランスフォーム（視点座標変換）の初期値
 	VECTOR3 vUpVec(0.0f, 1.0f, 0.0f);//上方位置

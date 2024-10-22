@@ -128,6 +128,7 @@ VECTOR3 Object3D::HitSphereToCubeplane(Sphere& sphere, VECTOR3& refVec)
 	return VECTOR3();
 }
 
+/*
 // PlayerとBallの衝突判定を書く
 VECTOR3 Object3D::HitPlayerToSphere(Sphere& sphere, VECTOR3& pushVec)
 {
@@ -149,9 +150,76 @@ VECTOR3 Object3D::HitPlayerToSphere(Sphere& sphere, VECTOR3& pushVec)
 		// 衝突したふたつのオブジェクトの反発係数と摩擦を考慮する
 		float e2 = (this->pObj.e + sphere.e) / 2;
 		float f2 = (this->pObj.f + sphere.f) / 2;
-		VECTOR3 b = -refNormal * e2 + refSessen * f2;
 
-		return b;
+		// 質量の考慮
+		float massA = sphere.mass;
+		float massB = this->sphere.mass;
+		float sumMass = massA + massB;
+
+		VECTOR3 velocityA = (massA - massB) / sumMass * this->sphere.velocity + (2 * massB) / sumMass * sphere.velocity;
+		VECTOR3 velocityB = (2 * massB) / sumMass * this->sphere.velocity + (massB - massA) / sumMass * sphere.velocity;
+
+		VECTOR3 a = -velocityA * e2 + refSessen;
+		VECTOR3 b = -velocityB * e2 + refSessen;
+		sphere.velocity = b;
+		this->sphere.velocity = -a;
+		//return a;
 	}
 	return VECTOR3();
+}
+*/
+BOOL Object3D::HitPlayerToSphere(Sphere& player, VECTOR3& pushVec)
+{
+	// PlayerとBallの距離計算
+	VECTOR3 vec = player.center - this->sphere.center;
+	float rsum = player.radius + this->sphere.radius;
+	VECTOR3 normal = normalize(vec);
+
+	// 衝突していたら
+	// めり込み解除ベクトルの計算
+	if (vec.LengthSquare() < rsum * rsum) {
+		float pushLen = rsum - vec.Length();		// 押し出す長さ
+		pushVec = normal * pushLen;// 押し出すベクトルに長さを掛ける
+
+		this->sphere.center -= pushVec / 2;
+		this->SetPosition(this->sphere.center);
+		player.center += pushVec / 2;
+		//player = sphere.center;
+
+		VECTOR3 sum1 = (player.velocity * player.mass) + (this->sphere.velocity * this->sphere.mass);
+
+		// 反射ベクトルの計算
+		// 法線方向に反発係数をかける
+		// 法線方向に垂直なベクトルに摩擦係数を計算
+
+		// 衝突したふたつのオブジェクトの反発係数と摩擦を考慮する
+		float e2 = (this->pObj.e + player.e) / 2;
+		float f2 = (this->pObj.f + player.f) / 2;
+
+		// 法線方向の速度成分 * 法線ベクトル
+		VECTOR3 refNormalA = dot(player.velocity, normal) * normal;
+		VECTOR3 refNormalB = dot(this->sphere.velocity, normal) * normal;
+
+		VECTOR3 refSessenA = player.velocity - refNormalA;
+		VECTOR3 refSessenB = this->sphere.velocity - refNormalB;
+
+		// 質量の考慮
+		float massA = player.mass;
+		float massB = this->sphere.mass;
+		float sumMass = massA + massB;
+
+		VECTOR3 velocityA = (massA - massB) / sumMass * refNormalB + (2 * massB) / sumMass * refNormalA;
+		VECTOR3 velocityB = (2 * massA) / sumMass * refNormalA + (massB - massA) / sumMass * refNormalB;
+
+		VECTOR3 a = -velocityA * e2 + refSessenA;
+		VECTOR3 b = -velocityB * e2 + refSessenB;
+
+		player.velocity = a;
+		this->sphere.velocity = -b;
+
+		return true;
+
+	}
+
+	return false;
 }

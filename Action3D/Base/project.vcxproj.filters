@@ -60,6 +60,9 @@
     <Filter Include="ソース ファイル\10_MapEditScene">
       <UniqueIdentifier>{83848451-33aa-4c66-b32d-f49c5202475e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\11_SplitScreen">
+      <UniqueIdentifier>{83dc2494-6c22-4c34-89ab-e16af2e0f31c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Hlsl\DisplaceSkinMesh.hlsli">
@@ -324,6 +327,12 @@
     <ClInclude Include="Src\StageEdit.h">
       <Filter>ソース ファイル\10_MapEditScene</Filter>
     </ClInclude>
+    <ClInclude Include="Src\SplitScreen.h">
+      <Filter>ソース ファイル\11_SplitScreen</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\SplitScreenLastDraw.h">
+      <Filter>ソース ファイル\11_SplitScreen</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Main.cpp">
@@ -460,6 +469,12 @@
     </ClCompile>
     <ClCompile Include="Src\StageEdit.cpp">
       <Filter>ソース ファイル\10_MapEditScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\SplitScreen.cpp">
+      <Filter>ソース ファイル\11_SplitScreen</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\SplitScreenLastDraw.cpp">
+      <Filter>ソース ファイル\11_SplitScreen</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

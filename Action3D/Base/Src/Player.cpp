@@ -43,6 +43,8 @@ Player::Player()
 	// サイズ調整
 	//transform.scale = VECTOR3(2, 2, 2);
 	sphere.radius *= transform.scale.x;
+
+	sphere.isPlayer = true;
 }
 
 Player::~Player()
@@ -86,9 +88,21 @@ void Player::Update()
 	for (Ball* ball : balles) {
 		VECTOR3 refVec = VECTOR3(0, 0, 0);
 		VECTOR3 pushVec = VECTOR3(0, 0, 0);
-		refVec = ball->HitPlayerToSphere(this->sphere, pushVec);
-		PushVec(pushVec, refVec);
-		ball->PushVec(-pushVec, -refVec);
+		//refVec = ball->HitPlayerToSphere(this->sphere, pushVec);
+		if (ball->HitPlayerToSphere(this->sphere, pushVec)) {
+			ball->sphere.center -= pushVec / 2;
+			ball->SetPosition(ball->sphere.center);
+			sphere.center += pushVec / 2;
+			transform.position = sphere.center;
+		}
+		transform.position = sphere.center;
+
+		sumVelocity.x = abs(this->sphere.velocity.x) + abs(ball->sphere.velocity.x);
+		sumVelocity.y = abs(this->sphere.velocity.y) + abs(ball->sphere.velocity.y);
+		sumVelocity.z = abs(this->sphere.velocity.z) + abs(ball->sphere.velocity.z);
+
+		//PushVec(pushVec, refVec);
+		//ball->PushVec(-pushVec, -refVec);
 	}
 
 	//animator->Update(); // 毎フレーム、Updateを呼ぶ
@@ -115,7 +129,11 @@ void Player::Update()
 	ImGui::InputFloat("Z", &sphere.velocity.z);
 	ImGui::End();
 
-	
+	ImGui::Begin("SUMVELOCITY");
+	ImGui::InputFloat("X", &sumVelocity.x);
+	ImGui::InputFloat("Y", &sumVelocity.y);
+	ImGui::InputFloat("Z", &sumVelocity.z);
+	ImGui::End();
 
 	// ダンサーとめり込まないようにする
 #if 0
@@ -267,12 +285,12 @@ void Player::PushVec(VECTOR3 pushVec, VECTOR3 RefVec)
 void Player::UpdateOnGround()
 {
 	//transform.position += move;
-	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_W)) {
+	if (GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_W)) {
 		// 三角関数でやる場合
 //		position.z += cosf(rotation.y) * 0.1;
 //		position.x += sinf(rotation.y) * 0.1;
 		// 行列でやる場合
-		VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * 20); // 回転してない時の移動量
+		VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
 		MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
 		sphere.velocity += forward * rotY; // キャラの向いてる方への移動速度
 	} else if (GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_S)) {

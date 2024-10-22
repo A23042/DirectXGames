@@ -4,6 +4,7 @@
 #include "Time.h"
 
 namespace {
+	const int distQNum = 2;	// ‰æ–Ê•ªŠ„Å‘å”
 	struct UpdateObject {
 		GameObject* object;
 		bool initialized;
@@ -16,6 +17,7 @@ namespace {
 	struct DrawObject {
 		GameObject* object;
 		int order;
+		float distQ[distQNum];	// ‹“_‚©‚ç‚Ì‹——£‚Ì‚Qæ[‰æ–Ê•ªŠ„Å‘å”]
 		bool visible;
 		DrawObject() : object(nullptr), order(0), visible(true) {}
 	};
@@ -23,6 +25,8 @@ namespace {
 	std::list<DrawObject> drawObjects;
 	bool needSortUpdate;
 	bool needSortDraw;
+	int drawTimes = 2;	// •`‰æ‰ñ”(‰æ–Ê•ªŠ„”)
+	int drawCounter;	// •`‰æƒJƒEƒ“ƒ^[(‰½‰æ–Ê–Ú‚Ì•`‰æ‚©)
 };
 
 void deleteDrawObject(GameObject* obj)
@@ -69,13 +73,16 @@ void ObjectManager::Update()
 
 void ObjectManager::Draw()
 {
-	if (needSortDraw) {
-		drawObjects.sort([](DrawObject& a, DrawObject& b) {return a.order > b.order; });
-		needSortDraw = false;
-	}
-	for (DrawObject node : drawObjects) {
-		if (node.visible) {
-			node.object->Draw();
+	for(drawCounter = 0; drawCounter < drawTimes; drawCounter++)	// drawTimes‰ñ”•`‰æˆ—‚ğs‚¤
+	{
+		if (needSortDraw) {
+			drawObjects.sort([](DrawObject& a, DrawObject& b) {return a.order > b.order; });
+			needSortDraw = false;
+		}
+		for (DrawObject node : drawObjects) {
+			if (node.visible) {
+				node.object->Draw();
+			}
 		}
 	}
 }
@@ -209,6 +216,16 @@ void ObjectManager::SetVisible(GameObject* obj, bool visible)
 	}
 }
 
+void ObjectManager::SetDrawTimes(int times)
+{
+	drawTimes = times;
+}
+
+int ObjectManager::DrawCounter()
+{
+	return drawCounter;
+}
+
 bool ObjectManager::IsExist(GameObject* obj)
 {
 	for (DrawObject& od : drawObjects) {
@@ -217,4 +234,14 @@ bool ObjectManager::IsExist(GameObject* obj)
 		}
 	}
 	return false;
+}
+
+void ObjectManager::SetEyeDist(GameObject* obj, const float& distQIn, const int idx)
+{
+	for (DrawObject& od : drawObjects) {
+		if (od.object == obj && od.visible) {
+			od.distQ[idx] = distQIn;
+		}
+	}
+	needSortDraw = true;
 }
