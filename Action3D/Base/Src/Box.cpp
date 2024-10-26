@@ -150,7 +150,7 @@ VECTOR3 Box::HitSphereToCubeplane(Sphere& sphere, VECTOR3 &refVec)
 				HitPoint = sphere.center - plane[i] * distance[i];	// 衝突点
 				refVec = ReflectionVec(sphere, plane[i]);	// 球体を反射させる
 				pushVec = plane[i] * (sphere.radius - distance[i]);	// めり込みを解除するための計算
-				return pushVec;
+				return pushVec;	// めり込み解除の量ベクトル
 			}
 		}
 	}
@@ -214,12 +214,16 @@ VECTOR3 Box::ReflectionVec(Sphere& sphere, VECTOR3 normal)
 {
 	// 法線方向に反発係数をかける
 	// 法線方向に垂直なベクトルに摩擦係数を計算
-	VECTOR3 refNormal = dot(sphere.velocity, normal) * normal ;
+	VECTOR3 refNormal = dot(sphere.velocity, normal) * normal;
+//	VECTOR3 refNormal = dot(sphere.velocity, normal) * normal * 2;
+
 	VECTOR3 refSessen = sphere.velocity - refNormal;
 	// 衝突したふたつのオブジェクトの反発係数と摩擦を考慮する
 	float e2 = (this->pObj.e + sphere.e) / 2;
 	float f2 = (this->pObj.f + sphere.f) / 2;
 	VECTOR3 b = -refNormal * e2 + refSessen * f2;
+	//VECTOR3 b = sphere.velocity - refNormal * e2;
+
 	// 順番の修正
 	// 埋め込みを解除->反射	〇
 	// 反射->埋め込み解除		×

@@ -14,8 +14,10 @@ namespace { // このcpp以外では使えない
 	static const float MoveSpeed = 0.8f;
 };
 
-Player::Player()
+Player::Player(int num)
 {
+	playerNum = num;
+
 	animator = new Animator(); // インスタンスを作成
 
 	mesh = new CFbxMesh();
@@ -33,7 +35,7 @@ Player::Player()
 	animator->SetPlaySpeed(1.0f);
 	*/
 
-	state = sOnGround;
+	state = sNormal;
 	//speedY = 0;
 
 	sphere.center = transform.position;
@@ -95,7 +97,7 @@ void Player::Update()
 			sphere.center += pushVec / 2;
 			transform.position = sphere.center;
 		}
-		transform.position = sphere.center;
+		//transform.position = sphere.center;
 
 		sumVelocity.x = abs(this->sphere.velocity.x) + abs(ball->sphere.velocity.x);
 		sumVelocity.y = abs(this->sphere.velocity.y) + abs(ball->sphere.velocity.y);
@@ -107,8 +109,8 @@ void Player::Update()
 
 	//animator->Update(); // 毎フレーム、Updateを呼ぶ
 	switch (state) {
-	case sOnGround:
-		UpdateOnGround();
+	case sNormal:
+		UpdateNormal();
 		break;
 	case sJump:
 		UpdateJump();
@@ -282,21 +284,16 @@ void Player::PushVec(VECTOR3 pushVec, VECTOR3 RefVec)
 	return;
 }
 
-void Player::UpdateOnGround()
+void Player::UpdateNormal()
 {
-	//transform.position += move;
-	if (GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_W)) {
-		// 三角関数でやる場合
-//		position.z += cosf(rotation.y) * 0.1;
-//		position.x += sinf(rotation.y) * 0.1;
+	auto pDI = GameDevice()->m_pDI;
+
+	if (pDI->CheckKey(KD_DAT, DIK_W)) {
 		// 行列でやる場合
 		VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
 		MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
 		sphere.velocity += forward * rotY; // キャラの向いてる方への移動速度
-	} else if (GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_S)) {
-		// 三角関数でやる場合
-//		position.z -= cosf(rotation.y) * 0.1;
-//		position.x -= sinf(rotation.y) * 0.1;
+	} else if (pDI->CheckKey(KD_DAT, DIK_S)) {
 		// 行列でやる場合
 		VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
 		MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
@@ -306,21 +303,21 @@ void Player::UpdateOnGround()
 	else {
 		animator->MergePlay(aIdle);
 	}
-	if (GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_A)) {
+	if (pDI->CheckKey(KD_DAT, DIK_A)) {
 		transform.rotation.y -= RotationSpeed / 180.0f * XM_PI;
 	}
-	if (GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_D)) {
+	if (pDI->CheckKey(KD_DAT, DIK_D)) {
 		transform.rotation.y += RotationSpeed / 180.0f * XM_PI;
 	}
 	//if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_SPACE)) {
-	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_SPACE)) {
+	if (pDI->CheckKey(KD_TRG, DIK_SPACE)) {
 		//transform.position.y += 0.1f;
 		//sphere.center = transform.position;
 		//speedY = JumpPower;
 		state = sJump;
 		//sphere.velocity.y += 15.0f * SceneManager::DeltaTime();
 	}
-	else if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_LSHIFT)) {
+	else if (pDI->CheckKey(KD_TRG, DIK_LSHIFT)) {
 		//transform.position.y -= 0.1f;
 		//sphere.center = transform.position;
 		//speedY = JumpPower;
@@ -334,7 +331,7 @@ void Player::UpdateOnGround()
 void Player::UpdateJump()
 {
 	sphere.velocity.y = 10.0f;
-	state = sOnGround();
+	state = sNormal();
 }
 
 void Player::UpdateAttack()
@@ -355,6 +352,6 @@ void Player::UpdateAttack()
 		}
 	}
 	if (animator->Finished()) {
-		state = sOnGround;
+		state = sNormal;
 	}
 }

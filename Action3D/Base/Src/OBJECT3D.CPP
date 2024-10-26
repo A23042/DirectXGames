@@ -181,11 +181,11 @@ BOOL Object3D::HitPlayerToSphere(Sphere& player, VECTOR3& pushVec)
 		float pushLen = rsum - vec.Length();		// 押し出す長さ
 		pushVec = normal * pushLen;// 押し出すベクトルに長さを掛ける
 
-		this->sphere.center -= pushVec / 2;
-		this->SetPosition(this->sphere.center);
-		player.center += pushVec / 2;
+		//this->sphere.center -= pushVec / 2;
+		//this->SetPosition(this->sphere.center);
+		//player.center += pushVec / 2;
 		//player = sphere.center;
-
+		
 		VECTOR3 sum1 = (player.velocity * player.mass) + (this->sphere.velocity * this->sphere.mass);
 
 		// 反射ベクトルの計算

@@ -2,87 +2,87 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\project.exe</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\project.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\DisplaceSkinMesh_DS.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\DisplaceSkinMesh_DS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\DisplaceSkinMesh_HS.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\DisplaceSkinMesh_HS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\DisplaceSkinMesh_PS.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\DisplaceSkinMesh_PS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\DisplaceSkinMesh_VS.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\DisplaceSkinMesh_VS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\DisplaceStaticMesh_DS.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\DisplaceStaticMesh_DS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\DisplaceStaticMesh_HS.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\DisplaceStaticMesh_HS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\DisplaceStaticMesh_PS.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\DisplaceStaticMesh_PS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\DisplaceStaticMesh_VS.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\DisplaceStaticMesh_VS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\DisplaceWave_DS.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\DisplaceWave_DS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\DisplaceWave_HS.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\DisplaceWave_HS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\DisplaceWave_PS.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\DisplaceWave_PS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\DisplaceWave_VS.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\DisplaceWave_VS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\Effect3D_GS_POINT.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\Effect3D_GS_POINT.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\Effect3D_PS.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\Effect3D_PS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\Effect3D_VS_BILL.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\Effect3D_VS_BILL.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\Effect3D_VS_BILLMESH.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\Effect3D_VS_BILLMESH.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\Effect3D_VS_POINT.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\Effect3D_VS_POINT.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\FbxSkinMesh_PS.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\FbxSkinMesh_PS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\FbxSkinMesh_VS.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\FbxSkinMesh_VS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\FbxStaticMesh_PS.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\FbxStaticMesh_PS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\FbxStaticMesh_VS.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\FbxStaticMesh_VS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\Simple_PS.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\Simple_PS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\Simple_VS.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\Simple_VS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\Sprite3D_PS.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\Sprite3D_PS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\Sprite3D_VS.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\Sprite3D_VS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\matsu\Documents\A23042\DirectXGameRepo\Action3D\Base\x64\Debug\Sprite3D_VS_BILL.cso</FullPath>
+      <FullPath>C:\Users\A23042\Documents\A23042\DirectXGame\SFolder\Action3D\Base\x64\Debug\Sprite3D_VS_BILL.cso</FullPath>
     </ContentFile>
   </ContentFiles>
   <SatelliteDlls />

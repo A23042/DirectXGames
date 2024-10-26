@@ -5,7 +5,7 @@
 
 class Player : public Object3D {
 public:
-	Player();
+	Player(int num);
 	~Player();
 	void Start() override;
 	void Update() override;
@@ -14,6 +14,8 @@ public:
 	SphereCollider Collider() override;
 	
 	void PushVec(VECTOR3 pushVec, VECTOR3 RefVec);
+
+	int playerNum;
 private:
 	//float speedY; // Yの速度
 
@@ -27,12 +29,12 @@ private:
 	};
 
 	enum State {
-		sOnGround = 0,
+		sNormal = 0,
 		sJump,
 		sAttack,
 	};
 	State state;
-	void UpdateOnGround();
+	void UpdateNormal();
 	void UpdateJump();
 	void UpdateAttack();
 	//int frame; // アニメーションのフレームを数える

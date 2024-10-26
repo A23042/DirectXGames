@@ -30,7 +30,8 @@ PlayScene::PlayScene()
 				float e = csv->GetFloat(i, 5);
 				float f = csv->GetFloat(i, 6);
 				float mass = csv->GetFloat(i, 7);
-				obj = Instantiate<Player>();
+				int num = csv->GetFloat(i, 8);
+				obj = new Player(num);
 				obj->sphere.e = e;
 				obj->sphere.f = f;
 				obj->sphere.mass = mass;

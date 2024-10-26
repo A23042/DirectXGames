@@ -1,5 +1,6 @@
 #include "Camera.h"
 #include "Player.h"
+#include "Ball.h"
 //                                      後方視点　　　　　　真上視点
 static const VECTOR3 CameraPos[] = { VECTOR3(0, 2, -10), VECTOR3(0, 10, -0.5) };
 static const VECTOR3 LookPos[] =   { VECTOR3(0, 0,  8), VECTOR3(0,  1,  1  ) };
@@ -31,6 +32,8 @@ void Camera::Update()
 {
 	if (ssObj->Multi())
 	{
+		std::list<Player*> pcs = ObjectManager::FindGameObjects<Player>();
+		for(Player* pc : pcs)
 		// 多画面のとき
 		for (int i = 0; i < ssObj->MultiSize(); i++)
 		{
@@ -41,28 +44,43 @@ void Camera::Update()
 			case 0:
 			{
 				// 画面0はPlayer1視点
-				Player* pc = ObjectManager::FindGameObject<Player>();
-				if (pc != nullptr)
-				{
-					updateCamera(i, pc->Position(), pc->Rotation());
-				}
-				else {
-					updateCamera(i, VECTOR3(0, 0, 0), VECTOR3(0, 0, 0));
-				}
+				//Player* pc = ObjectManager::FindGameObject<Player>();
+
+					if (pc->playerNum == 0)
+					{
+						if (pc != nullptr)
+						{
+							updateCamera(i, pc->Position(), pc->Rotation());
+						}
+						else {
+							updateCamera(i, VECTOR3(0, 0, 0), VECTOR3(0, 0, 0));
+						}
+					}
 			}
 			break;
 
 			case 1:
 			{
 				// 画面1はPlayer2視点
-				Player* pc = ObjectManager::FindGameObject<Player>();
-				if (pc != nullptr)
+				//Player* pc = ObjectManager::FindGameObject<Player>();
+				Ball* ball = ObjectManager::FindGameObject<Ball>();
+				if (ball != nullptr)
 				{
-					updateCamera(i, pc->Position(), pc->Rotation());
+					updateCamera(i, ball->Position(), ball->Rotation());
 				}
 				else {
 					updateCamera(i, VECTOR3(0, 0, 0), VECTOR3(0, 0, 0));
 				}
+				/*if (pc->playerNum == 1)
+				{
+					if (pc != nullptr)
+					{
+						updateCamera(i, pc->Position(), pc->Rotation());
+					}
+					else {
+						updateCamera(i, VECTOR3(0, 0, 0), VECTOR3(0, 0, 0));
+					}
+				}*/
 			}
 			break;
 			}
@@ -147,66 +165,66 @@ void Camera::Draw()
 void Camera::updateCamera(int counter, VECTOR3 pos, VECTOR3 rot)
 {
 
-	// プレイヤーの行列を求める
-	Player* player = ObjectManager::FindGameObject<Player>();
-	MATRIX4X4 rotY = XMMatrixRotationY(player->Rotation().y);
-	MATRIX4X4 trans = XMMatrixTranslation(
-		player->Position().x, player->Position().y / 2.0f + 0.0f, player->Position().z);
-	MATRIX4X4 m = rotY * trans;
-	// プレイヤーが回転・移動してない時のカメラ位置に
-	// プレイヤーの回転・移動行列を掛けると、
-	if (changeTime >= CHANGE_TIME_LIMIT) {
-		transform.position = CameraPos[viewType] * m;
-		lookPosition = LookPos[viewType] * m;
-	}
-	else { // 視点切り替え中
-		changeTime += 1.0f / 60.0f;
-		float timeRate = changeTime / CHANGE_TIME_LIMIT; // 0.0～1.0
-		float rate = timeRate;
-		VECTOR3 position = (changePosGoal - changePosStart) * rate + changePosStart;
-		VECTOR3 look = (changeLookGoal - changeLookStart) * rate + changeLookStart;
-		transform.position = position * m;
-		lookPosition = look * m;
-	}
-	// カメラが壁にめり込まないようにする
-	VECTOR3 start = player->Position() + VECTOR3(0, 0, 0);
-	VECTOR3 end = transform.position;
-	// startからendに向かうベクトルを作り、長さに0.2を加える
-	VECTOR3 camVec = end - start;
-	camVec = XMVector3Normalize(camVec) * (camVec.Length() + 0.2f);
-	end = start + camVec;
+			// プレイヤーの行列を求める
+			//Player* player = ObjectManager::FindGameObject<Player>();
+			MATRIX4X4 rotY = XMMatrixRotationY(rot.y);
+			MATRIX4X4 trans = XMMatrixTranslation(
+				pos.x, pos.y / 2.0f + 0.0f, pos.z);
+			MATRIX4X4 m = rotY * trans;
+			// プレイヤーが回転・移動してない時のカメラ位置に
+			// プレイヤーの回転・移動行列を掛けると、
+			if (changeTime >= CHANGE_TIME_LIMIT) {
+				transform.position = CameraPos[viewType] * m;
+				lookPosition = LookPos[viewType] * m;
+			}
+			else { // 視点切り替え中
+				changeTime += 1.0f / 60.0f;
+				float timeRate = changeTime / CHANGE_TIME_LIMIT; // 0.0～1.0
+				float rate = timeRate;
+				VECTOR3 position = (changePosGoal - changePosStart) * rate + changePosStart;
+				VECTOR3 look = (changeLookGoal - changeLookStart) * rate + changeLookStart;
+				transform.position = position * m;
+				lookPosition = look * m;
+			}
+			// カメラが壁にめり込まないようにする
+			VECTOR3 start = pos + VECTOR3(0, 0, 0);
+			VECTOR3 end = transform.position;
+			// startからendに向かうベクトルを作り、長さに0.2を加える
+			VECTOR3 camVec = end - start;
+			camVec = XMVector3Normalize(camVec) * (camVec.Length() + 0.2f);
+			end = start + camVec;
 
-	std::list<Object3D*> grounds = ObjectManager::FindGameObjects<Object3D>();
-	for (Object3D* g : grounds)
-	{
-		VECTOR3 hit;
-		if (g->HitLineToMesh(start, end, &hit)) {
-			end = hit;
-		}
-	}
-	//endから0.2手前に置く;
-	transform.position = XMVector3Normalize(camVec) * ((end - start).Length() - 0.2f) + start;
+			std::list<Object3D*> grounds = ObjectManager::FindGameObjects<Object3D>();
+			for (Object3D* g : grounds)
+			{
+				VECTOR3 hit;
+				if (g->HitLineToMesh(start, end, &hit)) {
+					end = hit;
+				}
+			}
+			//endから0.2手前に置く;
+			transform.position = XMVector3Normalize(camVec) * ((end - start).Length() - 0.2f) + start;
 
 
-	// ------------------------------------------------------------------
-	// カメラ座標を配列に設定する
-	eyePt[counter] = transform.position;   // カメラ座標
-	lookatPt[counter] = lookPosition;      // 注視点
-	view[counter] = XMMatrixLookAtLH(	    // ビューマトリックス
-		transform.position,
-		lookPosition,
-		VECTOR3(0, 1, 0));
+			// ------------------------------------------------------------------
+			// カメラ座標を配列に設定する
+			eyePt[counter] = transform.position;   // カメラ座標
+			lookatPt[counter] = lookPosition;      // 注視点
+			view[counter] = XMMatrixLookAtLH(	    // ビューマトリックス
+				transform.position,
+				lookPosition,
+				VECTOR3(0, 1, 0));
 
-	// ------------------------------------------------------------------
-	// 視点からの距離の２乗をDrawObjectに設定する
-	// これは、視点からの距離の降順に描画したいため
-	std::list<Object3D*> objList = ObjectManager::FindGameObjects<Object3D>();
-	for (Object3D*& obj : objList)
-	{
-		if (obj != this)
-		{
-			float distQ = magnitudeSQ(obj->Position() - transform.position);
-			ObjectManager::SetEyeDist(obj, distQ, counter);  // 視点からの距離の２乗をDrawObjectに設定
-		}
-	}
+			// ------------------------------------------------------------------
+			// 視点からの距離の２乗をDrawObjectに設定する
+			// これは、視点からの距離の降順に描画したいため
+			std::list<Object3D*> objList = ObjectManager::FindGameObjects<Object3D>();
+			for (Object3D*& obj : objList)
+			{
+				if (obj != this)
+				{
+					float distQ = magnitudeSQ(obj->Position() - transform.position);
+					ObjectManager::SetEyeDist(obj, distQ, counter);  // 視点からの距離の２乗をDrawObjectに設定
+				}
+			}	
 }
