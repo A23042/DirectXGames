@@ -69,6 +69,7 @@ void Player::Start()
 void Player::Update()
 {
 	sphere.velocity.y -= Gravity * SceneManager::DeltaTime();
+
 	// 速度成分を坂の時考慮する
 	// 面の法線に垂直なベクトル成分に進む
 	sphere.center += sphere.velocity * SceneManager::DeltaTime();
@@ -287,42 +288,84 @@ void Player::PushVec(VECTOR3 pushVec, VECTOR3 RefVec)
 void Player::UpdateNormal()
 {
 	auto pDI = GameDevice()->m_pDI;
+	if(playerNum == 0)
+	{
 
-	if (pDI->CheckKey(KD_DAT, DIK_W)) {
-		// 行列でやる場合
-		VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
-		MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
-		sphere.velocity += forward * rotY; // キャラの向いてる方への移動速度
-	} else if (pDI->CheckKey(KD_DAT, DIK_S)) {
-		// 行列でやる場合
-		VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
-		MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
-		sphere.velocity += -forward * rotY; // キャラの向いてる方への移動速度
+		if (pDI->CheckKey(KD_DAT, DIK_W)) {
+			// 行列でやる場合
+			VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
+			MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
+			sphere.velocity += forward * rotY; // キャラの向いてる方への移動速度
+		}
+		else if (pDI->CheckKey(KD_DAT, DIK_S)) {
+			// 行列でやる場合
+			VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
+			MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
+			sphere.velocity += -forward * rotY; // キャラの向いてる方への移動速度
 
+		}
+		else {
+			animator->MergePlay(aIdle);
+		}
+		if (pDI->CheckKey(KD_DAT, DIK_A)) {
+			transform.rotation.y -= RotationSpeed / 180.0f * XM_PI;
+		}
+		if (pDI->CheckKey(KD_DAT, DIK_D)) {
+			transform.rotation.y += RotationSpeed / 180.0f * XM_PI;
+		}
+		//if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_SPACE)) {
+		if (pDI->CheckKey(KD_TRG, DIK_SPACE)) {
+			//transform.position.y += 0.1f;
+			//sphere.center = transform.position;
+			//speedY = JumpPower;
+			state = sJump;
+			//sphere.velocity.y += 15.0f * SceneManager::DeltaTime();
+		}
+		else if (pDI->CheckKey(KD_TRG, DIK_LSHIFT)) {
+			//transform.position.y -= 0.1f;
+			//sphere.center = transform.position;
+			//speedY = JumpPower;
+			//state = sJump;
+			//sphere.velocity.y -= 10.0f * SceneManager::DeltaTime();
+		}
 	}
-	else {
-		animator->MergePlay(aIdle);
-	}
-	if (pDI->CheckKey(KD_DAT, DIK_A)) {
-		transform.rotation.y -= RotationSpeed / 180.0f * XM_PI;
-	}
-	if (pDI->CheckKey(KD_DAT, DIK_D)) {
-		transform.rotation.y += RotationSpeed / 180.0f * XM_PI;
-	}
-	//if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_SPACE)) {
-	if (pDI->CheckKey(KD_TRG, DIK_SPACE)) {
-		//transform.position.y += 0.1f;
-		//sphere.center = transform.position;
-		//speedY = JumpPower;
-		state = sJump;
-		//sphere.velocity.y += 15.0f * SceneManager::DeltaTime();
-	}
-	else if (pDI->CheckKey(KD_TRG, DIK_LSHIFT)) {
-		//transform.position.y -= 0.1f;
-		//sphere.center = transform.position;
-		//speedY = JumpPower;
-		//state = sJump;
-		//sphere.velocity.y -= 10.0f * SceneManager::DeltaTime();
+	else if (playerNum == 1)
+	{
+		if (pDI->CheckKey(KD_DAT, DIK_UP)) {
+			// 行列でやる場合
+			VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
+			MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
+			sphere.velocity += forward * rotY; // キャラの向いてる方への移動速度
+		}
+		else if (pDI->CheckKey(KD_DAT, DIK_DOWN)) {
+			// 行列でやる場合
+			VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
+			MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
+			sphere.velocity += -forward * rotY; // キャラの向いてる方への移動速度
+
+		}
+
+		if (pDI->CheckKey(KD_DAT, DIK_LEFT)) {
+			transform.rotation.y -= RotationSpeed / 180.0f * XM_PI;
+		}
+		if (pDI->CheckKey(KD_DAT, DIK_RIGHT)) {
+			transform.rotation.y += RotationSpeed / 180.0f * XM_PI;
+		}
+		//if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_SPACE)) {
+		if (pDI->CheckKey(KD_TRG, DIK_SPACE)) {
+			//transform.position.y += 0.1f;
+			//sphere.center = transform.position;
+			//speedY = JumpPower;
+			state = sJump;
+			//sphere.velocity.y += 15.0f * SceneManager::DeltaTime();
+		}
+		else if (pDI->CheckKey(KD_TRG, DIK_LSHIFT)) {
+			//transform.position.y -= 0.1f;
+			//sphere.center = transform.position;
+			//speedY = JumpPower;
+			//state = sJump;
+			//sphere.velocity.y -= 10.0f * SceneManager::DeltaTime();
+		}
 	}
 
 

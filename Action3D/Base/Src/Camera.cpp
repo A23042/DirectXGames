@@ -45,7 +45,6 @@ void Camera::Update()
 			{
 				// ‰æ–Ê0‚ÍPlayer1Ž‹“_
 				//Player* pc = ObjectManager::FindGameObject<Player>();
-
 					if (pc->playerNum == 0)
 					{
 						if (pc != nullptr)
@@ -62,16 +61,8 @@ void Camera::Update()
 			case 1:
 			{
 				// ‰æ–Ê1‚ÍPlayer2Ž‹“_
-				//Player* pc = ObjectManager::FindGameObject<Player>();
-				Ball* ball = ObjectManager::FindGameObject<Ball>();
-				if (ball != nullptr)
-				{
-					updateCamera(i, ball->Position(), ball->Rotation());
-				}
-				else {
-					updateCamera(i, VECTOR3(0, 0, 0), VECTOR3(0, 0, 0));
-				}
-				/*if (pc->playerNum == 1)
+				
+				if (pc->playerNum == 1)
 				{
 					if (pc != nullptr)
 					{
@@ -80,7 +71,7 @@ void Camera::Update()
 					else {
 						updateCamera(i, VECTOR3(0, 0, 0), VECTOR3(0, 0, 0));
 					}
-				}*/
+				}
 			}
 			break;
 			}
