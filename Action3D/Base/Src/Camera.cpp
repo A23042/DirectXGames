@@ -155,12 +155,9 @@ void Camera::Draw()
 
 void Camera::updateCamera(int counter, VECTOR3 pos, VECTOR3 rot)
 {
-
 			// プレイヤーの行列を求める
-			//Player* player = ObjectManager::FindGameObject<Player>();
 			MATRIX4X4 rotY = XMMatrixRotationY(rot.y);
-			MATRIX4X4 trans = XMMatrixTranslation(
-				pos.x, pos.y / 2.0f + 0.0f, pos.z);
+			MATRIX4X4 trans = XMMatrixTranslation(pos.x, pos.y / 2.0f + 0.0f, pos.z);
 			MATRIX4X4 m = rotY * trans;
 			// プレイヤーが回転・移動してない時のカメラ位置に
 			// プレイヤーの回転・移動行列を掛けると、
@@ -178,19 +175,21 @@ void Camera::updateCamera(int counter, VECTOR3 pos, VECTOR3 rot)
 				lookPosition = look * m;
 			}
 			// カメラが壁にめり込まないようにする
-			VECTOR3 start = pos + VECTOR3(0, 0, 0);
+			VECTOR3 start = pos;
 			VECTOR3 end = transform.position;
 			// startからendに向かうベクトルを作り、長さに0.2を加える
 			VECTOR3 camVec = end - start;
 			camVec = XMVector3Normalize(camVec) * (camVec.Length() + 0.2f);
 			end = start + camVec;
-
-			std::list<Object3D*> grounds = ObjectManager::FindGameObjects<Object3D>();
-			for (Object3D* g : grounds)
 			{
-				VECTOR3 hit;
-				if (g->HitLineToMesh(start, end, &hit)) {
-					end = hit;
+
+				std::list<Object3D*> objList = ObjectManager::FindGameObjects<Object3D>();
+				for (Object3D* g : objList)
+				{
+					VECTOR3 hit;
+					if (g->HitLineToMesh(start, end, &hit)) {
+						end = hit;
+					}
 				}
 			}
 			//endから0.2手前に置く;
@@ -209,13 +208,15 @@ void Camera::updateCamera(int counter, VECTOR3 pos, VECTOR3 rot)
 			// ------------------------------------------------------------------
 			// 視点からの距離の２乗をDrawObjectに設定する
 			// これは、視点からの距離の降順に描画したいため
-			std::list<Object3D*> objList = ObjectManager::FindGameObjects<Object3D>();
-			for (Object3D*& obj : objList)
 			{
-				if (obj != this)
+				std::list<Object3D*> objList = ObjectManager::FindGameObjects<Object3D>();
+				for (Object3D*& obj : objList)
 				{
-					float distQ = magnitudeSQ(obj->Position() - transform.position);
-					ObjectManager::SetEyeDist(obj, distQ, counter);  // 視点からの距離の２乗をDrawObjectに設定
+					if (obj != this)
+					{
+						float distQ = magnitudeSQ(obj->Position() - transform.position);
+						ObjectManager::SetEyeDist(obj, distQ, counter);  // 視点からの距離の２乗をDrawObjectに設定
+					}
 				}
-			}	
+			}
 }

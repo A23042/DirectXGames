@@ -9,8 +9,8 @@ Box::Box(VECTOR3 size, VECTOR3 rot)
 	mesh = new CFbxMesh();
 	mesh->Load("Data/Object/box00.mesh");
 
-	meshCol = new MeshCollider();
-	meshCol->MakeFromMesh(mesh);
+	//meshCol = new MeshCollider();
+	//meshCol->MakeFromMesh(mesh);
 	
 	vPos = VECTOR3(size.x / 2, size.y / 2, size.z / 2);
 	transform.scale = size;

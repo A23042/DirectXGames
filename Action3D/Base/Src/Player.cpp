@@ -47,6 +47,7 @@ Player::Player(int num)
 	sphere.radius *= transform.scale.x;
 
 	sphere.isPlayer = true;
+
 }
 
 Player::~Player()
@@ -79,7 +80,7 @@ void Player::Update()
 	// ‹óŠÔ•ªŠ„‚æ‚­‚í‚©‚Á‚Ä‚È‚¢
 
 	// ŠeBox‚Æ‚ÌÕ“Ë”»’è
-	std::list<Object3D*> objes = ObjectManager::FindGameObjects<Object3D>();
+	std::list<Object3D*> objes = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ");
 	for (Object3D* obj : objes) {
 		VECTOR3 refVec = VECTOR3(0, 0, 0);
 		VECTOR3 pushVec = VECTOR3(0, 0, 0);
@@ -93,9 +94,7 @@ void Player::Update()
 		VECTOR3 pushVec = VECTOR3(0, 0, 0);
 		//refVec = ball->HitPlayerToSphere(this->sphere, pushVec);
 		if (ball->HitPlayerToSphere(this->sphere, pushVec)) {
-			ball->sphere.center -= pushVec / 2;
 			ball->SetPosition(ball->sphere.center);
-			sphere.center += pushVec / 2;
 			transform.position = sphere.center;
 		}
 		//transform.position = sphere.center;
@@ -178,9 +177,8 @@ void Player::Update()
 		coll.radius = 0.5f;
 		VECTOR3 push;
 		if (object->HitSphereToMesh(coll, &push)) {
-			move = push;
-			//transform.position += move;
-			//sphere.center = transform.position;
+			transform.position += push;
+			sphere.center = transform.position;
 		}
 	}
 
