@@ -14,10 +14,13 @@ public:
 private:
 	CsvReader* csv;
 	Object3D* obj = nullptr;
-	VECTOR3 worldPos;
-	POINT mousePos;
-	VECTOR2 mPos;
-	VECTOR3 screenPos;
+	Object3D* getObj = nullptr;
 
-	VECTOR3 startPos, endPos;	// start‚©‚çend‚Ü‚ÅRay‚ð”ò‚Î‚·
+	POINT mousePos;
+
+	VECTOR3 nearWorldPos;
+	VECTOR3 farWorldPos;
+	VECTOR3 extendedFarWorldPos;
+	
+	bool hasObj = false;
 };

@@ -14,6 +14,8 @@ Ball::Ball()
 	//SetTag("STAGEOBJ");
 	mesh = new CFbxMesh();
 	mesh->Load("Data/Object/ball01.mesh");
+	meshCol = new MeshCollider();
+	meshCol->MakeFromMesh(mesh);
 
 	sphere.radius = 0.5f;
 	sphere.isPlayer = false;
@@ -35,7 +37,7 @@ void Ball::Start()
 
 void Ball::Update()
 {
-	sphere.velocity.y -= Gravity * SceneManager::DeltaTime();
+	//sphere.velocity.y -= Gravity * SceneManager::DeltaTime();
 
 	sphere.center += sphere.velocity * SceneManager::DeltaTime();
 	transform.position = sphere.center;
