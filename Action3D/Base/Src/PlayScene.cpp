@@ -32,9 +32,9 @@ PlayScene::PlayScene()
 				float mass = csv->GetFloat(i, 7);
 				int num = csv->GetFloat(i, 8);
 				obj = new Player(num);
-				obj->sphere.e = e;
-				obj->sphere.f = f;
-				obj->sphere.mass = mass;
+				obj->pObj.e = e;
+				obj->pObj.f = f;
+				obj->pObj.mass = mass;
 			}
 			else if (str == "BOX") {
 				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
@@ -61,9 +61,9 @@ PlayScene::PlayScene()
 				float f = csv->GetFloat(i, 6);
 				float mass = csv->GetFloat(i, 7);
 				obj = Instantiate<Ball>();
-				obj->sphere.e = e;
-				obj->sphere.f = f;
-				obj->sphere.mass = mass;
+				obj->pObj.e = e;
+				obj->pObj.f = f;
+				obj->pObj.mass = mass;
 			}
 			else {
 				assert(false);

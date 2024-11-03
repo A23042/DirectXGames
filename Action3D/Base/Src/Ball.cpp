@@ -17,8 +17,8 @@ Ball::Ball()
 	meshCol = new MeshCollider();
 	meshCol->MakeFromMesh(mesh);
 
-	sphere.radius = 0.5f;
-	sphere.isPlayer = false;
+	pObj.radius = 0.5f;
+	pObj.isPlayer = false;
 }
 
 Ball::~Ball()
@@ -31,33 +31,32 @@ Ball::~Ball()
 
 void Ball::Start()
 {
-	sphere.center = transform.position;
+	pObj.center = transform.position;
 }
 
 
 void Ball::Update()
 {
-	//sphere.velocity.y -= Gravity * SceneManager::DeltaTime();
-
-	sphere.center += sphere.velocity * SceneManager::DeltaTime();
-	transform.position = sphere.center;
+	//pObj.velocity.y -= Gravity * SceneManager::DeltaTime();
+	pObj.center += pObj.velocity * SceneManager::DeltaTime();
+	transform.position = pObj.center;
 
 	// BoxÇ∆ÇÃè’ìÀîªíË
 	std::list<Box*> boxes = ObjectManager::FindGameObjects<Box>();
 	for (Box* box : boxes) {
 		VECTOR3 refVec = VECTOR3(0, 0, 0);
 		VECTOR3 pushVec = VECTOR3(0, 0, 0);
-		pushVec = box->HitSphereToCubeplane(this->sphere, refVec);
+		pushVec = box->HitSphereToCubeplane(this->pObj, refVec);
 		PushVec(-pushVec, refVec);
 	}
 }
 
 void Ball::PushVec(VECTOR3 pushVec, VECTOR3 RefVec)
 {
-	sphere.center += pushVec;
-	transform.position = sphere.center;
+	pObj.center += pushVec;
+	transform.position = pObj.center;
 	if (RefVec.Length() > 0) {
-		sphere.velocity = RefVec;
+		pObj.velocity = RefVec;
 	}
 	return;
 }

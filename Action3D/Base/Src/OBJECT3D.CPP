@@ -123,14 +123,14 @@ float Object3D::HitSphereToSphere(const SphereCollider& target, bool withY)
 	return 0.0f;
 }
 
-VECTOR3 Object3D::HitSphereToCubeplane(Sphere& sphere, VECTOR3& refVec)
+VECTOR3 Object3D::HitSphereToCubeplane(PhysicsObject& pOgj, VECTOR3& refVec)
 {
 	return VECTOR3();
 }
 
 /*
 // PlayerとBallの衝突判定を書く
-VECTOR3 Object3D::HitPlayerToSphere(Sphere& sphere, VECTOR3& pushVec)
+VECTOR3 Object3D::HitPlayerToSphere(PhysicsObject& pOgj, VECTOR3& pushVec)
 {
 	// PlayerとBallの距離計算
 	VECTOR3 vec = sphere.center - this->sphere.center;
@@ -168,13 +168,13 @@ VECTOR3 Object3D::HitPlayerToSphere(Sphere& sphere, VECTOR3& pushVec)
 	return VECTOR3();
 }
 */
-BOOL Object3D::HitPlayerToSphere(Sphere& player, VECTOR3& pushVec)
+BOOL Object3D::HitPlayerToSphere(PhysicsObject& player, VECTOR3& pushVec)
 {
 	// PlayerとBallの距離計算
-	VECTOR3 vec = player.center - this->sphere.center;
-	VECTOR3 vecB = this->sphere.center - player.center;
+	VECTOR3 vec = player.center - this->pObj.center;
+	VECTOR3 vecB = this->pObj.center - player.center;
 
-	float rsum = player.radius + this->sphere.radius;
+	float rsum = player.radius + this->pObj.radius;
 	VECTOR3 normal = normalize(vec);
 
 	// 衝突していたら
@@ -188,28 +188,28 @@ BOOL Object3D::HitPlayerToSphere(Sphere& player, VECTOR3& pushVec)
 		float pushLen = rsum - vec.Length();		// 押し出す長さ
 		pushVec = normal * pushLen;// 押し出すベクトルに長さを掛ける
 
-		this->sphere.center -= pushVec / 2;
+		this->pObj.center -= pushVec / 2;
 		player.center += pushVec / 2;
 
-		VECTOR3 vec = player.center - this->sphere.center;
+		VECTOR3 vec = player.center - this->pObj.center;
 		VECTOR3 normal = normalize(vec);
 
 		// 衝突したふたつのオブジェクトの反発係数と摩擦を考慮する
-		float e2 = (this->sphere.e + player.e) / 2;
-		float f2 = (this->sphere.f + player.f) / 2;
+		float e2 = (this->pObj.e + player.e) / 2;
+		float f2 = (this->pObj.f + player.f) / 2;
 
 		// 質量の考慮
 		float massA = player.mass;
-		float massB = this->sphere.mass;
+		float massB = this->pObj.mass;
 		float sumMass = massA + massB;
 
 		VECTOR3 constVec = e2 / sumMass * normal;
 
 		VECTOR3 velocityA = -massB * constVec + player.velocity;
-		VECTOR3 velocityB = massA * constVec + this->sphere.velocity;
+		VECTOR3 velocityB = massA * constVec + this->pObj.velocity;
 
 		player.velocity = velocityB;
-		this->sphere.velocity = velocityA;
+		this->pObj.velocity = velocityA;
 
 		return true;
 

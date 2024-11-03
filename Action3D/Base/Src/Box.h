@@ -7,18 +7,19 @@ public:
 	Box(VECTOR3 size = VECTOR3(0,0,0), VECTOR3 rot = VECTOR3(0,0,0));
 
 	~Box();
+	void Start() override;
 	void Update() override;
 	void CubeSize(float x = 0, float y = 0, float z = 0);
 	// 押し返すベクトルを返したいからVECTOR3
 	// 平面の衝突判定
-	VECTOR3 HitSphereToCubeplane(Sphere& sphere, VECTOR3 &refVec) override;
+	VECTOR3 HitSphereToCubeplane(PhysicsObject& pOgj, VECTOR3 &refVec) override;
 	// 辺の衝突判定
-	VECTOR3 HitSphereToCubeEdge(Sphere& sphere, VECTOR3& refVec);
+	VECTOR3 HitSphereToCubeEdge(PhysicsObject& pOgj, VECTOR3& refVec);
 	// 頂点の衝突判定
-	VECTOR3 HitSphereToCubeVertices(Sphere& sphere, VECTOR3& refVec);
+	VECTOR3 HitSphereToCubeVertices(PhysicsObject& pOgj, VECTOR3& refVec);
 
 	// 跳ね返りベクトルの計算(仮途中)
-	virtual VECTOR3 ReflectionVec(Sphere& sphere, VECTOR3 normal);
+	virtual VECTOR3 ReflectionVec(PhysicsObject& pOgj, VECTOR3 normal);
 
 private:
 	VECTOR3 normal[6] = {};

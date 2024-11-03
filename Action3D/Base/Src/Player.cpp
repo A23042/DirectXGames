@@ -21,33 +21,18 @@ Player::Player(int num)
 	animator = new Animator(); // インスタンスを作成
 
 	mesh = new CFbxMesh();
-	//mesh->Load("Data/Player/PlayerChara.mesh");
 	mesh->Load("Data/Object/ball01.mesh");
 
-	/*
-	mesh->LoadAnimation(aIdle, "Data/Player/Idle.anmx", true);
-	mesh->LoadAnimation(aRun, "Data/Player/Run.anmx", true);
-	mesh->LoadAnimation(aAttack1, "Data/Player/attack1.anmx", false);
-	mesh->LoadAnimation(aAttack2, "Data/Player/attack2.anmx", false);
-	mesh->LoadAnimation(aAttack3, "Data/Player/attack3.anmx", false);
-	animator->SetModel(mesh); // このモデルでアニメーションする
-	animator->Play(aRun);
-	animator->SetPlaySpeed(1.0f);
-	*/
-
 	state = sNormal;
-	//speedY = 0;
 
-	sphere.center = transform.position;
-	sphere.radius = 0.5f;
-	sphere.velocity = VECTOR3(0, 0, 0);
+	pObj.center = transform.position;
+	pObj.radius = 0.5f;
+	pObj.velocity = VECTOR3(0, 0, 0);
 
 	// サイズ調整
-	//transform.scale = VECTOR3(2, 2, 2);
-	sphere.radius *= transform.scale.x;
+	//pObj.radius *= transform.scale.x;
 
-	sphere.isPlayer = true;
-
+	pObj.isPlayer = true;
 }
 
 Player::~Player()
@@ -64,17 +49,17 @@ Player::~Player()
 
 void Player::Start()
 {
-	sphere.center = transform.position;
+	pObj.center = transform.position;
 }
 
 void Player::Update()
 {
-	sphere.velocity.y -= Gravity * SceneManager::DeltaTime();
+	pObj.velocity.y -= Gravity * SceneManager::DeltaTime();
 
 	// 速度成分を坂の時考慮する
 	// 面の法線に垂直なベクトル成分に進む
-	sphere.center += sphere.velocity * SceneManager::DeltaTime();
-	transform.position = sphere.center;
+	pObj.center += pObj.velocity * SceneManager::DeltaTime();
+	transform.position = pObj.center;
 
 	// ここで空間分割を使って処理負荷の軽減をする？
 	// 空間分割よくわかってない
@@ -84,7 +69,7 @@ void Player::Update()
 	for (Object3D* obj : objes) {
 		VECTOR3 refVec = VECTOR3(0, 0, 0);
 		VECTOR3 pushVec = VECTOR3(0, 0, 0);
-		pushVec = obj->HitSphereToCubeplane(this->sphere, refVec);
+		pushVec = obj->HitSphereToCubeplane(this->pObj, refVec);
 		PushVec(-pushVec, refVec);
 	}
 	// Ball
@@ -92,16 +77,16 @@ void Player::Update()
 	for (Ball* ball : balles) {
 		VECTOR3 refVec = VECTOR3(0, 0, 0);
 		VECTOR3 pushVec = VECTOR3(0, 0, 0);
-		//refVec = ball->HitPlayerToSphere(this->sphere, pushVec);
-		if (ball->HitPlayerToSphere(this->sphere, pushVec)) {
-			ball->SetPosition(ball->sphere.center);
-			transform.position = sphere.center;
+		//refVec = ball->HitPlayerTopObj(this->pObj, pushVec);
+		if (ball->HitPlayerToSphere(this->pObj, pushVec)) {
+			ball->SetPosition(ball->pObj.center);
+			transform.position = pObj.center;
 		}
-		//transform.position = sphere.center;
+		//transform.position = pObj.center;
 
-		sumVelocity.x = abs(this->sphere.velocity.x) + abs(ball->sphere.velocity.x);
-		sumVelocity.y = abs(this->sphere.velocity.y) + abs(ball->sphere.velocity.y);
-		sumVelocity.z = abs(this->sphere.velocity.z) + abs(ball->sphere.velocity.z);
+		sumVelocity.x = abs(this->pObj.velocity.x) + abs(ball->pObj.velocity.x);
+		sumVelocity.y = abs(this->pObj.velocity.y) + abs(ball->pObj.velocity.y);
+		sumVelocity.z = abs(this->pObj.velocity.z) + abs(ball->pObj.velocity.z);
 
 		//PushVec(pushVec, refVec);
 		//ball->PushVec(-pushVec, -refVec);
@@ -126,9 +111,9 @@ void Player::Update()
 	ImGui::End();
 
 	ImGui::Begin("VELOCITY");
-	ImGui::InputFloat("X", &sphere.velocity.x);
-	ImGui::InputFloat("Y", &sphere.velocity.y);
-	ImGui::InputFloat("Z", &sphere.velocity.z);
+	ImGui::InputFloat("X", &pObj.velocity.x);
+	ImGui::InputFloat("Y", &pObj.velocity.y);
+	ImGui::InputFloat("Z", &pObj.velocity.z);
 	ImGui::End();
 
 	ImGui::Begin("SUMVELOCITY");
@@ -275,10 +260,10 @@ SphereCollider Player::Collider()
 
 void Player::PushVec(VECTOR3 pushVec, VECTOR3 RefVec)
 {	
-	sphere.center += pushVec;
-	transform.position = sphere.center;
+	pObj.center += pushVec;
+	transform.position = pObj.center;
 	if (RefVec.Length() > 0) {
-		sphere.velocity = RefVec;
+		pObj.velocity = RefVec;
 	}
 	return;
 }
@@ -293,13 +278,13 @@ void Player::UpdateNormal()
 			// 行列でやる場合
 			VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
 			MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
-			sphere.velocity += forward * rotY; // キャラの向いてる方への移動速度
+			pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
 		}
 		else if (pDI->CheckKey(KD_DAT, DIK_S)) {
 			// 行列でやる場合
 			VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
 			MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
-			sphere.velocity += -forward * rotY; // キャラの向いてる方への移動速度
+			pObj.velocity += -forward * rotY; // キャラの向いてる方への移動速度
 
 		}
 		else {
@@ -333,13 +318,13 @@ void Player::UpdateNormal()
 			// 行列でやる場合
 			VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
 			MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
-			sphere.velocity += forward * rotY; // キャラの向いてる方への移動速度
+			pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
 		}
 		else if (pDI->CheckKey(KD_DAT, DIK_DOWN)) {
 			// 行列でやる場合
 			VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
 			MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
-			sphere.velocity += -forward * rotY; // キャラの向いてる方への移動速度
+			pObj.velocity += -forward * rotY; // キャラの向いてる方への移動速度
 
 		}
 
@@ -371,7 +356,7 @@ void Player::UpdateNormal()
 
 void Player::UpdateJump()
 {
-	sphere.velocity.y = 10.0f;
+	pObj.velocity.y = 10.0f;
 	state = sNormal();
 }
 

@@ -13,7 +13,7 @@ public:
 	~MoveBox();
 	void Start() override;
 	void Update() override;
-	VECTOR3 ReflectionVec(Sphere& sphere, VECTOR3 normal) override;
+	VECTOR3 ReflectionVec(PhysicsObject& pOgj, VECTOR3 normal) override;
 private:
 	VECTOR3 vPos;
 	VECTOR3 pushVec;

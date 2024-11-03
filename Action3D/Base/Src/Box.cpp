@@ -9,8 +9,8 @@ Box::Box(VECTOR3 size, VECTOR3 rot)
 	mesh = new CFbxMesh();
 	mesh->Load("Data/Object/box00.mesh");
 
-	//meshCol = new MeshCollider();
-	//meshCol->MakeFromMesh(mesh);
+	meshCol = new MeshCollider();
+	meshCol->MakeFromMesh(mesh);
 	
 	vPos = VECTOR3(size.x / 2, size.y / 2, size.z / 2);
 	transform.scale = size;
@@ -25,10 +25,20 @@ Box::Box(VECTOR3 size, VECTOR3 rot)
 	pushVec = VECTOR3(0, 0, 0);
 	HitPoint = VECTOR3(0, 0, 0);
 	refVec = VECTOR3(0, 0, 0);
+
+	pObj.center = transform.position;
+	CubeSize(vPos.x, vPos.y, vPos.z);
+
+}
+
+void Box::Start()
+{
+	pObj.center = transform.position;
 }
 
 void Box::Update()
 {
+	transform.position = pObj.center;
 	CubeSize(vPos.x, vPos.y, vPos.z);
 
 	// 衝突判定の関数呼び出しはそれぞれのクラスで行う
@@ -114,13 +124,13 @@ void Box::CubeSize(float x, float y, float z)
 }
 
 // 面との衝突
-VECTOR3 Box::HitSphereToCubeplane(Sphere& sphere, VECTOR3 &refVec)
+VECTOR3 Box::HitSphereToCubeplane(PhysicsObject& tObj, VECTOR3 &refVec)
 {
 	pushVec = VECTOR3(0, 0, 0);
 
 	// 球の中心点から各頂点へのベクトル
 	for (int i = 0; i < 8; i++) {
-		pt[i] = sphere.center - ten[i];
+		pt[i] = tObj.center - ten[i];
 	}
 
 	int TptPoint[12] = {
@@ -141,25 +151,25 @@ VECTOR3 Box::HitSphereToCubeplane(Sphere& sphere, VECTOR3 &refVec)
 
 	// 平面との距離計算
 	for (int i = 0; i < 6; i++) {
-		distance[i] = abs(dot(plane[i], sphere.center) + d[i]) / plane[i].Length();
+		distance[i] = abs(dot(plane[i], tObj.center) + d[i]) / plane[i].Length();
 
 		// 衝突していたらあとの距離計算を省く
-		if (distance[i] <= sphere.radius) {
+		if (distance[i] <= tObj.radius) {
 			// 無限平面に衝突していたら辺に垂線を下ろせるか
 			if (Tpt[pair[i][0]] >= 0 && Tpt[pair[i][0]] <= 1 && Tpt[pair[i][1]] >= 0 && Tpt[pair[i][1]] <= 1) {
-				HitPoint = sphere.center - plane[i] * distance[i];	// 衝突点
-				refVec = ReflectionVec(sphere, plane[i]);	// 球体を反射させる
-				pushVec = plane[i] * (sphere.radius - distance[i]);	// めり込みを解除するための計算
+				HitPoint = tObj.center - plane[i] * distance[i];	// 衝突点
+				refVec = ReflectionVec(tObj, plane[i]);	// 球体を反射させる
+				pushVec = plane[i] * (tObj.radius - distance[i]);	// めり込みを解除するための計算
 				return pushVec;	// めり込み解除の量ベクトル
 			}
 		}
 	}
 
-	HitSphereToCubeEdge(sphere, refVec);
+	HitSphereToCubeEdge(tObj, refVec);
 }
 
 // 辺との衝突
-VECTOR3 Box::HitSphereToCubeEdge(Sphere& sphere, VECTOR3& refVec)
+VECTOR3 Box::HitSphereToCubeEdge(PhysicsObject& tObj, VECTOR3& refVec)
 {
 	int TptPoint[12] = {
 		{0}, {1}, {2}, {3},
@@ -176,31 +186,31 @@ VECTOR3 Box::HitSphereToCubeEdge(Sphere& sphere, VECTOR3& refVec)
 	// 辺と球との距離計算
 	for (int i = 0; i < 12; i++) {
 		distanceV[i] = edge[i] * dot(edge[i], pt[TptPoint[i]]) / edge[i].LengthSquare() - pt[TptPoint[i]];
-		if (distanceV[i].Length() <= sphere.radius) {
+		if (distanceV[i].Length() <= tObj.radius) {
 			//　垂線をおろせるか
 			if (0 <= Tpt[i] && Tpt[i] <= 1) {
 				//VECTOR3 vNormal = normalize(plane[pair[i][0]] + plane[pair[i][1]]) / 2;	// 辺の法線ベクトル
 				VECTOR3 vNormal = normalize(distanceV[i]);	// 辺の法線ベクトル
 
-				HitPoint = sphere.center - vNormal * distanceV[i].Length();	// 衝突点
-				refVec = ReflectionVec(sphere, vNormal);
-				pushVec = vNormal * (sphere.radius - distanceV[i].Length());
+				HitPoint = tObj.center - vNormal * distanceV[i].Length();	// 衝突点
+				refVec = ReflectionVec(tObj, vNormal);
+				pushVec = vNormal * (tObj.radius - distanceV[i].Length());
 				return pushVec;
 			}
 		}
 	}
 	
-	HitSphereToCubeVertices(sphere, refVec);
+	HitSphereToCubeVertices(tObj, refVec);
 	return VECTOR3();
 }
 
 // 頂点との衝突
-VECTOR3 Box::HitSphereToCubeVertices(Sphere& sphere, VECTOR3& refVec)
+VECTOR3 Box::HitSphereToCubeVertices(PhysicsObject& tObj, VECTOR3& refVec)
 {
 	for (int i = 0; i < 8; i++) {
-		if (pt[i].Length() < sphere.radius) {
-			refVec = ReflectionVec(sphere, normalize(pt[i]));
-			pushVec = normalize(ten[i] - sphere.center) * (sphere.radius - pt[i].Length());
+		if (pt[i].Length() < tObj.radius) {
+			refVec = ReflectionVec(tObj, normalize(pt[i]));
+			pushVec = normalize(ten[i] - tObj.center) * (tObj.radius - pt[i].Length());
 			return pushVec;
 		}
 	}
@@ -210,19 +220,17 @@ VECTOR3 Box::HitSphereToCubeVertices(Sphere& sphere, VECTOR3& refVec)
 
 // 反射させるための関数
 // 当たったときの法線ベクトルを受け取り跳ね返りベクトルを計算する
-VECTOR3 Box::ReflectionVec(Sphere& sphere, VECTOR3 normal)
+VECTOR3 Box::ReflectionVec(PhysicsObject& tObj, VECTOR3 normal)
 {
 	// 法線方向に反発係数をかける
 	// 法線方向に垂直なベクトルに摩擦係数を計算
-	VECTOR3 refNormal = dot(sphere.velocity, normal) * normal;
-//	VECTOR3 refNormal = dot(sphere.velocity, normal) * normal * 2;
+	VECTOR3 refNormal = dot(tObj.velocity, normal) * normal;
 
-	VECTOR3 refSessen = sphere.velocity - refNormal;
+	VECTOR3 refSessen = tObj.velocity - refNormal;
 	// 衝突したふたつのオブジェクトの反発係数と摩擦を考慮する
-	float e2 = (this->pObj.e + sphere.e) / 2;
-	float f2 = (this->pObj.f + sphere.f) / 2;
+	float e2 = (this->pObj.e + tObj.e) / 2;
+	float f2 = (this->pObj.f + tObj.f) / 2;
 	VECTOR3 b = -refNormal * e2 + refSessen * f2;
-	//VECTOR3 b = sphere.velocity - refNormal * e2;
 
 	// 順番の修正
 	// 埋め込みを解除->反射	〇
@@ -237,4 +245,5 @@ Box::~Box()
 		mesh = nullptr;
 	}
 }
+
 

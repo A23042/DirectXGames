@@ -84,15 +84,15 @@ void MoveBox::Update()
 #endif
 }
 
-VECTOR3 MoveBox::ReflectionVec(Sphere& sphere, VECTOR3 normal)
+VECTOR3 MoveBox::ReflectionVec(PhysicsObject& pOgj, VECTOR3 normal)
 {
 	// 法線ベクトルの方向の速度を考慮する
 	VECTOR3 pushVecNormal = dot(pObj.velocity, normal) * normal;
 	// 法線方向に反発係数をかける
-	VECTOR3 refNormal = dot(sphere.velocity, normal) * normal - pushVecNormal;
-	VECTOR3 refSessen = sphere.velocity - refNormal;
-	float e2 = (this->pObj.e + sphere.e) / 2;
-	float f2 = (this->pObj.f + sphere.f) / 2;
+	VECTOR3 refNormal = dot(pObj.velocity, normal) * normal - pushVecNormal;
+	VECTOR3 refSessen = pObj.velocity - refNormal;
+	float e2 = (this->pObj.e + pObj.e) / 2;
+	float f2 = (this->pObj.f + pObj.f) / 2;
 	VECTOR3 b = -refNormal * e2 + refSessen * f2;
 	// 順番の修正
 	// 埋め込みを解除->反射	〇

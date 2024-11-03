@@ -62,8 +62,12 @@ public:
 		VECTOR3 center = VECTOR3(0, 0, 0);		// 中心点
 		float e;	// 反発係数
 		float f;	// 摩擦
-	}pObj;
+		float radius = 0.0f;	// 半径
+		float mass = 0.0f;
+		bool isPlayer = false;
 
+	}pObj;
+#if 0
 	// 球体用の構造体
 	struct Sphere : PhysicsObject
 	{
@@ -71,7 +75,7 @@ public:
 		float mass = 0.0f;
 		bool isPlayer = false;
 	}sphere;
-
+#endif
 	void SetPosition(const VECTOR3& pos);
 	void SetPosition(float x, float y, float z);
 	void SetRotation(const VECTOR3& pos);
@@ -111,11 +115,11 @@ public:
 
 	// 球体とBoxの衝突判定
 	// 定義だけ書いてBox.cppで中をオーバーライド
-	virtual VECTOR3 HitSphereToCubeplane(Sphere& sphere, VECTOR3& refVec);
+	virtual VECTOR3 HitSphereToCubeplane(PhysicsObject& pOgj, VECTOR3& refVec);
 
 	// BallとPlayerの衝突判定
-	//virtual VECTOR3 HitPlayerToSphere(Sphere& sphere, VECTOR3& pushVec);
-	virtual BOOL HitPlayerToSphere(Sphere& sphere, VECTOR3& pushVec);
+	//virtual VECTOR3 HitPlayerToSphere(PhysicsObject& pOgj, VECTOR3& pushVec);
+	virtual BOOL HitPlayerToSphere(PhysicsObject& pOgj, VECTOR3& pushVec);
 
 protected:
 	CFbxMesh* mesh;
