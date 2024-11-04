@@ -19,14 +19,18 @@ PlayScene::PlayScene()
 	CsvReader* csv = new CsvReader("Data/map00.csv");
 	assert(csv->GetLines() > 0);
 	for (int i = 1; i < csv->GetLines(); i++) { // ‚Ps‚¸‚Â“Ç‚Þ
-		std::string str = csv->GetString(i, 0); // PLAYER‚ª“ü‚é
+		std::string str = csv->GetString(i, 0); // æ“ª‚Ì”Žš‚ðŽæ‚é
 		Object3D* obj = nullptr;
-		if (str == "1") {
+		// æ“ª‚ªu0v‚Ìê‡‚ÍƒXƒLƒbƒv
+		if (str == "0")
+		{
+			continue;
+		}
+		// u‚Pv‚Ìê‡‚¾‚¯i‚Þ
+		else if (str == "1")
+		{
 			str = csv->GetString(i, 1);
-			if (str == "#") {
-				continue;
-			}
-			else if (str == "PLAYER") {
+			if (str == "PLAYER") {
 				float e = csv->GetFloat(i, 5);
 				float f = csv->GetFloat(i, 6);
 				float mass = csv->GetFloat(i, 7);
@@ -41,7 +45,7 @@ PlayScene::PlayScene()
 				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
 				float e = csv->GetFloat(i, 11);
 				float f = csv->GetFloat(i, 12);
-				obj = new Box(size, rot);	// ’¼•û‘Ì‚ÌŠe•Ó‚Ì’·‚³‚Æ‰ñ“]—Ê‚ð“n‚·
+				obj = new Box(size, rot);	// ’¼•û‘Ì‚ÌƒTƒCƒY‚Æ‰ñ“]—Ê‚ð“n‚·
 				obj->pObj.e = e;
 				obj->pObj.f = f;
 			}
@@ -52,7 +56,7 @@ PlayScene::PlayScene()
 				VECTOR3 moveSpeed = VECTOR3(csv->GetFloat(i, 14), csv->GetFloat(i, 15), csv->GetFloat(i, 16));
 				float e = csv->GetFloat(i, 17);
 				float f = csv->GetFloat(i, 18);
-				obj = new MoveBox(size, rot, move, moveSpeed);	// ’¼•û‘Ì‚ÌŠe•Ó‚Ì’·‚³‚Æ‰ñ“]—ÊAˆÚ“®—Ê‚ð“n‚·
+				obj = new MoveBox(size, rot, move, moveSpeed);	// ’¼•û‘Ì‚ÌƒTƒCƒY‚Æ‰ñ“]—ÊAˆÚ“®—Ê‚ð“n‚·
 				obj->pObj.e = e;
 				obj->pObj.f = f;
 			}
@@ -72,11 +76,7 @@ PlayScene::PlayScene()
 			float y = csv->GetFloat(i, 3);
 			float z = csv->GetFloat(i, 4);
 			obj->SetPosition(x, y, z);
-			obj->Position();
-		}else if (str == "0") {
-			continue;
 		}
-		
 	}
 	Instantiate<Camera>();
 	Score* sc = ObjectManager::FindGameObject<Score>();

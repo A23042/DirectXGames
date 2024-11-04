@@ -1,6 +1,10 @@
 #include "StageEdit.h"
 #include "Box.h"
 #include "Ball.h"
+#include "MoveBox.h"
+#include "Player.h"
+#include "Gizmo3D.h"
+#include <fstream>
 
 #define EXTENDED_DISTANCE 50;	// Rayの長さ
 #define EXTENDED_OBJ_DISTANCE 20;	// (仮)オブジェクトの移動場所
@@ -10,11 +14,13 @@
 // オブジェクトを配置、削除したらcsvの行を詰めたい
 StageEdit::StageEdit()
 {
-	
-	GameDevice()->m_mView = XMMatrixLookAtLH(
-		VECTOR3(15, 20, -15),	// カメラ位置
-		VECTOR3(0, 0, 0),	// 注視点
-		VECTOR3(0, 1, 0));	// 上ベクトル
+	gizmoObj = new Gizmo3D();
+	gizmoObj->SetScale(VECTOR3(0.0015f, 0.0015f, 0.0015f));
+	gizmoObj->SetRotation(VECTOR3(0, 180.0f / 180 * XM_PI, 0));
+	//GameDevice()->m_mView = XMMatrixLookAtLH(
+	//	VECTOR3(10, 20, -15),	// カメラ位置
+	//	VECTOR3(0, 0, 0),	// 注視点
+	//	VECTOR3(0, 1, 0));	// 上ベクトル
 	nState = sNone;
 }
 
@@ -24,6 +30,16 @@ StageEdit::~StageEdit()
 
 void StageEdit::Update()
 {
+	mView = GameDevice()->m_mView;
+	mPrj = GameDevice()->m_mProj;
+	identity = XMMatrixIdentity();
+	GetWorldPos();
+
+	// 3DGizmo表示位置
+	// Windowの左下
+	VECTOR3 windowWorldPos = XMVector3Unproject(VECTOR3(100, WINDOW_HEIGHT - 100, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+	gizmoObj->SetPosition(windowWorldPos);
+	
 	switch (nState)
 	{
 	case StageEdit::sNone:
@@ -35,14 +51,32 @@ void StageEdit::Update()
 	default:
 		break;
 	}
-	GetWorldPos();
-	int x = (int)mousePos.x;
-	int y = (int)mousePos.y;
-	ImGui::Begin("MOUSEPOS");
-	ImGui::InputInt("X", &x);
-	ImGui::InputInt("Y", &y);
+
+	// オブジェクト作成ボタンImGui
+	ImGui::SetNextWindowPos(ImVec2(30, 30));
+	ImGui::SetNextWindowSize(ImVec2(130, 130));
+	ImGui::Begin("NEWOBJ");
+	if (ImGui::Button("Box"))
+	{
+		SetObj(new Box(VECTOR3(1,1,1)));
+	}
+	if (ImGui::Button("MoveBox"))
+	{
+		SetObj(new MoveBox(VECTOR3(1, 1, 1)));
+	}
+	if (ImGui::Button("Ball"))
+	{
+		SetObj(new Ball());
+	}
+	if(pNum == 0)
+	{
+		if (ImGui::Button("Player"))
+		{
+			SetObj(new Player(pNum));
+			pNum++;
+		}
+	}
 	ImGui::End();
-	
 }
 #if 1
 void StageEdit::Draw()
@@ -86,6 +120,14 @@ void StageEdit::HasUpdate()
 		nState = sNone;
 		return;	// 以下コード省略
 	}
+	// オブジェクト削除
+	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_DELETE))
+	{
+		getObj->DestroyMe();
+		getObj = nullptr;
+		nState = sNone;
+		return;
+	}
 	// マウス左クリック
 	if (GameDevice()->m_pDI->CheckMouse(KD_TRG, 0))
 	{
@@ -116,73 +158,130 @@ void StageEdit::HasUpdate()
 		}
 	}
 
+	// Ctrl + D オブジェクト複製
+	if (pDI->CheckKey(KD_DAT, DIK_LCONTROL) && pDI->CheckKey(KD_TRG, DIK_D))
+	{
+		DupeObj(getObj);
+		return;	// 以下コード省略
+	}
+
 	// ImGuiで場所、回転、スケールを変える
-	// InputFloatでの数値入力ができないからとりあえずInt型
-	// 場所
+	ImGui::SetNextWindowPos(ImVec2(30, 170));
+	ImGui::SetNextWindowSize(ImVec2(290, 310));
 	ImGui::Begin("OBJINFO");
-	ImGui::InputInt("PositionX", &objPosX);
-	ImGui::InputInt("PositionY", &objPosY);
-	ImGui::InputInt("PositionZ", &objPosZ);
+	// 反発係数・摩擦・質量
+	ImGui::SliderFloat("e", &e, 0.0f, 1.0f);
+	ImGui::SliderFloat("f", &f, 0.0f, 1.0f);
+	ImGui::InputFloat("mass", &mass, 0.5f, 1.0f);
+	// 場所
+	ImGui::InputFloat("PositionX", &objPos.x, 0.5f);
+	ImGui::InputFloat("PositionY", &objPos.y, 0.5f);
+	ImGui::InputFloat("PositionZ", &objPos.z, 0.5f);
 	// 回転
-	ImGui::InputInt("RotateX", &objRotX);
-	ImGui::InputInt("RotateY", &objRotY);
-	ImGui::InputInt("RotateZ", &objRotZ);
+	ImGui::InputFloat("RotateX", &objRot.x, 0.5f);
+	ImGui::InputFloat("RotateY", &objRot.y, 0.5f);
+	ImGui::InputFloat("RotateZ", &objRot.z, 0.5f);
 	// スケール
-	ImGui::InputInt("ScaleX", &objScaleX);
-	ImGui::InputInt("scaleY", &objScaleY);
-	ImGui::InputInt("ScaleZ", &objScaleZ);
+	ImGui::InputFloat("ScaleX", &objScale.x, 0.5f);
+	ImGui::InputFloat("scaleY", &objScale.y, 0.5f);
+	ImGui::InputFloat("ScaleZ", &objScale.z, 0.5f);
 	ImGui::End();
 
 	// ImGuiで入力された値をオブジェクトに適用
 	// 場所はObjectが持っている構造体のCenterに適用させる
 	// <-それぞれのオブジェクトのUpdateでCenterをtransform.positinonに適用させてるから
-	getObj->pObj.center = VECTOR3(objPosX, objPosY, objPosZ);	// 場所
+	getObj->pObj.center = objPos;	// 場所
 
 	// 回転角度をラジアンから度数に変換
 	VECTOR3 Rot = getObj->Rotation();
-	Rot.x = objRotX / 180.0f * XM_PI;
-	Rot.y = objRotY / 180.0f * XM_PI;
-	Rot.z = objRotZ / 180.0f * XM_PI;
+	Rot = objRot / 180.0f * XM_PI;
 	getObj->SetRotation(Rot);	// 回転
-	getObj->SetScale(VECTOR3(objScaleX, objScaleY, objScaleZ));	// スケール
+	getObj->SetScale(objScale);	// スケール
 
 }
 
-// オブジェクトの選択
 void StageEdit::SetObj(Object3D* ob)
 {
 	// 選択されてるオブジェクトの保存
 	getObj = ob;
 
-	// それぞれの値をImGuiで入力できるようにInt型に変換
+	// それぞれの値をImGui用の変数に保管
 	objPos = getObj->pObj.center;
-	objPosX = (int)objPos.x;
-	objPosY = (int)objPos.y;
-	objPosZ = (int)objPos.z;
-
 	objRot = getObj->Rotation();
-	objRotX = (int)objRot.x;
-	objRotY = (int)objRot.y;
-	objRotZ = (int)objRot.z;
-
 	objScale = getObj->Scale();
-	objScaleX = (int)objScale.x;
-	objScaleY = (int)objScale.y;
-	objScaleZ = (int)objScale.z;
-
+	
 	nState = sHas;
 }
 
+void StageEdit::DupeObj(Object3D* ob)
+{
+	if (ob->pObj.name == "Box")
+	{
+		getObj = new Box();
+	}
+	else if (ob->pObj.name == "MoveBax")
+	{
+		getObj = new MoveBox();
+	}
+	else if (ob->pObj.name == "Ball")
+	{
+		getObj = new Ball();
+	}
+	else if (ob->pObj.name == "Player")
+	{
+		getObj = new Player(1);
+	}
+	getObj->SetPosition(ob->Position());
+	getObj->SetRotation(ob->Rotation());
+	getObj->SetScale(ob->Scale());
+}
+
+void StageEdit::Save(int n)
+{
+	char name[64];
+	sprintf_s<64>(name, "data/Stage%02d.csv", n);
+	// ファイルを開く
+	std::ofstream ofs(name); // 引数にファイル名
+	// データを書く
+	// セーブするためにオブジェクト探索
+	std::list<Object3D*> objs = ObjectManager::FindGameObjects<Object3D>();
+	for (Object3D* ob : objs)
+	{
+		// Box
+		//if ()
+		{
+			
+		}
+		// MoveBox
+		//else if ()
+		{
+
+		}
+		// Player
+		//else if ()
+		{
+
+		}
+	}
+	// ファイルを閉じる
+	ofs.close();
+}
+
+void StageEdit::Load(int n)
+{
+	char name[64];
+	sprintf_s<64>(name, "data/Stage%02d.csv", n);
+
+	CsvReader* csv = new CsvReader(name);
+	
+	delete csv;
+}
+
 // マウスカーソルのワールド座標の取得
-VECTOR3 StageEdit::GetWorldPos()
+void StageEdit::GetWorldPos()
 {
 	// マウス座標取得
 	mousePos = GameDevice()->m_pDI->GetMousePos();
-
-	// 各行列取得
-	MATRIX4X4 mView = GameDevice()->m_mView;
-	MATRIX4X4 mPrj = GameDevice()->m_mProj;
-	MATRIX4X4 identity = XMMatrixIdentity();
 	
 	// 近視点(0)と遠視点(1)
 	nearWorldPos = XMVector3Unproject(VECTOR3(mousePos.x, mousePos.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
@@ -191,6 +290,5 @@ VECTOR3 StageEdit::GetWorldPos()
 	// 方向ベクトルを正規化して長さを延ばす
 	direction = XMVector3Normalize(farWorldPos - nearWorldPos);
 	extendedFarWorldPos = nearWorldPos + direction * EXTENDED_DISTANCE;  // EXTENDED_DISTANCEで延ばす
-
-	return farWorldPos;
+	return;
 }

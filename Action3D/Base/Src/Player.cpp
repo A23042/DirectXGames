@@ -17,7 +17,7 @@ namespace { // このcpp以外では使えない
 Player::Player(int num)
 {
 	playerNum = num;
-
+	pObj.name = "Player";
 	animator = new Animator(); // インスタンスを作成
 
 	mesh = new CFbxMesh();

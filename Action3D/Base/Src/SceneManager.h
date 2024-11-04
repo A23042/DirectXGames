@@ -49,4 +49,7 @@ namespace SceneManager {
 	float DeltaTime();
 
 	void Exit();
+
+	// stringå^Ç≈
+	std::string CurrentSceneName();
 };

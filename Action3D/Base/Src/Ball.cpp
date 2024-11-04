@@ -12,6 +12,7 @@ namespace { // ‚±‚ÌcppˆÈŠO‚Å‚ÍŽg‚¦‚È‚¢
 Ball::Ball()
 {
 	//SetTag("STAGEOBJ");
+	pObj.name = "Ball";
 	mesh = new CFbxMesh();
 	mesh->Load("Data/Object/ball01.mesh");
 	meshCol = new MeshCollider();

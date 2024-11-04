@@ -295,9 +295,11 @@
     <ClInclude Include="Src\Direct3D.h" />
     <ClInclude Include="Src\Displace.h" />
     <ClInclude Include="Src\Door.h" />
+    <ClInclude Include="Src\EditorCamera.h" />
     <ClInclude Include="Src\FbxMesh.h" />
     <ClInclude Include="Src\GameMain.h" />
     <ClInclude Include="Src\GameObject.h" />
+    <ClInclude Include="Src\Gizmo3D.h" />
     <ClInclude Include="Src\Ground.h" />
     <ClInclude Include="Src\Macro.h" />
     <ClInclude Include="Src\Main.h" />
@@ -347,8 +349,10 @@
     <ClCompile Include="Src\Direct3D.cpp" />
     <ClCompile Include="Src\Displace.cpp" />
     <ClCompile Include="Src\Door.cpp" />
+    <ClCompile Include="Src\EditorCamera.cpp" />
     <ClCompile Include="Src\FbxMesh.cpp" />
     <ClCompile Include="Src\GameMain.cpp" />
+    <ClCompile Include="Src\Gizmo3D.cpp" />
     <ClCompile Include="Src\Ground.cpp" />
     <ClCompile Include="Src\Main.cpp" />
     <ClCompile Include="Src\MainControl.cpp" />

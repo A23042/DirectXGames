@@ -58,6 +58,7 @@ public:
 	// 物理演算適用させるオブジェクト
 	struct PhysicsObject
 	{
+		std::string name = "";	// オブジェクトの名前
 		VECTOR3 velocity = VECTOR3(0, 0, 0);	// 速度
 		VECTOR3 center = VECTOR3(0, 0, 0);		// 中心点
 		float e;	// 反発係数

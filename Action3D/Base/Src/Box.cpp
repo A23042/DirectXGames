@@ -3,16 +3,18 @@
 #include "Ball.h"
 // 動かないBoxオブジェクト
 
-Box::Box(VECTOR3 size, VECTOR3 rot)
+// 初期化リスト　生成と同時に初期値が入るコンストラクタに書くよりも高速
+Box::Box(VECTOR3 size, VECTOR3 rot) : vPos(size / 2)
 {
 	SetTag("STAGEOBJ");
+	pObj.name = "Box";
 	mesh = new CFbxMesh();
 	mesh->Load("Data/Object/box00.mesh");
 
 	meshCol = new MeshCollider();
 	meshCol->MakeFromMesh(mesh);
 	
-	vPos = VECTOR3(size.x / 2, size.y / 2, size.z / 2);
+	//vPos = VECTOR3(size.x / 2, size.y / 2, size.z / 2);
 	transform.scale = size;
 
 	// 回転角をラジアンに変換し、回転行列を作成
@@ -27,13 +29,13 @@ Box::Box(VECTOR3 size, VECTOR3 rot)
 	refVec = VECTOR3(0, 0, 0);
 
 	pObj.center = transform.position;
-	CubeSize(vPos.x, vPos.y, vPos.z);
-
+	
 }
 
 void Box::Start()
 {
 	pObj.center = transform.position;
+	CubeSize(vPos.x, vPos.y, vPos.z);
 }
 
 void Box::Update()
