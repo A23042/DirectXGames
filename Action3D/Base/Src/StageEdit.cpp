@@ -196,7 +196,7 @@ void StageEdit::HasUpdate()
 	// 回転角度をラジアンから度数に変換
 	VECTOR3 Rot = getObj->Rotation();
 	//objRot = objRot / 180.0f * XM_PI;
-	getObj->SetRotation(objRot);	// 回転
+	getObj->SetRotation(objRot / 180.0f * XM_PI);	// 回転
 	getObj->SetScale(objScale);	// スケール
 
 }
@@ -210,7 +210,7 @@ void StageEdit::SetObj(Object3D* ob)
 
 	// それぞれの値をImGui用の変数に保管
 	objPos = getObj->pObj.center;
-	objRot = getObj->Rotation();
+	objRot = getObj->Rotation() * 180.0f / XM_PI;
 	objScale = getObj->Scale();
 	
 	nState = sHas;
