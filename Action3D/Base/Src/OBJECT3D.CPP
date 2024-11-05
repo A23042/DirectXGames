@@ -204,21 +204,24 @@ BOOL Object3D::HitPlayerToSphere(PhysicsObject& player, VECTOR3& pushVec)
 		VECTOR3 p1Velocity = player.velocity;
 		VECTOR3 p2Velocity = this->pObj.velocity;
 
-		// Ball(P2)に渡すベクトル
+		// Ball(P2)に渡すベクトル(法線方向の速度)
 		VECTOR3 p1OverVec = (dot(normal, p1Velocity) * normal);
 		// Player(P1)の残ったベクトル
 		VECTOR3 p1RestVec = p1Velocity - p1OverVec;
-		p1OverVec *= p1Mass;
-		// P1に渡すベクトル
-		VECTOR3 p2OverVec = (dot(-normal, p2Velocity) * -normal);
+				
+		// P1に渡すベクトル(法線方向の速度)
+		VECTOR3 p2OverVec = (dot(normal, p2Velocity) * normal);
 		// P2の残ったベクトル
 		VECTOR3 p2RestVec = p2Velocity - p2OverVec;
-		p2OverVec *= p2Mass;
+		
+		// 法線方向に質量を考慮した速度を計算する
+		// P1の法線方向速度
+		VECTOR3 newNomalP1Vec = ((p1Mass - p2Mass) * p1OverVec + 2 * p2Mass * p2OverVec) / sumMass;
+		// P2の法線方向速度
+		VECTOR3 newNomalP2Vec = ((p2Mass - p1Mass) * p2OverVec + 2 * p1Mass * p1OverVec) / sumMass;
 
-		// 渡すベクトルを減必要有
-
-		VECTOR3 resultP1Vec = (p1RestVec + p2OverVec / p1Mass) * aveE;
-		VECTOR3 resultP2Vec = (p2RestVec + p1OverVec / p2Mass) * aveE;
+		VECTOR3 resultP1Vec = (p1RestVec + newNomalP1Vec) * aveE;
+		VECTOR3 resultP2Vec = (p2RestVec + newNomalP2Vec) * aveE;
 
 		player.velocity = resultP1Vec;
 		this->pObj.velocity = resultP2Vec;

@@ -40,7 +40,6 @@ void Ball::Update()
 {
 	pObj.center += pObj.velocity * SceneManager::DeltaTime();
 	transform.position = pObj.center;
-
 	if (isPhysic)
 	{
 		pObj.velocity.y -= Gravity * SceneManager::DeltaTime();
