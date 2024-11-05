@@ -4,6 +4,7 @@
 #include "MoveBox.h"
 #include "Player.h"
 #include "Gizmo3D.h"
+#include "GizmoXYZ.h"
 #include <fstream>
 
 #define EXTENDED_DISTANCE 50;	// Rayの長さ
@@ -66,13 +67,13 @@ void StageEdit::Update()
 	}
 	if (ImGui::Button("Ball"))
 	{
-		SetObj(new Ball());
+		SetObj(new Ball(false));
 	}
 	if(pNum == 0)
 	{
 		if (ImGui::Button("Player"))
 		{
-			SetObj(new Player(pNum));
+			SetObj(new Player(pNum,false));
 			pNum++;
 		}
 	}
@@ -194,8 +195,8 @@ void StageEdit::HasUpdate()
 
 	// 回転角度をラジアンから度数に変換
 	VECTOR3 Rot = getObj->Rotation();
-	Rot = objRot / 180.0f * XM_PI;
-	getObj->SetRotation(Rot);	// 回転
+	//objRot = objRot / 180.0f * XM_PI;
+	getObj->SetRotation(objRot);	// 回転
 	getObj->SetScale(objScale);	// スケール
 
 }
@@ -204,6 +205,8 @@ void StageEdit::SetObj(Object3D* ob)
 {
 	// 選択されてるオブジェクトの保存
 	getObj = ob;
+
+	//gizmoXYZ = new GizmoXYZ();
 
 	// それぞれの値をImGui用の変数に保管
 	objPos = getObj->pObj.center;
@@ -248,20 +251,23 @@ void StageEdit::Save(int n)
 	for (Object3D* ob : objs)
 	{
 		// Box
-		//if ()
+		if (ob->pObj.name == "Box")
 		{
+			ofs << "1" << "," << "BOX";
 			
 		}
 		// MoveBox
-		//else if ()
+		else if (ob->pObj.name == "MoveBox")
 		{
 
 		}
 		// Player
-		//else if ()
+		else if (ob->pObj.name == "Player")
 		{
 
 		}
+		// 改行
+		ofs << std::endl;
 	}
 	// ファイルを閉じる
 	ofs.close();

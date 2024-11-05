@@ -172,46 +172,56 @@ BOOL Object3D::HitPlayerToSphere(PhysicsObject& player, VECTOR3& pushVec)
 {
 	// PlayerとBallの距離計算
 	VECTOR3 vec = player.center - this->pObj.center;
-	VECTOR3 vecB = this->pObj.center - player.center;
 
 	float rsum = player.radius + this->pObj.radius;
+	// P1とP2の法線ベクトル(正規化)
 	VECTOR3 normal = normalize(vec);
 
 	// 衝突していたら
 	// めり込み解除ベクトルの計算
 	if (vec.LengthSquare() > rsum * rsum)
 	{
+		// 衝突していない場合は終了
 		return false;
 	}
 	else
 	{
 		float pushLen = rsum - vec.Length();		// 押し出す長さ
 		pushVec = normal * pushLen;// 押し出すベクトルに長さを掛ける
-
 		this->pObj.center -= pushVec / 2;
 		player.center += pushVec / 2;
 
-		VECTOR3 vec = player.center - this->pObj.center;
-		VECTOR3 normal = normalize(vec);
+		// 反発係数と摩擦力
+		float aveE = (player.e + this->pObj.e) / 2;
+		float aveF = (player.f + this->pObj.f) / 2;
 
-		// 衝突したふたつのオブジェクトの反発係数と摩擦を考慮する
-		float e2 = (this->pObj.e + player.e) / 2;
-		float f2 = (this->pObj.f + player.f) / 2;
+		// 質量
+		float p1Mass = player.mass;
+		float p2Mass = this->pObj.mass;
+		float sumMass = p1Mass + p2Mass;
 
-		// 質量の考慮
-		float massA = player.mass;
-		float massB = this->pObj.mass;
-		float sumMass = massA + massB;
+		// PlayerとBallのVelocity
+		VECTOR3 p1Velocity = player.velocity;
+		VECTOR3 p2Velocity = this->pObj.velocity;
 
-		VECTOR3 constVec = e2 / sumMass * normal;
+		// Ball(P2)に渡すベクトル
+		VECTOR3 p1OverVec = (dot(normal, p1Velocity) * normal);
+		// Player(P1)の残ったベクトル
+		VECTOR3 p1RestVec = p1Velocity - p1OverVec;
+		p1OverVec *= p1Mass;
+		// P1に渡すベクトル
+		VECTOR3 p2OverVec = (dot(-normal, p2Velocity) * -normal);
+		// P2の残ったベクトル
+		VECTOR3 p2RestVec = p2Velocity - p2OverVec;
+		p2OverVec *= p2Mass;
 
-		VECTOR3 velocityA = -massB * constVec + player.velocity;
-		VECTOR3 velocityB = massA * constVec + this->pObj.velocity;
+		// 渡すベクトルを減必要有
 
-		player.velocity = velocityB;
-		this->pObj.velocity = velocityA;
+		VECTOR3 resultP1Vec = (p1RestVec + p2OverVec / p1Mass) * aveE;
+		VECTOR3 resultP2Vec = (p2RestVec + p1OverVec / p2Mass) * aveE;
 
+		player.velocity = resultP1Vec;
+		this->pObj.velocity = resultP2Vec;
 		return true;
-
 	}
 }

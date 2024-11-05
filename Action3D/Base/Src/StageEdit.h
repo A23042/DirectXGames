@@ -73,7 +73,9 @@ private:
 	Object3D* getObj = nullptr;	
 	// 3DGizmo
 	Object3D* gizmoObj = nullptr;	
-
+	// 3DGizmoXYZ
+	Object3D* gizmoXYZ = nullptr;
+	
 	// マウススクリーン座標
 	POINT mousePos;		
 

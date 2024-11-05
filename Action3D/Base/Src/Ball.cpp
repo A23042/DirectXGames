@@ -9,7 +9,7 @@ namespace { // Ç±ÇÃcppà»äOÇ≈ÇÕégÇ¶Ç»Ç¢
 	static const float MoveSpeed = 0.8f;
 };
 
-Ball::Ball()
+Ball::Ball(bool isPhysic) : isPhysic(isPhysic)
 {
 	//SetTag("STAGEOBJ");
 	pObj.name = "Ball";
@@ -38,17 +38,20 @@ void Ball::Start()
 
 void Ball::Update()
 {
-	//pObj.velocity.y -= Gravity * SceneManager::DeltaTime();
 	pObj.center += pObj.velocity * SceneManager::DeltaTime();
 	transform.position = pObj.center;
 
-	// BoxÇ∆ÇÃè’ìÀîªíË
-	std::list<Box*> boxes = ObjectManager::FindGameObjects<Box>();
-	for (Box* box : boxes) {
-		VECTOR3 refVec = VECTOR3(0, 0, 0);
-		VECTOR3 pushVec = VECTOR3(0, 0, 0);
-		pushVec = box->HitSphereToCubeplane(this->pObj, refVec);
-		PushVec(-pushVec, refVec);
+	if (isPhysic)
+	{
+		pObj.velocity.y -= Gravity * SceneManager::DeltaTime();
+		// BoxÇ∆ÇÃè’ìÀîªíË
+		std::list<Box*> boxes = ObjectManager::FindGameObjects<Box>();
+		for (Box* box : boxes) {
+			VECTOR3 refVec = VECTOR3(0, 0, 0);
+			VECTOR3 pushVec = VECTOR3(0, 0, 0);
+			pushVec = box->HitSphereToCubeplane(this->pObj, refVec);
+			PushVec(-pushVec, refVec);
+		}
 	}
 }
 

@@ -14,11 +14,9 @@ namespace { // このcpp以外では使えない
 	static const float MoveSpeed = 0.8f;
 };
 
-Player::Player(int num)
+Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
 {
-	playerNum = num;
 	pObj.name = "Player";
-	animator = new Animator(); // インスタンスを作成
 
 	mesh = new CFbxMesh();
 	mesh->Load("Data/Object/ball01.mesh");
@@ -41,10 +39,6 @@ Player::~Player()
 		delete meshCol;
 		meshCol = nullptr;
 	}
-	if (animator != nullptr) {
-		delete animator;
-		animator = nullptr;
-	}
 }
 
 void Player::Start()
@@ -54,73 +48,77 @@ void Player::Start()
 
 void Player::Update()
 {
-	pObj.velocity.y -= Gravity * SceneManager::DeltaTime();
+	if (isPhysic)
+	{
+		pObj.velocity.y -= Gravity * SceneManager::DeltaTime();
+
+		// ここで空間分割を使って処理負荷の軽減をする？
+		// 空間分割よくわかってない
+
+		// 各Boxとの衝突判定
+		std::list<Object3D*> objes = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ");
+		for (Object3D* obj : objes) {
+			VECTOR3 refVec = VECTOR3(0, 0, 0);
+			VECTOR3 pushVec = VECTOR3(0, 0, 0);
+			pushVec = obj->HitSphereToCubeplane(this->pObj, refVec);
+			PushVec(-pushVec, refVec);
+		}
+		// Ball
+		std::list<Ball*> balles = ObjectManager::FindGameObjects<Ball>();
+		for (Ball* ball : balles) {
+			VECTOR3 refVec = VECTOR3(0, 0, 0);
+			VECTOR3 pushVec = VECTOR3(0, 0, 0);
+			//refVec = ball->HitPlayerTopObj(this->pObj, pushVec);
+			if (ball->HitPlayerToSphere(this->pObj, pushVec)) {
+				ball->SetPosition(ball->pObj.center);
+				transform.position = pObj.center;
+			}
+			//transform.position = pObj.center;
+
+			sumVelocity.x = abs(this->pObj.velocity.x) + abs(ball->pObj.velocity.x);
+			sumVelocity.y = abs(this->pObj.velocity.y) + abs(ball->pObj.velocity.y);
+			sumVelocity.z = abs(this->pObj.velocity.z) + abs(ball->pObj.velocity.z);
+
+			//PushVec(pushVec, refVec);
+			//ball->PushVec(-pushVec, -refVec);
+		}
+
+		//animator->Update(); // 毎フレーム、Updateを呼ぶ
+		switch (state) {
+		case sNormal:
+			UpdateNormal();
+			break;
+		case sJump:
+			UpdateJump();
+			break;
+		case sAttack:
+			UpdateAttack();
+			break;
+		}
+		ImGui::Begin("POSITION");
+		ImGui::InputFloat("X", &transform.position.x);
+		ImGui::InputFloat("Y", &transform.position.y);
+		ImGui::InputFloat("Z", &transform.position.z);
+		ImGui::End();
+
+		ImGui::Begin("VELOCITY");
+		ImGui::InputFloat("X", &pObj.velocity.x);
+		ImGui::InputFloat("Y", &pObj.velocity.y);
+		ImGui::InputFloat("Z", &pObj.velocity.z);
+		ImGui::End();
+
+		ImGui::Begin("SUMVELOCITY");
+		ImGui::InputFloat("X", &sumVelocity.x);
+		ImGui::InputFloat("Y", &sumVelocity.y);
+		ImGui::InputFloat("Z", &sumVelocity.z);
+		ImGui::End();
+
+	}
 
 	// 速度成分を坂の時考慮する
 	// 面の法線に垂直なベクトル成分に進む
 	pObj.center += pObj.velocity * SceneManager::DeltaTime();
 	transform.position = pObj.center;
-
-	// ここで空間分割を使って処理負荷の軽減をする？
-	// 空間分割よくわかってない
-
-	// 各Boxとの衝突判定
-	std::list<Object3D*> objes = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ");
-	for (Object3D* obj : objes) {
-		VECTOR3 refVec = VECTOR3(0, 0, 0);
-		VECTOR3 pushVec = VECTOR3(0, 0, 0);
-		pushVec = obj->HitSphereToCubeplane(this->pObj, refVec);
-		PushVec(-pushVec, refVec);
-	}
-	// Ball
-	std::list<Ball*> balles = ObjectManager::FindGameObjects<Ball>();
-	for (Ball* ball : balles) {
-		VECTOR3 refVec = VECTOR3(0, 0, 0);
-		VECTOR3 pushVec = VECTOR3(0, 0, 0);
-		//refVec = ball->HitPlayerTopObj(this->pObj, pushVec);
-		if (ball->HitPlayerToSphere(this->pObj, pushVec)) {
-			ball->SetPosition(ball->pObj.center);
-			transform.position = pObj.center;
-		}
-		//transform.position = pObj.center;
-
-		sumVelocity.x = abs(this->pObj.velocity.x) + abs(ball->pObj.velocity.x);
-		sumVelocity.y = abs(this->pObj.velocity.y) + abs(ball->pObj.velocity.y);
-		sumVelocity.z = abs(this->pObj.velocity.z) + abs(ball->pObj.velocity.z);
-
-		//PushVec(pushVec, refVec);
-		//ball->PushVec(-pushVec, -refVec);
-	}
-
-	//animator->Update(); // 毎フレーム、Updateを呼ぶ
-	switch (state) {
-	case sNormal:
-		UpdateNormal();
-		break;
-	case sJump:
-		UpdateJump();
-		break;
-	case sAttack:
-		UpdateAttack();
-		break;
-	}
-	ImGui::Begin("POSITION");
-	ImGui::InputFloat("X", &transform.position.x);
-	ImGui::InputFloat("Y", &transform.position.y);
-	ImGui::InputFloat("Z", &transform.position.z);
-	ImGui::End();
-
-	ImGui::Begin("VELOCITY");
-	ImGui::InputFloat("X", &pObj.velocity.x);
-	ImGui::InputFloat("Y", &pObj.velocity.y);
-	ImGui::InputFloat("Z", &pObj.velocity.z);
-	ImGui::End();
-
-	ImGui::Begin("SUMVELOCITY");
-	ImGui::InputFloat("X", &sumVelocity.x);
-	ImGui::InputFloat("Y", &sumVelocity.y);
-	ImGui::InputFloat("Z", &sumVelocity.z);
-	ImGui::End();
 
 	// ダンサーとめり込まないようにする
 #if 0
@@ -287,9 +285,7 @@ void Player::UpdateNormal()
 			pObj.velocity += -forward * rotY; // キャラの向いてる方への移動速度
 
 		}
-		else {
-			animator->MergePlay(aIdle);
-		}
+
 		if (pDI->CheckKey(KD_DAT, DIK_A)) {
 			transform.rotation.y -= RotationSpeed / 180.0f * XM_PI;
 		}
@@ -376,8 +372,5 @@ void Player::UpdateAttack()
 		if (d->HitLineToMesh(start, end, &hit)) {
 			d->AddDamage(10, transform.position); // 敵に当てた
 		}
-	}
-	if (animator->Finished()) {
-		state = sNormal;
 	}
 }
