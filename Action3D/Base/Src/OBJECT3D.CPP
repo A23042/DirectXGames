@@ -228,3 +228,24 @@ BOOL Object3D::HitPlayerToSphere(PhysicsObject& player, VECTOR3& pushVec)
 		return true;
 	}
 }
+
+const MATRIX4X4 Transform::matrix()
+{
+	MATRIX4X4 scaleM = XMMatrixScaling(
+		scale.x, scale.y, scale.z);
+	MATRIX4X4 rotX = XMMatrixRotationX(
+		rotation.x);
+	MATRIX4X4 rotY = XMMatrixRotationY(
+		rotation.y);
+	MATRIX4X4 rotZ = XMMatrixRotationZ(
+		rotation.z);
+	MATRIX4X4 trans = XMMatrixTranslation(
+		position.x, position.y, position.z);
+	//return scaleM * rotZ * rotX * rotY * trans;
+	MATRIX4X4 mat = scaleM * rotZ * rotX * rotY * trans;
+	if (parent != nullptr)
+	{
+		mat = mat * parent->Matrix();
+	}
+	return mat;
+}

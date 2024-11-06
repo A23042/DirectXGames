@@ -7,21 +7,36 @@
 #include "GizmoXYZ.h"
 #include <fstream>
 
-#define EXTENDED_DISTANCE 50;	// Rayの長さ
-#define EXTENDED_OBJ_DISTANCE 20;	// (仮)オブジェクトの移動場所
+namespace
+{
+	static const int EXTENDED_DISTANCE = 50;	// Rayの長さ
+	static const int EXTENDED_OBJ_DISTANCE = 20;	// (仮)オブジェクトの移動場所
+}
 
 // マウスのドラッグアンドドロップでステージオブジェクトの配置が理想
 // Tankのレティクルの画面座標をワールド座標に変換するのが使えそう？
 // オブジェクトを配置、削除したらcsvの行を詰めたい
 StageEdit::StageEdit()
 {
+	// 左下Gizmo初期化
 	gizmoObj = new Gizmo3D();
 	gizmoObj->SetScale(VECTOR3(0.0015f, 0.0015f, 0.0015f));
 	gizmoObj->SetRotation(VECTOR3(0, 180.0f / 180 * XM_PI, 0));
-	//GameDevice()->m_mView = XMMatrixLookAtLH(
-	//	VECTOR3(10, 20, -15),	// カメラ位置
-	//	VECTOR3(0, 0, 0),	// 注視点
-	//	VECTOR3(0, 1, 0));	// 上ベクトル
+
+	// 親Gizmoと移動、回転サイズGizmoの初期化
+	gizmoC = new GizmoXYZ();
+	posGizmoX = new PosGizmoX(gizmoC);
+	posGizmoY = new PosGizmoY(gizmoC);
+	posGizmoZ = new PosGizmoZ(gizmoC);
+
+	//rotGizmoX = new RotGizmoX(gizmoC);
+	//rotGizmoY = new RotGizmoY(gizmoC);
+	//rotGizmoZ = new RotGizmoZ(gizmoC);
+
+	scaleGizmoX = new ScaleGizmoX(gizmoC);
+	scaleGizmoY = new ScaleGizmoY(gizmoC);
+	scaleGizmoZ = new ScaleGizmoZ(gizmoC);
+
 	nState = sNone;
 	gState = sNoneGizmo;
 }
@@ -130,35 +145,43 @@ void StageEdit::HasUpdate()
 	// マウス左クリック
 	if (GameDevice()->m_pDI->CheckMouse(KD_TRG, 0))
 	{
+		bool isHit = false;
 		// オブジェクト探索
-		std::list<Object3D*> objs = ObjectManager::FindGameObjects<Object3D>();
-		for (Object3D* ob : objs)
+		// 先にGizmoだけ衝突判定をとる
+		std::list<Object3D*> gizmos = ObjectManager::FindGameObjectsWithTag<Object3D>("Gizmo");
+		for (Object3D* gizmo : gizmos)
 		{
 			VECTOR3 hit;
-			// カーソルのワールド座標の近視点から遠視点の距離を伸ばした点までのRayを飛ばしす
-			if (ob->HitLineToMesh(nearWorldPos, extendedFarWorldPos, &hit))
+			if (gizmo->HitLineToMesh(nearWorldPos, farWorldPos, &hit))
 			{
-				// 現在選択状態のオブジェクトの場合何もしない
-				if (ob == getObj)
+				getGizmo = gizmo;
+				isHit = true;
+			}
+		}
+		// Gizmoに当たってなければ衝突判定をとる
+		if(!isHit)
+		{
+			// Gizmo以外のオブジェクトを調べる
+			std::list<Object3D*> objs = ObjectManager::FindGameObjectsWithOutTag<Object3D>("Gizmo");
+			for (Object3D* ob : objs)
+			{
+				VECTOR3 hit;
+				// カーソルのワールド座標の近視点から遠視点の距離を伸ばした点までのRayを飛ばしす
+				if (ob->HitLineToMesh(nearWorldPos, extendedFarWorldPos, &hit))
 				{
-					break;
-				}
-				// ギズモの場合スキップ
-				else if (!ob->IsTag("Gizmo"))
-				{
-					// 違うオブジェクトがクリックされたら選択オブジェクト変更
-					SelectObj(ob);
-					return;	// 以下コード省略
+					// 現在選択状態のオブジェクトの場合何もしない
+					if (ob == getObj)
+					{
+						break;
+					}
+					else
+					{
+						// 違うオブジェクトがクリックされたら選択オブジェクト変更
+						SelectObj(ob);
+						return;	// 以下コード省略
+					}
 				}
 			}
-			// 何もないところをクリックしたら選択解除しようとしたがImGuiを触れなくなるから却下
-			else
-			{
-				//getObj = nullptr;
-				//nState = sNone;
-				//return;
-			}
-			 
 		}
 	}
 
@@ -201,6 +224,50 @@ void StageEdit::HasUpdate()
 	getObj->SetRotation(objRot / 180.0f * XM_PI);	// 回転
 	getObj->SetScale(objScale);	// スケール
 
+	// 操作変更
+	if (!pDI->CheckMouse(KD_DAT, 1))
+	{
+		if (pDI->CheckKey(KD_TRG, DIK_W))
+		{
+			ObjectManager::SetVisible(posGizmoX, true);
+			ObjectManager::SetVisible(posGizmoY, true);
+			ObjectManager::SetVisible(posGizmoZ, true);
+			ObjectManager::SetVisible(rotGizmoX, false);
+			ObjectManager::SetVisible(rotGizmoY, false);
+			ObjectManager::SetVisible(rotGizmoZ, false);
+			ObjectManager::SetVisible(scaleGizmoX, false);
+			ObjectManager::SetVisible(scaleGizmoY, false);
+			ObjectManager::SetVisible(scaleGizmoZ, false);
+			gState = sPosGizmo;
+		}
+		else if (pDI->CheckKey(KD_TRG, DIK_E))
+		{
+			ObjectManager::SetVisible(posGizmoX, false);
+			ObjectManager::SetVisible(posGizmoY, false);
+			ObjectManager::SetVisible(posGizmoZ, false);
+			ObjectManager::SetVisible(rotGizmoX, true);
+			ObjectManager::SetVisible(rotGizmoY, true);
+			ObjectManager::SetVisible(rotGizmoZ, true);
+			ObjectManager::SetVisible(scaleGizmoX, false);
+			ObjectManager::SetVisible(scaleGizmoY, false);
+			ObjectManager::SetVisible(scaleGizmoZ, false);
+			gState = sScaleGizmo;
+		}
+		else if (pDI->CheckKey(KD_TRG, DIK_R))
+		{
+			ObjectManager::SetVisible(posGizmoX, false);
+			ObjectManager::SetVisible(posGizmoY, false);
+			ObjectManager::SetVisible(posGizmoZ, false);
+			ObjectManager::SetVisible(rotGizmoX, false);
+			ObjectManager::SetVisible(rotGizmoY, false);
+			ObjectManager::SetVisible(rotGizmoZ, false);
+			ObjectManager::SetVisible(scaleGizmoX, true);
+			ObjectManager::SetVisible(scaleGizmoY, true);
+			ObjectManager::SetVisible(scaleGizmoZ, true);
+			gState = sRotGizmo;
+		}
+	}
+
 	// ギズモの表示状態でステータス分け
 	switch (gState)
 	{
@@ -208,29 +275,82 @@ void StageEdit::HasUpdate()
 		PosGizmoUpdate();
 		break;
 	case sRotGizmo:
+		RotGizmoUpdate();
 		break;
 	case sScaleGizmo:
+		ScaleGizmoUpdate();
 		break;
 	default:
 		break;
 	}
 }
-
-// Position移動ギズモ表示中
+//
+// Gizmoをクリック出来ない問題発生中
+// 原因はおそらくGizmoの位置とRayの発射位置が両方nearWorldPosになっているから？
+// 
+// 
+// Position移動Gizmo表示中
 void StageEdit::PosGizmoUpdate()
 {
-	// ここでGizmoを触ってオブジェクトを動かす
-	
+	if (getGizmo != nullptr)
+	{
+		// オブジェクトの位置まで伸ばす
+		float exDistance = (nearWorldPos - getObj->Position()).Length();
+		VECTOR3 nearWorldPosEx = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
+		// ここでGizmoを触ってオブジェクトを動かす
+		VECTOR3 diff = nearWorldPosEx - prevMousePos;
+		if (diff.Length() != 0)
+		{
+			if (pDI->CheckMouse(KD_DAT, 0))
+			{
+				if (getGizmo->pObj.name == "posGizmoX")
+				{
+					objPos.x = getObj->Position().x + diff.x;
+					getObj->pObj.center.x = getObj->Position().x + diff.x;
+				}
+				else if (getGizmo->pObj.name == "posGizmoY")
+				{
+					objPos.y = getObj->Position().y + diff.y;
+					getObj->pObj.center.y = getObj->Position().y + diff.y;
+				}
+				else if (getGizmo->pObj.name == "posGizmoZ")
+				{
+					objPos.z = getObj->Position().z + diff.z;
+					getObj->pObj.center.z = getObj->Position().z + diff.z;
+				}
+			}
+		}
+		exDistance = (nearWorldPos - getObj->Position()).Length();
+		nearWorldPosEx = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
+		prevMousePos = nearWorldPosEx;
+	}
 	// getObjのスクリーン座標
-	VECTOR3 objScreenPos = XMVector3Project(VECTOR3(getObj->Position().x, getObj->Position().y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+	VECTOR3 objScreenPos = XMVector3Project(getObj->Position(), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
 	// getObjのスクリーン座標をワールド座標に変換
 	VECTOR3 gizmoWorldPos = XMVector3Unproject(VECTOR3(objScreenPos.x, objScreenPos.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
-	
 	gizmoC->SetPosition(gizmoWorldPos);
-	gizmoX->SetPosition(gizmoWorldPos);
-	gizmoY->SetPosition(gizmoWorldPos);
-	gizmoZ->SetPosition(gizmoWorldPos);
+}
 
+void StageEdit::RotGizmoUpdate()
+{
+	// ここでGizmoを触ってオブジェクトを動かす
+
+	// getObjのスクリーン座標
+	VECTOR3 objScreenPos = XMVector3Project(getObj->Position(), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+	// getObjのスクリーン座標をワールド座標に変換
+	VECTOR3 gizmoWorldPos = XMVector3Unproject(VECTOR3(objScreenPos.x, objScreenPos.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+	gizmoC->SetPosition(gizmoWorldPos);
+}
+
+void StageEdit::ScaleGizmoUpdate()
+{
+	// ここでGizmoを触ってオブジェクトを動かす
+
+	// getObjのスクリーン座標
+	VECTOR3 objScreenPos = XMVector3Project(getObj->Position(), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+	// getObjのスクリーン座標をワールド座標に変換
+	VECTOR3 gizmoWorldPos = XMVector3Unproject(VECTOR3(objScreenPos.x, objScreenPos.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+	gizmoC->SetPosition(gizmoWorldPos);
 }
 
 void StageEdit::SelectObj(Object3D* ob)
@@ -239,34 +359,48 @@ void StageEdit::SelectObj(Object3D* ob)
 	getObj = ob;
 
 	// 選択されてるオブジェクトのGizmo表示
-	gizmoC = new GizmoXYZ();
-	gizmoX = new GizmoX();
-	gizmoY = new GizmoY();
-	gizmoZ = new GizmoZ();
-	gizmoX->SetParent(gizmoC);
-	gizmoY->SetParent(gizmoC);
-	gizmoZ->SetParent(gizmoC);
+	// 初めてGizmoが出る場合posGizmoを出す
+	if (gState == sNoneGizmo)
+	{
+		gState = sPosGizmo;
+	}
+	// ステータスによって表示するGizmoを変える
+	if (gState == sPosGizmo)
+	{
+		ObjectManager::SetVisible(posGizmoX, true);
+		ObjectManager::SetVisible(posGizmoY, true);
+		ObjectManager::SetVisible(posGizmoZ, true);
+	}
+	else if (gState == sRotGizmo)
+	{
+		ObjectManager::SetVisible(rotGizmoX, true);
+		ObjectManager::SetVisible(rotGizmoY, true);
+		ObjectManager::SetVisible(rotGizmoZ, true);
+	}
+	else if (gState == sScaleGizmo)
+	{
+		ObjectManager::SetVisible(scaleGizmoX, true);
+		ObjectManager::SetVisible(scaleGizmoY, true);
+		ObjectManager::SetVisible(scaleGizmoZ, true);
+	}
 
 	// それぞれの値をImGui用の変数に保管
 	objPos = getObj->pObj.center;
 	objRot = getObj->Rotation() * 180.0f / XM_PI;
 	objScale = getObj->Scale();
-	
+
 	nState = sHas;
-	if (gState == sNoneGizmo)
-	{
-		gState = sPosGizmo;
-	}
 }
 
 void StageEdit::DeselectObj()
 {
 	getObj = nullptr;
 	nState = sNone;
-	gizmoC->DestroyMe();
-	/*gizmoX->DestroyMe();
-	gizmoY->DestroyMe();
-	gizmoZ->DestroyMe();*/
+	ObjectManager::SetVisible(gizmoC, false);
+	ObjectManager::SetVisible(posGizmoX, false);
+	ObjectManager::SetVisible(posGizmoY, false);
+	ObjectManager::SetVisible(posGizmoZ, false);
+
 }
 
 void StageEdit::DupeObj(Object3D* ob)

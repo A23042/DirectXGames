@@ -26,6 +26,16 @@ public:
 	/// HasUpdate()の中で呼ぶ
 	/// </summary>
 	void PosGizmoUpdate();
+
+	/// <summary>
+	/// 
+	/// </summary>
+	void RotGizmoUpdate();
+	
+	/// <summary>
+	/// 
+	/// </summary>
+	void ScaleGizmoUpdate();
 	
 	/// <summary>
 	/// オブジェクト選択が選択される時に呼ばれる
@@ -92,16 +102,23 @@ private:
 	CsvReader* csv;
 	// 選択状態のオブジェクト
 	Object3D* getObj = nullptr;	
-	// 表示中のGizmo
-	Object3D* visibleGizmo = nullptr;
+	// 選択状態のGizmo
+	Object3D* getGizmo = nullptr;
 
-	// 3DGizmo
+	// 左下の3DGizmo
 	Object3D* gizmoObj = nullptr;	
 	// 3DGizmoXYZ
 	Object3D* gizmoC = nullptr;
-	Object3D* gizmoX = nullptr;
-	Object3D* gizmoY = nullptr;
-	Object3D* gizmoZ = nullptr;
+	Object3D* posGizmoX = nullptr;
+	Object3D* posGizmoY = nullptr;
+	Object3D* posGizmoZ = nullptr;
+	Object3D* rotGizmoX = nullptr;
+	Object3D* rotGizmoY = nullptr;
+	Object3D* rotGizmoZ = nullptr;
+	Object3D* scaleGizmoX = nullptr;
+	Object3D* scaleGizmoY = nullptr;
+	Object3D* scaleGizmoZ = nullptr;
+
 
 	// マウススクリーン座標
 	POINT mousePos;		

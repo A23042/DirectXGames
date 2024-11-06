@@ -84,4 +84,5 @@ void EditorCamera::Draw()
 		transform.position, // ƒJƒƒ‰À•W
 		lookPosition, // ’Ž‹“_
 		VECTOR3(0, 1, 0));
+	GameDevice()->m_vEyePt = transform.position;
 }
