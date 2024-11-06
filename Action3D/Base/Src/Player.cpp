@@ -51,7 +51,14 @@ void Player::Update()
 	if (isPhysic)
 	{
 		pObj.velocity.y -= Gravity * SceneManager::DeltaTime();
+	}
+	// 速度成分を坂の時考慮する
+	// 面の法線に垂直なベクトル成分に進む
+	pObj.center += pObj.velocity * SceneManager::DeltaTime();
+	transform.position = pObj.center;
 
+	if (isPhysic)
+	{
 		// ここで空間分割を使って処理負荷の軽減をする？
 		// 空間分割よくわかってない
 
@@ -61,27 +68,39 @@ void Player::Update()
 			VECTOR3 refVec = VECTOR3(0, 0, 0);
 			VECTOR3 pushVec = VECTOR3(0, 0, 0);
 			pushVec = obj->HitSphereToCubeplane(this->pObj, refVec);
-			PushVec(-pushVec, refVec);
+			if (pushVec.Length() > 0)
+			{
+				PushVec(-pushVec, refVec);
+			}
 		}
 		// Ball
 		std::list<Ball*> balles = ObjectManager::FindGameObjects<Ball>();
 		for (Ball* ball : balles) {
 			VECTOR3 refVec = VECTOR3(0, 0, 0);
 			VECTOR3 pushVec = VECTOR3(0, 0, 0);
-			//refVec = ball->HitPlayerTopObj(this->pObj, pushVec);
 			if (ball->HitPlayerToSphere(this->pObj, pushVec)) {
 				ball->SetPosition(ball->pObj.center);
 				transform.position = pObj.center;
 			}
-			//transform.position = pObj.center;
-
 			sumVelocity.x = abs(this->pObj.velocity.x) + abs(ball->pObj.velocity.x);
 			sumVelocity.y = abs(this->pObj.velocity.y) + abs(ball->pObj.velocity.y);
 			sumVelocity.z = abs(this->pObj.velocity.z) + abs(ball->pObj.velocity.z);
-
-			//PushVec(pushVec, refVec);
-			//ball->PushVec(-pushVec, -refVec);
 		}
+		// 自分以外のPlayerと衝突判定
+		std::list<Player*> otherPlayers = ObjectManager::FindGameObjects<Player>();
+		for (Player* otherplayer : otherPlayers)
+		{
+			if (otherplayer != this)
+			{
+				VECTOR3 refVec = VECTOR3(0, 0, 0);
+				VECTOR3 pushVec = VECTOR3(0, 0, 0);
+				if (otherplayer->HitPlayerToSphere(this->pObj, pushVec)) {
+					otherplayer->SetPosition(otherplayer->pObj.center);
+					transform.position = pObj.center;
+				}
+			}
+		}
+
 
 		//animator->Update(); // 毎フレーム、Updateを呼ぶ
 		switch (state) {
@@ -115,10 +134,6 @@ void Player::Update()
 
 	}
 
-	// 速度成分を坂の時考慮する
-	// 面の法線に垂直なベクトル成分に進む
-	pObj.center += pObj.velocity * SceneManager::DeltaTime();
-	transform.position = pObj.center;
 
 	// ダンサーとめり込まないようにする
 #if 0

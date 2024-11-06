@@ -23,6 +23,7 @@ void MapEditScene::Update()
 void MapEditScene::Draw()
 {
 	// 仮グリッド線表示
+	// いつかきれいにする
 	CSprite cs;
 	for (int i = 0; i < 50; i++)
 	{

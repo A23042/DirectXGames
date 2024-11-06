@@ -38,11 +38,15 @@ void Ball::Start()
 
 void Ball::Update()
 {
-	pObj.center += pObj.velocity * SceneManager::DeltaTime();
-	transform.position = pObj.center;
 	if (isPhysic)
 	{
 		pObj.velocity.y -= Gravity * SceneManager::DeltaTime();
+	}
+	pObj.center += pObj.velocity * SceneManager::DeltaTime();
+	transform.position = pObj.center;
+
+	if (isPhysic)
+	{
 		// BoxÇ∆ÇÃè’ìÀîªíË
 		std::list<Box*> boxes = ObjectManager::FindGameObjects<Box>();
 		for (Box* box : boxes) {

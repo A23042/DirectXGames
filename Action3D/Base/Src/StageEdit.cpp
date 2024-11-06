@@ -23,6 +23,7 @@ StageEdit::StageEdit()
 	//	VECTOR3(0, 0, 0),	// 注視点
 	//	VECTOR3(0, 1, 0));	// 上ベクトル
 	nState = sNone;
+	gState = sNoneGizmo;
 }
 
 StageEdit::~StageEdit()
@@ -43,10 +44,10 @@ void StageEdit::Update()
 	
 	switch (nState)
 	{
-	case StageEdit::sNone:
+	case sNone:
 		NoneUpdate();
 		break;
-	case StageEdit::sHas:
+	case sHas:
 		HasUpdate();
 		break;
 	default:
@@ -59,21 +60,21 @@ void StageEdit::Update()
 	ImGui::Begin("NEWOBJ");
 	if (ImGui::Button("Box"))
 	{
-		SetObj(new Box(VECTOR3(1,1,1)));
+		SelectObj(new Box());
 	}
 	if (ImGui::Button("MoveBox"))
 	{
-		SetObj(new MoveBox(VECTOR3(1, 1, 1)));
+		SelectObj(new MoveBox());
 	}
 	if (ImGui::Button("Ball"))
 	{
-		SetObj(new Ball(false));
+		SelectObj(new Ball(false));
 	}
 	if(pNum == 0)
 	{
 		if (ImGui::Button("Player"))
 		{
-			SetObj(new Player(pNum,false));
+			SelectObj(new Player(pNum,false));
 			pNum++;
 		}
 	}
@@ -96,19 +97,18 @@ void StageEdit::NoneUpdate()
 			VECTOR3 hit;
 			if (ob->HitLineToMesh(nearWorldPos, extendedFarWorldPos, &hit))
 			{
-				SetObj(ob);
+				SelectObj(ob);
 				return;	// 以下コード省略
 			}
 		}
 	}
 	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_1))
 	{
-		SetObj(new Ball());
-		//new Ball();
+		SelectObj(new Ball(false));
 	}
 	else if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_2))
 	{
-		SetObj(new Box(VECTOR3(1, 1, 1), VECTOR3(0, 0, 0)));
+		SelectObj(new Box());
 	}
 }
 
@@ -117,16 +117,14 @@ void StageEdit::HasUpdate()
 	// 選択解除
 	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_N))
 	{
-		getObj = nullptr;
-		nState = sNone;
+		DeselectObj();
 		return;	// 以下コード省略
 	}
 	// オブジェクト削除
 	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_DELETE))
 	{
 		getObj->DestroyMe();
-		getObj = nullptr;
-		nState = sNone;
+		DeselectObj();
 		return;
 	}
 	// マウス左クリック
@@ -145,10 +143,15 @@ void StageEdit::HasUpdate()
 				{
 					break;
 				}
-				// 違うオブジェクトがクリックされたら選択オブジェクト変更
-				SetObj(ob);
-				return;	// 以下コード省略
+				// ギズモの場合スキップ
+				else if (!ob->IsTag("Gizmo"))
+				{
+					// 違うオブジェクトがクリックされたら選択オブジェクト変更
+					SelectObj(ob);
+					return;	// 以下コード省略
+				}
 			}
+			// 何もないところをクリックしたら選択解除しようとしたがImGuiを触れなくなるから却下
 			else
 			{
 				//getObj = nullptr;
@@ -195,18 +198,54 @@ void StageEdit::HasUpdate()
 
 	// 回転角度をラジアンから度数に変換
 	VECTOR3 Rot = getObj->Rotation();
-	//objRot = objRot / 180.0f * XM_PI;
 	getObj->SetRotation(objRot / 180.0f * XM_PI);	// 回転
 	getObj->SetScale(objScale);	// スケール
 
+	// ギズモの表示状態でステータス分け
+	switch (gState)
+	{
+	case sPosGizmo:
+		PosGizmoUpdate();
+		break;
+	case sRotGizmo:
+		break;
+	case sScaleGizmo:
+		break;
+	default:
+		break;
+	}
 }
 
-void StageEdit::SetObj(Object3D* ob)
+// Position移動ギズモ表示中
+void StageEdit::PosGizmoUpdate()
+{
+	// ここでGizmoを触ってオブジェクトを動かす
+	
+	// getObjのスクリーン座標
+	VECTOR3 objScreenPos = XMVector3Project(VECTOR3(getObj->Position().x, getObj->Position().y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+	// getObjのスクリーン座標をワールド座標に変換
+	VECTOR3 gizmoWorldPos = XMVector3Unproject(VECTOR3(objScreenPos.x, objScreenPos.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+	
+	gizmoC->SetPosition(gizmoWorldPos);
+	gizmoX->SetPosition(gizmoWorldPos);
+	gizmoY->SetPosition(gizmoWorldPos);
+	gizmoZ->SetPosition(gizmoWorldPos);
+
+}
+
+void StageEdit::SelectObj(Object3D* ob)
 {
 	// 選択されてるオブジェクトの保存
 	getObj = ob;
 
-	//gizmoXYZ = new GizmoXYZ();
+	// 選択されてるオブジェクトのGizmo表示
+	gizmoC = new GizmoXYZ();
+	gizmoX = new GizmoX();
+	gizmoY = new GizmoY();
+	gizmoZ = new GizmoZ();
+	gizmoX->SetParent(gizmoC);
+	gizmoY->SetParent(gizmoC);
+	gizmoZ->SetParent(gizmoC);
 
 	// それぞれの値をImGui用の変数に保管
 	objPos = getObj->pObj.center;
@@ -214,6 +253,20 @@ void StageEdit::SetObj(Object3D* ob)
 	objScale = getObj->Scale();
 	
 	nState = sHas;
+	if (gState == sNoneGizmo)
+	{
+		gState = sPosGizmo;
+	}
+}
+
+void StageEdit::DeselectObj()
+{
+	getObj = nullptr;
+	nState = sNone;
+	gizmoC->DestroyMe();
+	/*gizmoX->DestroyMe();
+	gizmoY->DestroyMe();
+	gizmoZ->DestroyMe();*/
 }
 
 void StageEdit::DupeObj(Object3D* ob)

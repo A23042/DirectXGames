@@ -22,10 +22,21 @@ public:
 	void HasUpdate();
 
 	/// <summary>
+	/// ギズモ表示状態
+	/// HasUpdate()の中で呼ぶ
+	/// </summary>
+	void PosGizmoUpdate();
+	
+	/// <summary>
 	/// オブジェクト選択が選択される時に呼ばれる
 	/// </summary>
 	/// <param name="ob">選択されたオブジェクト</param>
-	void SetObj(Object3D* ob);
+	void SelectObj(Object3D* ob);
+
+	/// <summary>
+	/// オブジェクトの選択が解除されたときに呼ばれる
+	/// </summary>
+	void DeselectObj();
 
 	/// <summary>
 	/// オブジェクト複製
@@ -59,7 +70,17 @@ private:
 	{
 		sNone = 0,	// 何も持っていない
 		sHas,		// オブジェクト選択状態
+		sGizmo,		// ギズモ選択状態
 	}nState;
+
+	// ギズモ関連のステータス
+	enum GizmoState
+	{
+		sNoneGizmo = 0,
+		sPosGizmo,
+		sRotGizmo,
+		sScaleGizmo,
+	}gState;
 
 	CDirectInput* pDI = GameDevice()->m_pDI;	// pDIショートカット
 
@@ -71,11 +92,17 @@ private:
 	CsvReader* csv;
 	// 選択状態のオブジェクト
 	Object3D* getObj = nullptr;	
+	// 表示中のGizmo
+	Object3D* visibleGizmo = nullptr;
+
 	// 3DGizmo
 	Object3D* gizmoObj = nullptr;	
 	// 3DGizmoXYZ
-	Object3D* gizmoXYZ = nullptr;
-	
+	Object3D* gizmoC = nullptr;
+	Object3D* gizmoX = nullptr;
+	Object3D* gizmoY = nullptr;
+	Object3D* gizmoZ = nullptr;
+
 	// マウススクリーン座標
 	POINT mousePos;		
 
@@ -87,7 +114,11 @@ private:
 	VECTOR3 extendedFarWorldPos;	
 	// 方向
 	VECTOR3 direction;	
+	//
+	VECTOR3 prevMousePos = {};
+	VECTOR3 currMousePos;
 
+	// ImGu格納用変数
 	VECTOR3 objPos;
 	VECTOR3 objRot;
 	VECTOR3 objScale;

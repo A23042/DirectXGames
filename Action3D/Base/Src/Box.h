@@ -3,7 +3,7 @@
 
 class Box : public Object3D {
 public:
-	Box(VECTOR3 size = VECTOR3(0,0,0), VECTOR3 rot = VECTOR3(0,0,0));
+	Box(VECTOR3 size = VECTOR3(1, 1, 1), VECTOR3 rot = VECTOR3(0, 0, 0));
 	~Box();
 	void Start() override;
 	void Update() override;

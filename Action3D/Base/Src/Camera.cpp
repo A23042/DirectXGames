@@ -2,8 +2,8 @@
 #include "Player.h"
 #include "Ball.h"
 //                                      後方視点　　　　　　真上視点
-static const VECTOR3 CameraPos[] = { VECTOR3(0, 2, -10), VECTOR3(0, 10, -0.5) };
-static const VECTOR3 LookPos[] =   { VECTOR3(0, 0,  8), VECTOR3(0,  1,  1  ) };
+static const VECTOR3 CameraPos[] = { VECTOR3(0, 4, -10), VECTOR3(0, 10, -0.5) };
+static const VECTOR3 LookPos[] =   { VECTOR3(0, 0,  5), VECTOR3(0,  1,  1  ) };
 static const float CHANGE_TIME_LIMIT = 0.5f; // 秒
 
 Camera::Camera()
@@ -64,6 +64,7 @@ void Camera::Update()
 				
 				if (pc->playerNum == 1)
 				{
+#if 1
 					if (pc != nullptr)
 					{
 						updateCamera(i, pc->Position(), pc->Rotation());
@@ -71,6 +72,9 @@ void Camera::Update()
 					else {
 						updateCamera(i, VECTOR3(0, 0, 0), VECTOR3(0, 0, 0));
 					}
+#else
+					updateCamera(i, VECTOR3(0, 2, -15), VECTOR3(0, 0, 0));
+#endif
 				}
 			}
 			break;
