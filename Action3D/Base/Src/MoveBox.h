@@ -22,5 +22,5 @@ private:
 	XMMATRIX rotationMatrix;
 
 	VECTOR3 moveMax, moveMin;	// ˆÚ“®§ŒÀ
-	VECTOR3 move;
+	VECTOR3 moveSpeed;
 };

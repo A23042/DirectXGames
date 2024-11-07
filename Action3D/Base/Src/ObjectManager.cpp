@@ -236,6 +236,17 @@ bool ObjectManager::IsExist(GameObject* obj)
 	return false;
 }
 
+bool ObjectManager::IsVisible(GameObject* obj)
+{
+	for (DrawObject& od : drawObjects) {
+		if (od.object == obj) {
+			if (od.visible)
+				return true;
+		}
+	}
+	return false;
+}
+
 void ObjectManager::SetEyeDist(GameObject* obj, const float& distQIn, const int idx)
 {
 	for (DrawObject& od : drawObjects) {

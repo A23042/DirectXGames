@@ -203,6 +203,37 @@ namespace ObjectManager {
 	/// <returns>存在すれtrue</returns>
 	bool IsExist(GameObject* obj);
 
+	/// 2024.11.07 S.Matsunaga
+	/// <summary>
+	/// 指定のオブジェクトが表示中か調べる
+	/// </summary>
+	/// <param name="obj">GameObjectのインスタンス</param>
+	/// <returns>表示中ならtrue</returns>
+	bool IsVisible(GameObject* obj);
+
 	void SetEyeDist(GameObject* obj, const float& distQIn, const int idx);
 
+	/// 2024.11.07 S.Matsunaga
+	/// <summary>
+	/// クラスの表示中オブジェクトをすべて探す
+	/// </summary>
+	/// <typeparam name="C">クラス名</typeparam>
+	/// <returns>オブジェクトの実態list</returns>
+	template<class C> std::list<C*> FindGameObjectsVisible()
+	{
+		std::list<C*> out;
+		out.clear();
+
+		const std::list<GameObject*> objs = GetAllObjects();
+
+		for (GameObject* node : objs) {
+			if (IsVisible(node))
+			{
+				C* obj = dynamic_cast<C*>(node);
+				if (obj != nullptr)
+					out.emplace_back(obj);
+			}
+		}
+		return out;
+	}
 };

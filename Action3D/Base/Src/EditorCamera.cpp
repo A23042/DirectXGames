@@ -76,6 +76,7 @@ void EditorCamera::Update()
 	transform.position += noramalVelocity * moveSpeed;	// 移動
 	lookPosition = transform.position + VECTOR3(0, -3, 10) * rot;	// 注視点方向にマトリクスをかける
 	mousePos0 = pDI->GetMousePos();	// 1フレーム前のマウス座標保管
+	GameDevice()->m_vEyePt = transform.position;
 }
 
 void EditorCamera::Draw()
@@ -84,5 +85,4 @@ void EditorCamera::Draw()
 		transform.position, // カメラ座標
 		lookPosition, // 注視点
 		VECTOR3(0, 1, 0));
-	GameDevice()->m_vEyePt = transform.position;
 }

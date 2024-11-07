@@ -36,6 +36,12 @@ public:
 	/// 
 	/// </summary>
 	void ScaleGizmoUpdate();
+
+	/// <summary>
+	/// ActiveとVisibleを切り替える
+	/// </summary>
+	/// <param name="gState">Gizmoステータス</param>
+	void SetGizmo(int gState);
 	
 	/// <summary>
 	/// オブジェクト選択が選択される時に呼ばれる
@@ -112,6 +118,7 @@ private:
 	Object3D* posGizmoX = nullptr;
 	Object3D* posGizmoY = nullptr;
 	Object3D* posGizmoZ = nullptr;
+	Object3D* rotGizmoC = nullptr;
 	Object3D* rotGizmoX = nullptr;
 	Object3D* rotGizmoY = nullptr;
 	Object3D* rotGizmoZ = nullptr;
@@ -125,23 +132,26 @@ private:
 
 	// 近視点
 	VECTOR3 nearWorldPos;
+	VECTOR3 extendedNearWorldPos;
 	// 遠視点
 	VECTOR3 farWorldPos;	
 	// 遠視点方向に距離を伸ばした点
 	VECTOR3 extendedFarWorldPos;	
 	// 方向
 	VECTOR3 direction;	
-	//
-	VECTOR3 prevMousePos = {};
-	VECTOR3 currMousePos;
+	// 1フレーム前の座標
+	VECTOR3 prevMousePos;
 
 	// ImGu格納用変数
 	VECTOR3 objPos;
 	VECTOR3 objRot;
 	VECTOR3 objScale;
+	VECTOR3 moveVolumu = {};	// MoveBoxの移動量
+	float moveSpeed = 0;	// MoveBoxの移動速度
 	float e;
 	float f;
 	float mass;
 
 	int pNum = 0;
+	int stageNum = 0;
 };

@@ -38,6 +38,13 @@ public:
 };
 
 // ‰ñ“]—pƒMƒYƒ‚
+class RotGizmoC : public GizmoXYZ
+{
+public:
+	RotGizmoC(Object3D* parent);
+	~RotGizmoC();
+	void Update() override;
+};
 class RotGizmoX : public GizmoXYZ
 {
 public:
