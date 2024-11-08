@@ -167,26 +167,51 @@ void StageEdit::HasUpdate()
 		// オブジェクト探索
 		// 先に表示中のGizmoだけ衝突判定をとる
 		std::list<GizmoXYZ*> gizmos = ObjectManager::FindGameObjectsVisible<GizmoXYZ>();
-		if(!isHit)
+		for (GizmoXYZ* gizmo : gizmos)
 		{
-			for (GizmoXYZ* gizmo : gizmos)
+			// 探索された最初のオブジェクトか
+			bool firstFlag = true;
+			// naerWorldPosから当たった場所までの距離
+			float distance = 0.0f;
+			// 当たったオブジェクトのなかでの最短距離
+			float minDistance = 0.0f;
+			VECTOR3 hit;
+			if (gizmo->HitLineToMesh(nearWorldPos, farWorldPos, &hit))
 			{
-				VECTOR3 hit;
-				if (gizmo->HitLineToMesh(nearWorldPos, farWorldPos, &hit))
+				// 当たった場所への距離を求めて一番近いオブジェクトを格納する
+				distance = (hit - nearWorldPos).Length();
+				// 違うオブジェクトがクリックされたら選択オブジェクト変更
+				if (firstFlag)
 				{
+					minDistance = distance;
+					firstFlag = false;
 					float exDistance = (nearWorldPos - getObj->Position()).Length();
 					extendedNearWorldPos = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
 					prevMousePos = extendedNearWorldPos;
 					getGizmo = gizmo;
-					isHit = true;
 				}
+				else
+				{
+					if (minDistance > distance)
+					{
+						minDistance = distance;
+						float exDistance = (nearWorldPos - getObj->Position()).Length();
+						extendedNearWorldPos = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
+						prevMousePos = extendedNearWorldPos;
+						getGizmo = gizmo;
+					}
+				}					
+				isHit = true;
 			}
 		}
 		// Gizmoに当たってなければ衝突判定をとる
 		if(!isHit)
 		{
+			// 探索された最初のオブジェクトか
 			bool firstFlag = true;
+			// naerWorldPosから当たった場所までの距離
 			float distance = 0.0f;
+			// 当たったオブジェクトのなかでの最短距離
 			float minDistance = 0.0f;
 			// Gizmo以外のオブジェクトを調べる
 			std::list<Object3D*> objs = ObjectManager::FindGameObjectsWithOutTag<Object3D>("Gizmo");
@@ -194,27 +219,27 @@ void StageEdit::HasUpdate()
 			{
 				VECTOR3 hit;
 				// カーソルのワールド座標の近視点から遠視点の距離を伸ばした点までのRayを飛ばしす
-				if (obj->HitLineToMesh(nearWorldPos, farWorldPos, &hit)) //extendedFarWorldPos
+				if (obj->HitLineToMesh(nearWorldPos, farWorldPos, &hit))
 				{
-
-						distance = (hit - nearWorldPos).Length();
-						// 違うオブジェクトがクリックされたら選択オブジェクト変更
-						if (firstFlag)
+					// 当たった場所への距離を求めて一番近いオブジェクトを格納する
+					distance = (hit - nearWorldPos).Length();
+					// 違うオブジェクトがクリックされたら選択オブジェクト変更
+					if (firstFlag)
+					{
+						getObj = obj;
+						minDistance = distance;
+						firstFlag = false;
+					}
+					else
+					{
+						if (minDistance > distance)
 						{
+							if(obj != getObj)
 							getObj = obj;
 							minDistance = distance;
-							firstFlag = false;
 						}
-						else
-						{
-							if (minDistance > distance)
-							{
-								if(obj != getObj)
-								getObj = obj;
-								minDistance = distance;
-							}
-						}
-						SelectObj(getObj);
+					}
+					SelectObj(getObj);
 				}
 			}
 		}
@@ -459,6 +484,11 @@ void StageEdit::ScaleGizmoUpdate()
 				{
 					objScale.z += diff.z * 2;
 				}
+				else if (getGizmo->pObj.name == "gizmoCenter")
+				{
+					objScale += diff * 2;
+				}
+
 			}
 		}
 		exDistance = (nearWorldPos - getObj->Position()).Length();
@@ -607,18 +637,28 @@ void StageEdit::Save(int n)
 			ofs << ob->Position().x << "," << ob->Position().y << "," << ob->Position().z << ",";
 			ofs << ob->Scale().x * 2 << "," << ob->Scale().y * 2 << "," << ob->Scale().z * 2 << ",";
 			ofs << ob->Rotation().x * 180.0f / XM_PI << "," << ob->Rotation().y * 180.0f / XM_PI << "," << ob->Rotation().z * 180.0f / XM_PI << ",";
-			ofs << ob->pObj.e << "," << ob->pObj.f;
-			
+			ofs << ob->pObj.e << "," << ob->pObj.f;		
 		}
 		// MoveBox
 		else if (ob->pObj.name == "MoveBox")
 		{
-
+			ofs << "1" << "," << "MBox" << ",";
+			ofs << ob->Position().x << "," << ob->Position().y << "," << ob->Position().z << ",";
+			ofs << ob->Scale().x * 2 << "," << ob->Scale().y * 2 << "," << ob->Scale().z * 2 << ",";
 		}
 		// Player
 		else if (ob->pObj.name == "Player")
 		{
-
+			ofs << "1" << "," << "PLAYER" << ",";
+			ofs << ob->Position().x << "," << ob->Position().y << "," << ob->Position().z << ",";
+			ofs << ob->pObj.e << "," << ob->pObj.f << "," << ob->pObj.mass << ",";
+			ofs << ob->pObj.pNum;
+		}
+		else if (ob->pObj.name == "Ball")
+		{
+			ofs << "1" << "," << "BALL" << ",";
+			ofs << ob->Position().x << "," << ob->Position().y << "," << ob->Position().z << ",";
+			ofs << ob->pObj.e << "," << ob->pObj.f << "," << ob->pObj.mass;
 		}
 		// 改行
 		ofs << std::endl;
@@ -629,6 +669,14 @@ void StageEdit::Save(int n)
 
 void StageEdit::Load(int n)
 {
+	std::list<Object3D*> objs = ObjectManager::FindGameObjects<Object3D>();
+	for (Object3D* obj : objs)
+	{
+		if (obj->pObj.name == "Box" || obj->pObj.name == "MoveBox"|| obj->pObj.name == "Player"|| obj->pObj.name == "Ball")
+		{
+			obj->DestroyMe();
+		}
+	}
 	char name[64];
 	sprintf_s<64>(name, "data/Stage%02d.csv", n);
 

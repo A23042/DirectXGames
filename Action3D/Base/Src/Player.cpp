@@ -20,6 +20,8 @@ Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
 
 	mesh = new CFbxMesh();
 	mesh->Load("Data/Object/ball01.mesh");
+	meshCol = new MeshCollider();
+	meshCol->MakeFromMesh(mesh);
 
 	state = sNormal;
 

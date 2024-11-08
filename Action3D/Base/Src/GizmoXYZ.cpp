@@ -3,7 +3,6 @@
 GizmoXYZ::GizmoXYZ()
 {
 	SetTag("Gizmo");
-	//ObjectManager::SetDrawOrder(this, 100);
 	pObj.name = "gizmoCenter";
 	mesh = new CFbxMesh;
 	mesh->Load("Data/Gizmo/gizmoCenter.mesh");

@@ -64,6 +64,7 @@ public:
 		float radius = 0.0f;	// ”¼Œa
 		float mass = 0.0f;
 		bool isPlayer = false;
+		int pNum = 0;
 
 	}pObj;
 #if 0
