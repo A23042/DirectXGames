@@ -45,7 +45,7 @@ void Camera::Update()
 			{
 				// ‰æ–Ê0‚ÍPlayer1Ž‹“_
 				//Player* pc = ObjectManager::FindGameObject<Player>();
-					if (pc->playerNum == 0)
+					if (pc->GetPlNum() == 0)
 					{
 						if (pc != nullptr)
 						{
@@ -62,7 +62,7 @@ void Camera::Update()
 			{
 				// ‰æ–Ê1‚ÍPlayer2Ž‹“_
 				
-				if (pc->playerNum == 1)
+				if (pc->GetPlNum() == 1)
 				{
 #if 1
 					if (pc != nullptr)
@@ -187,7 +187,7 @@ void Camera::updateCamera(int counter, VECTOR3 pos, VECTOR3 rot)
 			end = start + camVec;
 			{
 
-				std::list<Object3D*> objList = ObjectManager::FindGameObjects<Object3D>();
+				std::list<Object3D*> objList = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ");
 				for (Object3D* g : objList)
 				{
 					VECTOR3 hit;

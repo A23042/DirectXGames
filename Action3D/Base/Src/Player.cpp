@@ -79,14 +79,11 @@ void Player::Update()
 		std::list<Ball*> balles = ObjectManager::FindGameObjects<Ball>();
 		for (Ball* ball : balles) {
 			VECTOR3 refVec = VECTOR3(0, 0, 0);
-			VECTOR3 pushVec = VECTOR3(0, 0, 0);
-			if (ball->HitPlayerToSphere(this->pObj, pushVec)) {
+			//VECTOR3 pushVec = VECTOR3(0, 0, 0);
+			if (ball->HitSphereToSphere(this->pObj)) {
 				ball->SetPosition(ball->pObj.center);
 				transform.position = pObj.center;
 			}
-			sumVelocity.x = abs(this->pObj.velocity.x) + abs(ball->pObj.velocity.x);
-			sumVelocity.y = abs(this->pObj.velocity.y) + abs(ball->pObj.velocity.y);
-			sumVelocity.z = abs(this->pObj.velocity.z) + abs(ball->pObj.velocity.z);
 		}
 		// ©•ªˆÈŠO‚ÌPlayer‚ÆÕ“Ë”»’è
 		std::list<Player*> otherPlayers = ObjectManager::FindGameObjects<Player>();
@@ -95,8 +92,8 @@ void Player::Update()
 			if (otherplayer != this)
 			{
 				VECTOR3 refVec = VECTOR3(0, 0, 0);
-				VECTOR3 pushVec = VECTOR3(0, 0, 0);
-				if (otherplayer->HitPlayerToSphere(this->pObj, pushVec)) {
+				//VECTOR3 pushVec = VECTOR3(0, 0, 0);
+				if (otherplayer->HitSphereToSphere(this->pObj)) {
 					otherplayer->SetPosition(otherplayer->pObj.center);
 					transform.position = pObj.center;
 				}

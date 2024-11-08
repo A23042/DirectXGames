@@ -53,6 +53,7 @@ public:
 		return transform.matrix();
 	};
 
+	/// S.Matsunaga
 	// 物理演算適用させるオブジェクト
 	struct PhysicsObject
 	{
@@ -103,7 +104,7 @@ public:
 	/// <param name="hit">交点を格納する場所</param>
 	/// <returns>当たった場合にtrue</returns>
 	virtual bool HitLineToMesh(const VECTOR3& from, const VECTOR3& to, VECTOR3* hit = nullptr);
-
+#if 0
 	/// <summary>
 	/// 球と球の当たり判定をする
 	/// 自分の球は、Collider()で取得する
@@ -112,14 +113,25 @@ public:
 	/// <param name="withY">falseにするとYの座標差を無視する</param>
 	/// <returns>重なり量</returns>
 	virtual float HitSphereToSphere(const SphereCollider& target, bool withY=true);
+#endif
 
-	// 球体とBoxの衝突判定
-	// 定義だけ書いてBox.cppで中をオーバーライド
+	/// S.Matsunaga
+	/// <summary>
+	/// 球体とBoxの衝突判定
+	/// 定義だけ書いてBox.cppで中をオーバーライド
+	/// </summary>
+	/// <param name="pOgj">衝突判定する球体の構造体</param>
+	/// <param name="refVec">反射ベクトル</param>
+	/// <returns>めり込み解除ベクトル</returns>
 	virtual VECTOR3 HitSphereToCubeplane(PhysicsObject& pOgj, VECTOR3& refVec);
 
-	// BallとPlayerの衝突判定
-	//virtual VECTOR3 HitPlayerToSphere(PhysicsObject& pOgj, VECTOR3& pushVec);
-	virtual BOOL HitPlayerToSphere(PhysicsObject& pOgj, VECTOR3& pushVec);
+	/// S.Matsunaga
+	/// <summary>
+	/// 球と球の衝突判定
+	/// </summary>
+	/// <param name="target">ターゲットオブジェクトの構造体</param>
+	/// <returns>衝突していたらtrue</returns>
+	virtual bool HitSphereToSphere(PhysicsObject& target);
 
 protected:
 	CFbxMesh* mesh;

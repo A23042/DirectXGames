@@ -110,6 +110,7 @@ bool Object3D::HitLineToMesh(const VECTOR3& from, const VECTOR3& to, VECTOR3* hi
 	return false;
 }
 
+/*
 float Object3D::HitSphereToSphere(const SphereCollider& target, bool withY)
 {
 	SphereCollider my = Collider();
@@ -122,58 +123,19 @@ float Object3D::HitSphereToSphere(const SphereCollider& target, bool withY)
 	}
 	return 0.0f;
 }
-
+*/
 VECTOR3 Object3D::HitSphereToCubeplane(PhysicsObject& pOgj, VECTOR3& refVec)
 {
 	return VECTOR3();
 }
 
-/*
-// PlayerとBallの衝突判定を書く
-VECTOR3 Object3D::HitPlayerToSphere(PhysicsObject& pOgj, VECTOR3& pushVec)
+
+bool Object3D::HitSphereToSphere(PhysicsObject& target)
 {
-	// PlayerとBallの距離計算
-	VECTOR3 vec = sphere.center - this->sphere.center;
-	float rsum = sphere.radius + this->sphere.radius;
-	VECTOR3 normal = normalize(vec);
+	// targetとBallの距離計算
+	VECTOR3 vec = target.center - this->pObj.center;
 
-	// 衝突していたら
-	// めり込み解除ベクトルの計算
-	if (vec.LengthSquare() < rsum * rsum) {
-		float pushLen = rsum - vec.Length();		// 押し出す長さ
-		pushVec = normal * pushLen;// 押し出すベクトルに長さを掛ける
-		// 反射ベクトルの計算
-		// 法線方向に反発係数をかける
-		// 法線方向に垂直なベクトルに摩擦係数を計算
-		VECTOR3 refNormal = dot(sphere.velocity, normal) * normal;
-		VECTOR3 refSessen = sphere.velocity - refNormal;
-		// 衝突したふたつのオブジェクトの反発係数と摩擦を考慮する
-		float e2 = (this->pObj.e + sphere.e) / 2;
-		float f2 = (this->pObj.f + sphere.f) / 2;
-
-		// 質量の考慮
-		float massA = sphere.mass;
-		float massB = this->sphere.mass;
-		float sumMass = massA + massB;
-
-		VECTOR3 velocityA = (massA - massB) / sumMass * this->sphere.velocity + (2 * massB) / sumMass * sphere.velocity;
-		VECTOR3 velocityB = (2 * massB) / sumMass * this->sphere.velocity + (massB - massA) / sumMass * sphere.velocity;
-
-		VECTOR3 a = -velocityA * e2 + refSessen;
-		VECTOR3 b = -velocityB * e2 + refSessen;
-		sphere.velocity = b;
-		this->sphere.velocity = -a;
-		//return a;
-	}
-	return VECTOR3();
-}
-*/
-BOOL Object3D::HitPlayerToSphere(PhysicsObject& player, VECTOR3& pushVec)
-{
-	// PlayerとBallの距離計算
-	VECTOR3 vec = player.center - this->pObj.center;
-
-	float rsum = player.radius + this->pObj.radius;
+	float rsum = target.radius + this->pObj.radius;
 	// P1とP2の法線ベクトル(正規化)
 	VECTOR3 normal = normalize(vec);
 
@@ -186,27 +148,28 @@ BOOL Object3D::HitPlayerToSphere(PhysicsObject& player, VECTOR3& pushVec)
 	}
 	else
 	{
+		VECTOR3 pushVec = VECTOR3();
 		float pushLen = rsum - vec.Length();		// 押し出す長さ
 		pushVec = normal * pushLen;// 押し出すベクトルに長さを掛ける
 		this->pObj.center -= pushVec / 2;
-		player.center += pushVec / 2;
+		target.center += pushVec / 2;
 
 		// 反発係数と摩擦力
-		float aveE = (player.e + this->pObj.e) / 2;
-		float aveF = (player.f + this->pObj.f) / 2;
+		float aveE = (target.e + this->pObj.e) / 2;
+		float aveF = (target.f + this->pObj.f) / 2;
 
 		// 質量
-		float p1Mass = player.mass;
+		float p1Mass = target.mass;
 		float p2Mass = this->pObj.mass;
 		float sumMass = p1Mass + p2Mass;
 
-		// PlayerとBallのVelocity
-		VECTOR3 p1Velocity = player.velocity;
+		// targetとBallのVelocity
+		VECTOR3 p1Velocity = target.velocity;
 		VECTOR3 p2Velocity = this->pObj.velocity;
 
 		// Ball(P2)に渡すベクトル(法線方向の速度)
 		VECTOR3 p1OverVec = (dot(normal, p1Velocity) * normal);
-		// Player(P1)の残ったベクトル
+		// target(P1)の残ったベクトル
 		VECTOR3 p1RestVec = p1Velocity - p1OverVec;
 				
 		// P1に渡すベクトル(法線方向の速度)
@@ -223,7 +186,7 @@ BOOL Object3D::HitPlayerToSphere(PhysicsObject& player, VECTOR3& pushVec)
 		VECTOR3 resultP1Vec = (p1RestVec + newNomalP1Vec) * aveE;
 		VECTOR3 resultP2Vec = (p2RestVec + newNomalP2Vec) * aveE;
 
-		player.velocity = resultP1Vec;
+		target.velocity = resultP1Vec;
 		this->pObj.velocity = resultP2Vec;
 		return true;
 	}

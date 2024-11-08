@@ -12,21 +12,24 @@ public:
 	void Draw() override;
 
 	SphereCollider Collider() override;
-	
+
 	void PushVec(VECTOR3 pushVec, VECTOR3 RefVec);
 
-	int playerNum;
+	int GetPlNum() { return playerNum; }
 private:
 	enum State {
 		sNormal = 0,
 		sJump,
 		sAttack,
-	};
-	State state;
+	}state;
+
 	void UpdateNormal();
 	void UpdateJump();
 	void UpdateAttack();
+
 	bool isPhysic;
+
 	VECTOR3 sumVelocity;
 
+	int playerNum;
 };

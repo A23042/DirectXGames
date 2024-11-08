@@ -7,12 +7,6 @@
 #include "GizmoXYZ.h"
 #include <fstream>
 
-namespace
-{
-	static const int EXTENDED_DISTANCE = 50;	// Rayの長さ
-	static const int EXTENDED_OBJ_DISTANCE = 20;	// (仮)オブジェクトの移動場所
-}
-
 // マウスのドラッグアンドドロップでステージオブジェクトの配置が理想
 // Tankのレティクルの画面座標をワールド座標に変換するのが使えそう？
 // オブジェクトを配置、削除したらcsvの行を詰めたい
@@ -89,7 +83,7 @@ void StageEdit::Update()
 	{
 		SelectObj(new Ball(false));
 	}
-	if(pNum == 0)
+	if(pNum <= 1)
 	{
 		if (ImGui::Button("Player"))
 		{

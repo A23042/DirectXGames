@@ -55,6 +55,19 @@ void Ball::Update()
 			pushVec = box->HitSphereToCubeplane(this->pObj, refVec);
 			PushVec(-pushVec, refVec);
 		}
+		// ©•ªˆÈŠO‚ÌBall‚ÆÕ“Ë”»’è
+		std::list<Ball*> otherBall = ObjectManager::FindGameObjects<Ball>();
+		for (Ball* ball : otherBall)
+		{
+			if (ball != this)
+			{
+				if (ball->HitSphereToSphere(this->pObj))
+				{
+					ball->SetPosition(ball->pObj.center);
+					transform.position = pObj.center;
+				}
+			}
+		}
 	}
 }
 

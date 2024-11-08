@@ -2,14 +2,13 @@
 #include "Player.h"
 // 平行移動Boxオブジェクト
 
-MoveBox::MoveBox(VECTOR3 size, VECTOR3 rot, VECTOR3 move, VECTOR3 moveSpeed)
+MoveBox::MoveBox(VECTOR3 size, VECTOR3 rot, VECTOR3 move, VECTOR3 moveSpeed) : vPos(size / 2)
 {
 	SetTag("STAGEOBJ");
 	pObj.name = "MoveBox";
 	mesh = new CFbxMesh();
 	mesh->Load("Data/Object/box00.mesh");
 
-	vPos = VECTOR3(size.x / 2, size.y / 2, size.z / 2);
 	transform.scale = size;
 
 	// 回転角をラジアンに変換し、回転行列を作成
