@@ -111,12 +111,12 @@ void StageEdit::NoneUpdate()
 	if (GameDevice()->m_pDI->CheckMouse(KD_TRG, 0))
 	{
 		std::list<Object3D*> objs = ObjectManager::FindGameObjects<Object3D>();
-		for (Object3D* ob : objs)
+		for (Object3D* obj : objs)
 		{
 			VECTOR3 hit;
-			if (ob->HitLineToMesh(nearWorldPos, extendedFarWorldPos, &hit))
+			if (obj->HitLineToMesh(nearWorldPos, farWorldPos, &hit))
 			{
-				SelectObj(ob);
+				SelectObj(obj);
 				return;	// 以下コード省略
 			}
 		}
@@ -185,25 +185,36 @@ void StageEdit::HasUpdate()
 		// Gizmoに当たってなければ衝突判定をとる
 		if(!isHit)
 		{
+			bool firstFlag = true;
+			float distance = 0.0f;
+			float minDistance = 0.0f;
 			// Gizmo以外のオブジェクトを調べる
 			std::list<Object3D*> objs = ObjectManager::FindGameObjectsWithOutTag<Object3D>("Gizmo");
-			for (Object3D* ob : objs)
+			for (Object3D* obj : objs)
 			{
 				VECTOR3 hit;
 				// カーソルのワールド座標の近視点から遠視点の距離を伸ばした点までのRayを飛ばしす
-				if (ob->HitLineToMesh(nearWorldPos, extendedFarWorldPos, &hit))
+				if (obj->HitLineToMesh(nearWorldPos, farWorldPos, &hit)) //extendedFarWorldPos
 				{
-					// 現在選択状態のオブジェクトの場合何もしない
-					if (ob == getObj)
-					{
-						break;
-					}
-					else
-					{
+
+						distance = (hit - nearWorldPos).Length();
 						// 違うオブジェクトがクリックされたら選択オブジェクト変更
-						SelectObj(ob);
-						return;	// 以下コード省略
-					}
+						if (firstFlag)
+						{
+							getObj = obj;
+							minDistance = distance;
+							firstFlag = false;
+						}
+						else
+						{
+							if (minDistance > distance)
+							{
+								if(obj != getObj)
+								getObj = obj;
+								minDistance = distance;
+							}
+						}
+						SelectObj(getObj);
 				}
 			}
 		}
@@ -527,7 +538,10 @@ void StageEdit::SetGizmo(int gState)
 void StageEdit::SelectObj(Object3D* ob)
 {
 	// 選択されてるオブジェクトの保存
-	getObj = ob;
+	if (getObj != ob)
+	{
+		getObj = ob;
+	}
 	// 選択されてるオブジェクトのGizmo表示
 	// 初めてGizmoが出る場合posGizmoを出す
 	if (gState == sNoneGizmo)
@@ -695,6 +709,5 @@ void StageEdit::GetWorldPos()
 	
 	// 方向ベクトルを正規化して長さを延ばす
 	direction = XMVector3Normalize(farWorldPos - nearWorldPos);
-	extendedFarWorldPos = nearWorldPos + direction * EXTENDED_DISTANCE;  // EXTENDED_DISTANCEで延ばす
 	return;
 }
