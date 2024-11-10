@@ -54,29 +54,27 @@ public:
 	};
 
 	/// S.Matsunaga
-	// 物理演算適用させるオブジェクト
+	// 物理演算や衝突判定を適用させるオブジェクト
 	struct PhysicsObject
 	{
-		std::string name = "";	// オブジェクトの名前
 		VECTOR3 velocity = VECTOR3(0, 0, 0);	// 速度
 		VECTOR3 center = VECTOR3(0, 0, 0);		// 中心点
 		float e;	// 反発係数
 		float f;	// 摩擦
-		float radius = 0.0f;	// 半径
+		float radius = 0.0f;	// 球体用半径
 		float mass = 0.0f;
 		bool isPlayer = false;
 		int pNum = 0;
 
 	}pObj;
-#if 0
-	// 球体用の構造体
-	struct Sphere : PhysicsObject
+
+	// Mapエディタ使用中に使う構造体
+	struct EditObject
 	{
-		float radius = 0.0f;	// 半径
-		float mass = 0.0f;
-		bool isPlayer = false;
-	}sphere;
-#endif
+		std::string name = "";	// オブジェクトの名前
+		bool isSelect = false;	// 選択状態かどうか
+	}editObj;
+
 	void SetPosition(const VECTOR3& pos);
 	void SetPosition(float x, float y, float z);
 	void SetRotation(const VECTOR3& pos);

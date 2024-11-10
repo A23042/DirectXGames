@@ -12,7 +12,7 @@ namespace { // ‚±‚ÌcppˆÈŠO‚Å‚ÍŽg‚¦‚È‚¢
 Ball::Ball(bool isPhysic) : isPhysic(isPhysic)
 {
 	//SetTag("STAGEOBJ");
-	pObj.name = "Ball";
+	editObj.name = "Ball";
 	mesh = new CFbxMesh();
 	mesh->Load("Data/Object/ball01.mesh");
 	meshCol = new MeshCollider();

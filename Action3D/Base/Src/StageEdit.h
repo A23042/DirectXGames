@@ -126,6 +126,9 @@ private:
 	Object3D* scaleGizmoY = nullptr;
 	Object3D* scaleGizmoZ = nullptr;
 
+	// アウトライン
+	Object3D* outlineBox = nullptr;
+	Object3D* outlineSphere = nullptr;
 
 	// マウススクリーン座標
 	POINT mousePos;		

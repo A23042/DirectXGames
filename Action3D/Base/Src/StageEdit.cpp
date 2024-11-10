@@ -31,6 +31,8 @@ StageEdit::StageEdit()
 	scaleGizmoY = new ScaleGizmoY(gizmoC);
 	scaleGizmoZ = new ScaleGizmoZ(gizmoC);
 
+	outlineBox = new OutlineBox();
+
 	nState = sNone;
 	gState = sNoneGizmo;
 
@@ -201,6 +203,7 @@ void StageEdit::HasUpdate()
 		// Gizmoに当たってなければ衝突判定をとる
 		if(!isHit)
 		{
+			Object3D* temp = nullptr;
 			// 探索された最初のオブジェクトか
 			bool firstFlag = true;
 			// naerWorldPosから当たった場所までの距離
@@ -220,7 +223,7 @@ void StageEdit::HasUpdate()
 					// 違うオブジェクトがクリックされたら選択オブジェクト変更
 					if (firstFlag)
 					{
-						getObj = obj;
+						temp = obj;
 						minDistance = distance;
 						firstFlag = false;
 					}
@@ -228,13 +231,18 @@ void StageEdit::HasUpdate()
 					{
 						if (minDistance > distance)
 						{
-							if(obj != getObj)
-							getObj = obj;
-							minDistance = distance;
+							if(obj != temp)
+							{
+								temp = obj;
+								minDistance = distance;
+							}
 						}
 					}
-					SelectObj(getObj);
 				}
+			}
+			if (temp != nullptr)
+			{
+				SelectObj(temp);
 			}
 		}
 	}
@@ -248,7 +256,7 @@ void StageEdit::HasUpdate()
 
 	// ImGuiで場所、回転、スケールを変える
 	ImGui::SetNextWindowPos(ImVec2(30, 170));
-	if (getObj->pObj.name != "MoveBox")
+	if (getObj->editObj.name != "MoveBox")
 	{
 		ImGui::SetNextWindowSize(ImVec2(290, 310));
 	}
@@ -256,7 +264,9 @@ void StageEdit::HasUpdate()
 	{
 		ImGui::SetNextWindowSize(ImVec2(290, 400));
 	}
-	ImGui::Begin("OBJINFO");
+	string name = "OBJINFO:" + getObj->editObj.name;
+	//sprintf_s<64>(name, "data/Stage%02d.csv", n);
+	ImGui::Begin(name.c_str());
 	// 反発係数・摩擦・質量
 	ImGui::SliderFloat("e", &e, 0.0f, 1.0f, "%.1f");
 	ImGui::SliderFloat("f", &f, 0.0f, 1.0f, "%.2f");
@@ -274,7 +284,7 @@ void StageEdit::HasUpdate()
 	ImGui::InputFloat("scaleY", &objScale.y, 0.5f);
 	ImGui::InputFloat("ScaleZ", &objScale.z, 0.5f);
 	// MoveBoxの場合移動速と移動量
-	if (getObj->pObj.name == "MoveBox")
+	if (getObj->editObj.name == "MoveBox")
 	{
 		ImGui::InputFloat("MoveSpeed", &moveSpeed, 0.5f);
 		ImGui::InputFloat("MovementX", &moveVolumu.x, 0.5f);
@@ -305,7 +315,7 @@ void StageEdit::HasUpdate()
 	}
 	getObj->SetScale(objScale);	// スケール
 
-	if (getObj->pObj.name == "MoveBox")
+	if (getObj->editObj.name == "MoveBox")
 	{
 
 	}
@@ -355,9 +365,18 @@ void StageEdit::PosGizmoUpdate()
 {
 	if (getGizmo != nullptr)
 	{
+		// 選択されているGizmoのみ表示
 		if (getGizmo != posGizmoX)
 		{
 			ObjectManager::SetVisible(posGizmoX,false);
+		}
+		if (getGizmo != posGizmoY)
+		{
+			ObjectManager::SetVisible(posGizmoY, false);
+		}
+		if (getGizmo != posGizmoZ)
+		{
+			ObjectManager::SetVisible(posGizmoZ, false);
 		}
 		// オブジェクトの位置まで伸ばす
 		float exDistance = (nearWorldPos - getObj->Position()).Length();	// オブジェクトまでの距離
@@ -368,24 +387,18 @@ void StageEdit::PosGizmoUpdate()
 		{
 			if (pDI->CheckMouse(KD_DAT, 0))
 			{
-				if (getGizmo->pObj.name == "posGizmoX")
+				if (getGizmo->editObj.name == "posGizmoX")
 				{
-					ObjectManager::SetVisible(posGizmoY, false);
-					ObjectManager::SetVisible(posGizmoZ, false);
 					objPos.x +=  diff.x;
 					getObj->pObj.center.x += diff.x;
 				}
-				else if (getGizmo->pObj.name == "posGizmoY")
+				else if (getGizmo->editObj.name == "posGizmoY")
 				{
-					ObjectManager::SetVisible(posGizmoX, false);
-					ObjectManager::SetVisible(posGizmoZ, false);
 					objPos.y += diff.y;
 					getObj->pObj.center.y += diff.y;
 				}
-				else if (getGizmo->pObj.name == "posGizmoZ")
+				else if (getGizmo->editObj.name == "posGizmoZ")
 				{
-					ObjectManager::SetVisible(posGizmoX, false);
-					ObjectManager::SetVisible(posGizmoY, false);
 					objPos.z += diff.z;
 					getObj->pObj.center.z += diff.z;
 				}
@@ -412,6 +425,19 @@ void StageEdit::RotGizmoUpdate()
 	// ここでGizmoを触ってオブジェクトを動かす
 	if (getGizmo != nullptr)
 	{
+		// 選択されているGizmoのみ表示
+		if (getGizmo != rotGizmoX)
+		{
+			ObjectManager::SetVisible(rotGizmoX, false);
+		}
+		if (getGizmo != rotGizmoY)
+		{
+			ObjectManager::SetVisible(rotGizmoY, false);
+		}
+		if (getGizmo != rotGizmoZ)
+		{
+			ObjectManager::SetVisible(rotGizmoZ, false);
+		}
 		// オブジェクトの位置まで伸ばす
 		float exDistance = (nearWorldPos - getObj->Position()).Length();
 		VECTOR3 nearWorldPosEx = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
@@ -421,17 +447,17 @@ void StageEdit::RotGizmoUpdate()
 		{
 			if (pDI->CheckMouse(KD_DAT, 0))
 			{
-				if (getGizmo->pObj.name == "rotGizmoX")
+				if (getGizmo->editObj.name == "rotGizmoX")
 				{
 					//objRot.x = (objRot.x / 180.0f * XM_PI) + (diff.x * 10 / 180.0f * XM_PI);
 					//getObj->SetRotation(VECTOR3((objRot.x / 180.0f * XM_PI) + (diff.x * 10 / 180.0f * XM_PI), getObj->Rotation().y, getObj->Rotation().z));
 				}
-				else if (getGizmo->pObj.name == "rotGizmoY")
+				else if (getGizmo->editObj.name == "rotGizmoY")
 				{
 					objRot.y = (objRot.y / 180.0f * XM_PI) + (diff.y * 10 / 180.0f * XM_PI);
 					getObj->SetRotation(VECTOR3(objRot.x, (objRot.y / 180.0f * XM_PI) + (diff.y * 10 / 180.0f * XM_PI), objRot.z));
 				}
-				else if (getGizmo->pObj.name == "rotGizmoZ")
+				else if (getGizmo->editObj.name == "rotGizmoZ")
 				{
 					//objRot.z = diff.z / 180.0f * XM_PI;
 				}
@@ -449,6 +475,9 @@ void StageEdit::RotGizmoUpdate()
 	if (pDI->CheckMouse(KD_UTRG, 0))
 	{
 		getGizmo = nullptr;
+		ObjectManager::SetVisible(rotGizmoX, true);
+		ObjectManager::SetVisible(rotGizmoY, true);
+		ObjectManager::SetVisible(rotGizmoZ, true);
 	}
 }
 
@@ -457,6 +486,19 @@ void StageEdit::ScaleGizmoUpdate()
 	// ここでGizmoを触ってオブジェクトを動かす
 	if (getGizmo != nullptr)
 	{
+		// 選択されているGizmoのみ表示
+		if (getGizmo != scaleGizmoX)
+		{
+			ObjectManager::SetVisible(scaleGizmoX, false);
+		}
+		if (getGizmo != scaleGizmoY)
+		{
+			ObjectManager::SetVisible(scaleGizmoY, false);
+		}
+		if (getGizmo != scaleGizmoZ)
+		{
+			ObjectManager::SetVisible(scaleGizmoZ, false);
+		}
 		// オブジェクトの位置まで伸ばす
 		float exDistance = (nearWorldPos - getObj->Position()).Length();
 		VECTOR3 nearWorldPosEx = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
@@ -466,19 +508,19 @@ void StageEdit::ScaleGizmoUpdate()
 		{
 			if (pDI->CheckMouse(KD_DAT, 0))
 			{
-				if (getGizmo->pObj.name == "scaleGizmoX")
+				if (getGizmo->editObj.name == "scaleGizmoX")
 				{
 					objScale.x += diff.x * 2;
 				}
-				else if (getGizmo->pObj.name == "scaleGizmoY")
+				else if (getGizmo->editObj.name == "scaleGizmoY")
 				{
 					objScale.y += diff.y * 2;
 				}
-				else if (getGizmo->pObj.name == "scaleGizmoZ")
+				else if (getGizmo->editObj.name == "scaleGizmoZ")
 				{
 					objScale.z += diff.z * 2;
 				}
-				else if (getGizmo->pObj.name == "gizmoCenter")
+				else if (getGizmo->editObj.name == "gizmoCenter")
 				{
 					objScale += diff * 2;
 				}
@@ -497,6 +539,9 @@ void StageEdit::ScaleGizmoUpdate()
 	if (pDI->CheckMouse(KD_UTRG, 0))
 	{
 		getGizmo = nullptr;
+		ObjectManager::SetVisible(scaleGizmoX, true);
+		ObjectManager::SetVisible(scaleGizmoY, true);
+		ObjectManager::SetVisible(scaleGizmoZ, true);
 	}
 }
 
@@ -564,6 +609,7 @@ void StageEdit::SelectObj(Object3D* ob)
 	// 選択されてるオブジェクトの保存
 	if (getObj != ob)
 	{
+		if (getObj != nullptr)DeselectObj();
 		getObj = ob;
 	}
 	// 選択されてるオブジェクトのGizmo表示
@@ -579,12 +625,14 @@ void StageEdit::SelectObj(Object3D* ob)
 	objPos = getObj->pObj.center;
 	objRot = getObj->Rotation() * 180.0f / XM_PI;
 	objScale = getObj->Scale();
-
+	
+	getObj->editObj.isSelect = true;
 	nState = sHas;
 }
 
 void StageEdit::DeselectObj()
 {
+	getObj->editObj.isSelect = false;
 	getObj = nullptr;
 	nState = sNone;
 	SetGizmo(sNoneGizmo);
@@ -592,19 +640,19 @@ void StageEdit::DeselectObj()
 
 void StageEdit::DupeObj(Object3D* ob)
 {
-	if (ob->pObj.name == "Box")
+	if (ob->editObj.name == "Box")
 	{
 		getObj = new Box();
 	}
-	else if (ob->pObj.name == "MoveBax")
+	else if (ob->editObj.name == "MoveBax")
 	{
 		getObj = new MoveBox();
 	}
-	else if (ob->pObj.name == "Ball")
+	else if (ob->editObj.name == "Ball")
 	{
 		getObj = new Ball();
 	}
-	else if (ob->pObj.name == "Player")
+	else if (ob->editObj.name == "Player")
 	{
 		getObj = new Player(1);
 	}
@@ -625,30 +673,30 @@ void StageEdit::Save(int n)
 	for (Object3D* ob : objs)
 	{
 		// Box
-		if (ob->pObj.name == "Box")
+		if (ob->editObj.name == "Box")
 		{
 			ofs << "1" << "," << "BOX" << ",";
 			ofs << ob->Position().x << "," << ob->Position().y << "," << ob->Position().z << ",";
-			ofs << ob->Scale().x * 2 << "," << ob->Scale().y * 2 << "," << ob->Scale().z * 2 << ",";
+			ofs << ob->Scale().x << "," << ob->Scale().y << "," << ob->Scale().z << ",";
 			ofs << ob->Rotation().x * 180.0f / XM_PI << "," << ob->Rotation().y * 180.0f / XM_PI << "," << ob->Rotation().z * 180.0f / XM_PI << ",";
 			ofs << ob->pObj.e << "," << ob->pObj.f;		
 		}
 		// MoveBox
-		else if (ob->pObj.name == "MoveBox")
+		else if (ob->editObj.name == "MoveBox")
 		{
 			ofs << "1" << "," << "MBox" << ",";
 			ofs << ob->Position().x << "," << ob->Position().y << "," << ob->Position().z << ",";
-			ofs << ob->Scale().x * 2 << "," << ob->Scale().y * 2 << "," << ob->Scale().z * 2 << ",";
+			ofs << ob->Scale().x << "," << ob->Scale().y << "," << ob->Scale().z << ",";
 		}
 		// Player
-		else if (ob->pObj.name == "Player")
+		else if (ob->editObj.name == "Player")
 		{
 			ofs << "1" << "," << "PLAYER" << ",";
 			ofs << ob->Position().x << "," << ob->Position().y << "," << ob->Position().z << ",";
 			ofs << ob->pObj.e << "," << ob->pObj.f << "," << ob->pObj.mass << ",";
 			ofs << ob->pObj.pNum;
 		}
-		else if (ob->pObj.name == "Ball")
+		else if (ob->editObj.name == "Ball")
 		{
 			ofs << "1" << "," << "BALL" << ",";
 			ofs << ob->Position().x << "," << ob->Position().y << "," << ob->Position().z << ",";
@@ -666,7 +714,7 @@ void StageEdit::Load(int n)
 	std::list<Object3D*> objs = ObjectManager::FindGameObjects<Object3D>();
 	for (Object3D* obj : objs)
 	{
-		if (obj->pObj.name == "Box" || obj->pObj.name == "MoveBox"|| obj->pObj.name == "Player"|| obj->pObj.name == "Ball")
+		if (obj->editObj.name == "Box" || obj->editObj.name == "MoveBox"|| obj->editObj.name == "Player"|| obj->editObj.name == "Ball")
 		{
 			obj->DestroyMe();
 		}

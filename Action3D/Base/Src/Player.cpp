@@ -16,7 +16,7 @@ namespace { // ‚±‚ÌcppˆÈŠO‚Å‚ÍŽg‚¦‚È‚¢
 
 Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
 {
-	pObj.name = "Player";
+	editObj.name = "Player";
 
 	mesh = new CFbxMesh();
 	mesh->Load("Data/Object/ball01.mesh");

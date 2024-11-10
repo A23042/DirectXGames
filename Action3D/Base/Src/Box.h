@@ -7,7 +7,24 @@ public:
 	~Box();
 	void Start() override;
 	void Update() override;
+	void Draw() override;
 	void CubeSize(float x = 0, float y = 0, float z = 0);
+	
+	// 選択状態切替
+	void SetSelect() {
+		if (editObj.isSelect == true)
+		{
+			editObj.isSelect = false;
+		}
+		else
+		{
+			editObj.isSelect = true;
+		}
+	}
+	// 選択されているか
+	bool IsSelect() { return editObj.isSelect; }
+	
+
 	// 押し返すベクトルを返したいからVECTOR3
 	// 平面の衝突判定
 	VECTOR3 HitSphereToCubeplane(PhysicsObject& pOgj, VECTOR3 &refVec) override;
@@ -38,4 +55,6 @@ private:
 	float Tpt[12] = {};
 
 	XMMATRIX rotationMatrix;
+
+	CSprite* spr;
 };

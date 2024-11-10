@@ -3,7 +3,7 @@
 GizmoXYZ::GizmoXYZ()
 {
 	SetTag("Gizmo");
-	pObj.name = "gizmoCenter";
+	editObj.name = "gizmoCenter";
 	mesh = new CFbxMesh;
 	mesh->Load("Data/Gizmo/gizmoCenter.mesh");
 	transform.scale = VECTOR3(1, 1, 1);
@@ -22,14 +22,13 @@ PosGizmoX::PosGizmoX(Object3D* parent)
 {
 	SetTag("Gizmo");
 	//ObjectManager::SetDrawOrder(this, 100);
-	pObj.name = "posGizmoX";
+	editObj.name = "posGizmoX";
 	transform.SetParent(parent);
 	mesh = new CFbxMesh;
 	mesh->Load("Data/Gizmo/PosGizmoX.mesh");
 	meshCol = new MeshCollider;
 	meshCol->MakeFromMesh(mesh);
 	transform.rotation.z = (180.0f / 180 * XM_PI);
-	transform.scale = VECTOR3(1, 1, 1);
 	ObjectManager::SetVisible(this, false);
 }
 
@@ -44,13 +43,12 @@ void PosGizmoX::Update()
 PosGizmoY::PosGizmoY(Object3D* parent)
 {
 	SetTag("Gizmo");
-	pObj.name = "posGizmoY";
+	editObj.name = "posGizmoY";
 	transform.SetParent(parent);
 	mesh = new CFbxMesh;
 	mesh->Load("Data/Gizmo/PosGizmoY.mesh");
 	meshCol = new MeshCollider;
 	meshCol->MakeFromMesh(mesh);
-	transform.scale = VECTOR3(1, 1, 1);
 	ObjectManager::SetVisible(this, false);
 }
 
@@ -65,14 +63,13 @@ void PosGizmoY::Update()
 PosGizmoZ::PosGizmoZ(Object3D* parent)
 {
 	SetTag("Gizmo");
-	pObj.name = "posGizmoZ";
+	editObj.name = "posGizmoZ";
 	transform.SetParent(parent);
 	mesh = new CFbxMesh;
 	mesh->Load("Data/Gizmo/PosGizmoZ.mesh");
 	meshCol = new MeshCollider;
 	meshCol->MakeFromMesh(mesh);
 	transform.rotation.x = (180.0f / 180 * XM_PI);
-	transform.scale = VECTOR3(1, 1, 1);
 	ObjectManager::SetVisible(this, false);
 }
 
@@ -87,7 +84,7 @@ void PosGizmoZ::Update()
 RotGizmoC::RotGizmoC(Object3D* parent)
 {
 	SetTag("Gizmo");
-	pObj.name = "rotGizmoC";
+	editObj.name = "rotGizmoC";
 	transform.SetParent(parent);
 	mesh = new CFbxMesh;
 	mesh->Load("Data/Gizmo/RotGizmoCenter.mesh");
@@ -106,7 +103,7 @@ void RotGizmoC::Update()
 RotGizmoX::RotGizmoX(Object3D* parent)
 {
 	SetTag("Gizmo");
-	pObj.name = "rotGizmoX";
+	editObj.name = "rotGizmoX";
 	transform.SetParent(parent);
 	mesh = new CFbxMesh;
 	mesh->Load("Data/Gizmo/RotGizmoX.mesh");
@@ -126,7 +123,7 @@ void RotGizmoX::Update()
 RotGizmoY::RotGizmoY(Object3D* parent)
 {
 	SetTag("Gizmo");
-	pObj.name = "rotGizmoY";
+	editObj.name = "rotGizmoY";
 	transform.SetParent(parent);
 	mesh = new CFbxMesh;
 	mesh->Load("Data/Gizmo/RotGizmoY.mesh");
@@ -146,7 +143,7 @@ void RotGizmoY::Update()
 RotGizmoZ::RotGizmoZ(Object3D* parent)
 {
 	SetTag("Gizmo");
-	pObj.name = "rotGizmoZ";
+	editObj.name = "rotGizmoZ";
 	transform.SetParent(parent);
 	mesh = new CFbxMesh;
 	mesh->Load("Data/Gizmo/RotGizmoZ.mesh");
@@ -167,7 +164,7 @@ void RotGizmoZ::Update()
 ScaleGizmoX::ScaleGizmoX(Object3D* parent)
 {
 	SetTag("Gizmo");
-	pObj.name = "scaleGizmoX";
+	editObj.name = "scaleGizmoX";
 	transform.SetParent(parent);
 	mesh = new CFbxMesh;
 	mesh->Load("Data/Gizmo/ScaleGizmoX.mesh");
@@ -187,7 +184,7 @@ void ScaleGizmoX::Update()
 ScaleGizmoY::ScaleGizmoY(Object3D* parent)
 {
 	SetTag("Gizmo");
-	pObj.name = "scaleGizmoY";
+	editObj.name = "scaleGizmoY";
 	transform.SetParent(parent);
 	mesh = new CFbxMesh;
 	mesh->Load("Data/Gizmo/ScaleGizmoY.mesh");
@@ -206,7 +203,7 @@ void ScaleGizmoY::Update()
 ScaleGizmoZ::ScaleGizmoZ(Object3D* parent)
 {
 	SetTag("Gizmo");
-	pObj.name = "scaleGizmoZ";
+	editObj.name = "scaleGizmoZ";
 	transform.SetParent(parent);
 	mesh = new CFbxMesh;
 	mesh->Load("Data/Gizmo/ScaleGizmoZ.mesh");
@@ -221,5 +218,20 @@ ScaleGizmoZ::~ScaleGizmoZ()
 }
 
 void ScaleGizmoZ::Update()
+{
+}
+
+OutlineBox::OutlineBox()
+{
+	SetTag("Outline");
+	mesh = new CFbxMesh;
+	mesh->Load("Data/Gizmo/outlineBox.mesh");
+}
+
+OutlineBox::~OutlineBox()
+{
+}
+
+void OutlineBox::Update()
 {
 }

@@ -5,7 +5,7 @@
 MoveBox::MoveBox(VECTOR3 size, VECTOR3 rot, VECTOR3 move, VECTOR3 moveSpeed) : vPos(size / 2)
 {
 	SetTag("STAGEOBJ");
-	pObj.name = "MoveBox";
+	editObj.name = "MoveBox";
 	mesh = new CFbxMesh();
 	mesh->Load("Data/Object/box00.mesh");
 

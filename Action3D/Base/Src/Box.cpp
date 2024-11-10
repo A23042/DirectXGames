@@ -7,7 +7,7 @@
 Box::Box(VECTOR3 size, VECTOR3 rot) : vPos(size / 2)
 {
 	SetTag("STAGEOBJ");
-	pObj.name = "Box";
+	editObj.name = "Box";
 	mesh = new CFbxMesh();
 	mesh->Load("Data/Object/box00.mesh");
 
@@ -30,17 +30,19 @@ Box::Box(VECTOR3 size, VECTOR3 rot) : vPos(size / 2)
 
 	pObj.center = transform.position;
 	
+	spr = new CSprite;
 }
 
 void Box::Start()
 {
 	pObj.center = transform.position;
-	CubeSize(vPos.x, vPos.y, vPos.z);
+	//CubeSize(vPos.x, vPos.y, vPos.z);
 }
 
 void Box::Update()
 {
 	transform.position = pObj.center;
+	vPos = transform.scale / 2;
 	CubeSize(vPos.x, vPos.y, vPos.z);
 
 	// 衝突判定の関数呼び出しはそれぞれのクラスで行う
@@ -63,6 +65,28 @@ void Box::Update()
 		ball->PushVec(-pushVec, refVec);	// プレイヤーをめり込んだ量だけもどす
 	}
 #endif
+}
+
+void Box::Draw()
+{
+	mesh->Render(transform.matrix());
+
+	// 選択されている場合自身のアウトライを表示させる
+	if(editObj.isSelect)
+	{
+		// 各辺の頂点パーツ
+		int edgePoint[12][2] = {
+			{0, 1}, {1, 2}, {2, 3}, {3, 0},//正面：右、　下、　左、　下
+			{0, 4}, {1, 5}, {2, 6}, {3, 7},//側面：右上、右下、左下、左上
+			{4, 5}, {5, 6}, {6, 7}, {7, 4} //背面：右、　下、　左、　下、
+		};
+
+		// 辺ベクトル作成
+		for (int i = 0; i < 12; i++) {
+			edge[i] = ten[edgePoint[i][1]] - ten[edgePoint[i][0]];
+			spr->DrawLine3D(ten[edgePoint[i][1]], ten[edgePoint[i][0]], RGB(0, 255, 50), 1.0f);
+		}
+	}
 }
 
 void Box::CubeSize(float x, float y, float z)
@@ -92,7 +116,7 @@ void Box::CubeSize(float x, float y, float z)
 	for (int i = 0; i < 8; i++) {
 		ten[i] += transform.position;
 	}
-
+	
 	// 各辺の頂点パーツ
 	int edgePoint[12][2] = {
 		{0, 1}, {1, 2}, {2, 3}, {3, 0},//正面：右、　下、　左、　下
@@ -100,10 +124,9 @@ void Box::CubeSize(float x, float y, float z)
 		{4, 5}, {5, 6}, {6, 7}, {7, 4} //背面：右、　下、　左、　下、
 	};
 
-	// 辺の長さを１で作成
+	
+	// 辺ベクトル作成
 	for (int i = 0; i < 12; i++) {
-		//	gpt				点　頂点パーツの左				頂点パーツの右
-		//edge[i] = normalize(ten[edgePoint[i][1]] - ten[edgePoint[i][0]]);
 		edge[i] = ten[edgePoint[i][1]] - ten[edgePoint[i][0]];
 	}
 
