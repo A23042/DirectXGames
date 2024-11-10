@@ -53,7 +53,7 @@ public:
 		return transform.matrix();
 	};
 
-	/// S.Matsunaga
+	// S.Matsunaga
 	// 物理演算や衝突判定を適用させるオブジェクト
 	struct PhysicsObject
 	{
@@ -68,6 +68,7 @@ public:
 
 	}pObj;
 
+	// S.Matsunaga
 	// Mapエディタ使用中に使う構造体
 	struct EditObject
 	{
@@ -113,7 +114,7 @@ public:
 	virtual float HitSphereToSphere(const SphereCollider& target, bool withY=true);
 #endif
 
-	/// S.Matsunaga
+	/// 2024.9.24 S.Matsunaga
 	/// <summary>
 	/// 球体とBoxの衝突判定
 	/// 定義だけ書いてBox.cppで中をオーバーライド
@@ -123,7 +124,7 @@ public:
 	/// <returns>めり込み解除ベクトル</returns>
 	virtual VECTOR3 HitSphereToCubeplane(PhysicsObject& pOgj, VECTOR3& refVec);
 
-	/// S.Matsunaga
+	/// 2024.11.05 S.Matsunaga
 	/// <summary>
 	/// 球と球の衝突判定
 	/// </summary>

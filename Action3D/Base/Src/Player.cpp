@@ -1,7 +1,5 @@
 #include "Player.h"
 #include "../Libs/Imgui/imgui.h"
-#include "Dancer.h"
-#include "Door.h"
 #include "Box.h"
 #include "MoveBox.h"
 #include "Ball.h"
@@ -108,9 +106,6 @@ void Player::Update()
 			break;
 		case sJump:
 			UpdateJump();
-			break;
-		case sAttack:
-			UpdateAttack();
 			break;
 		}
 		ImGui::Begin("POSITION");
@@ -368,23 +363,4 @@ void Player::UpdateJump()
 {
 	pObj.velocity.y = 10.0f;
 	state = sNormal();
-}
-
-void Player::UpdateAttack()
-{
-	// 敵に攻撃を当てる
-	std::list<Dancer*> dancers = ObjectManager::FindGameObjects<Dancer>();
-
-	VECTOR3 tipPos = VECTOR3(0.9966, 0.6536, 0.140);
-	MATRIX4X4 mat = transform.matrix(); // 世界（ワールド）の中で、プレイヤーの位置と向き
-	MATRIX4X4 bone = mesh->GetFrameMatrices(34); // プレイヤーの原点からの手首の位置(34は手首)
-	VECTOR3 start = VECTOR3(0, 0, 0) * bone * mat;
-	VECTOR3 end = tipPos * bone * mat;
-
-	for (Dancer* d : dancers) {
-		VECTOR3 hit;
-		if (d->HitLineToMesh(start, end, &hit)) {
-			d->AddDamage(10, transform.position); // 敵に当てた
-		}
-	}
 }

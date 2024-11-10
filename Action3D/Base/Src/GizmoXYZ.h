@@ -89,11 +89,3 @@ public:
 	~ScaleGizmoZ();
 	void Update() override;
 };
-
-class OutlineBox : public Object3D
-{
-public:
-	OutlineBox();
-	~OutlineBox();
-	void Update() override;
-};

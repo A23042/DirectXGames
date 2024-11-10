@@ -149,14 +149,13 @@ bool Object3D::HitSphereToSphere(PhysicsObject& target)
 	else
 	{
 		VECTOR3 pushVec = VECTOR3();
-		float pushLen = rsum - vec.Length();		// 押し出す長さ
-		pushVec = normal * pushLen;// 押し出すベクトルに長さを掛ける
+		float pushLen = rsum - vec.Length();	// 押し出す長さ
+		pushVec = normal * pushLen;				// 押し出すベクトルに長さを掛ける
 		this->pObj.center -= pushVec / 2;
 		target.center += pushVec / 2;
 
-		// 反発係数と摩擦力
+		// 反発係数
 		float aveE = (target.e + this->pObj.e) / 2;
-		float aveF = (target.f + this->pObj.f) / 2;
 
 		// 質量
 		float p1Mass = target.mass;
@@ -183,6 +182,7 @@ bool Object3D::HitSphereToSphere(PhysicsObject& target)
 		// P2の法線方向速度
 		VECTOR3 newNomalP2Vec = ((p2Mass - p1Mass) * p2OverVec + 2 * p1Mass * p1OverVec) / sumMass;
 
+		// 衝突後の速度
 		VECTOR3 resultP1Vec = (p1RestVec + newNomalP1Vec) * aveE;
 		VECTOR3 resultP2Vec = (p2RestVec + newNomalP2Vec) * aveE;
 

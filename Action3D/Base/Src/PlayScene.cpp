@@ -1,11 +1,8 @@
+#include <fstream>
+#include <assert.h>
 #include "PlayScene.h"
 #include "Player.h"
-#include "Ground.h"
-#include "Door.h"
-#include "Dancer.h"
-#include <fstream>
 #include "CsvReader.h"
-#include <assert.h>
 #include "Camera.h"
 #include "Score.h"
 #include "ScoreDraw.h"

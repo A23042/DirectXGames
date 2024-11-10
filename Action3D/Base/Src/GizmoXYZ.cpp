@@ -21,7 +21,6 @@ void GizmoXYZ::Update()
 PosGizmoX::PosGizmoX(Object3D* parent)
 {
 	SetTag("Gizmo");
-	//ObjectManager::SetDrawOrder(this, 100);
 	editObj.name = "posGizmoX";
 	transform.SetParent(parent);
 	mesh = new CFbxMesh;
@@ -218,20 +217,5 @@ ScaleGizmoZ::~ScaleGizmoZ()
 }
 
 void ScaleGizmoZ::Update()
-{
-}
-
-OutlineBox::OutlineBox()
-{
-	SetTag("Outline");
-	mesh = new CFbxMesh;
-	mesh->Load("Data/Gizmo/outlineBox.mesh");
-}
-
-OutlineBox::~OutlineBox()
-{
-}
-
-void OutlineBox::Update()
 {
 }

@@ -1,3 +1,5 @@
+// 2024.10.06~ S.Matsunaga	編集中
+
 #include "StageEdit.h"
 #include "Box.h"
 #include "Ball.h"
@@ -31,8 +33,6 @@ StageEdit::StageEdit()
 	scaleGizmoY = new ScaleGizmoY(gizmoC);
 	scaleGizmoZ = new ScaleGizmoZ(gizmoC);
 
-	outlineBox = new OutlineBox();
-
 	nState = sNone;
 	gState = sNoneGizmo;
 
@@ -47,6 +47,7 @@ StageEdit::~StageEdit()
 
 void StageEdit::Update()
 {
+	// 各行列とカーソルのワールド座標取得
 	mView = GameDevice()->m_mView;
 	mPrj = GameDevice()->m_mProj;
 	identity = XMMatrixIdentity();
@@ -85,6 +86,7 @@ void StageEdit::Update()
 	{
 		SelectObj(new Ball(false));
 	}
+	// Playerは２つまで
 	if(pNum <= 1)
 	{
 		if (ImGui::Button("Player"))
@@ -95,6 +97,7 @@ void StageEdit::Update()
 	}
 	ImGui::End();
 }
+
 #if 1
 void StageEdit::Draw()
 {
@@ -102,11 +105,12 @@ void StageEdit::Draw()
 	//spr->DrawLine3D(nearWorldPos, farWorldPos, RGB(255, 0, 0), 1);
 }
 #endif
+
 void StageEdit::NoneUpdate()
 {
 	if (GameDevice()->m_pDI->CheckMouse(KD_TRG, 0))
 	{
-		std::list<Object3D*> objs = ObjectManager::FindGameObjects<Object3D>();
+		list<Object3D*> objs = ObjectManager::FindGameObjects<Object3D>();
 		for (Object3D* obj : objs)
 		{
 			VECTOR3 hit;
@@ -119,11 +123,11 @@ void StageEdit::NoneUpdate()
 	}
 	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_1))
 	{
-		SelectObj(new Ball(false));
+		SelectObj(new Box());
 	}
 	else if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_2))
 	{
-		SelectObj(new Box());
+		SelectObj(new Player(false));
 	}
 
 	// Stage読み書き用
@@ -162,7 +166,7 @@ void StageEdit::HasUpdate()
 		bool isHit = false;
 		// オブジェクト探索
 		// 先に表示中のGizmoだけ衝突判定をとる
-		std::list<GizmoXYZ*> gizmos = ObjectManager::FindGameObjectsVisible<GizmoXYZ>();
+		list<GizmoXYZ*> gizmos = ObjectManager::FindGameObjectsVisible<GizmoXYZ>();
 		for (GizmoXYZ* gizmo : gizmos)
 		{
 			// 探索された最初のオブジェクトか
@@ -176,14 +180,17 @@ void StageEdit::HasUpdate()
 			{
 				// 当たった場所への距離を求めて一番近いオブジェクトを格納する
 				distance = (hit - nearWorldPos).Length();
+				float exDistance = (nearWorldPos - getObj->Position()).Length();
+				extendedNearWorldPos = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
+				prevMousePos = extendedNearWorldPos;
 				// 違うオブジェクトがクリックされたら選択オブジェクト変更
 				if (firstFlag)
 				{
 					minDistance = distance;
 					firstFlag = false;
-					float exDistance = (nearWorldPos - getObj->Position()).Length();
-					extendedNearWorldPos = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
-					prevMousePos = extendedNearWorldPos;
+					//float exDistance = (nearWorldPos - getObj->Position()).Length();
+					//extendedNearWorldPos = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
+					//prevMousePos = extendedNearWorldPos;
 					getGizmo = gizmo;
 				}
 				else
@@ -191,9 +198,9 @@ void StageEdit::HasUpdate()
 					if (minDistance > distance)
 					{
 						minDistance = distance;
-						float exDistance = (nearWorldPos - getObj->Position()).Length();
-						extendedNearWorldPos = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
-						prevMousePos = extendedNearWorldPos;
+						//float exDistance = (nearWorldPos - getObj->Position()).Length();
+						//extendedNearWorldPos = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
+						//prevMousePos = extendedNearWorldPos;
 						getGizmo = gizmo;
 					}
 				}					
@@ -203,6 +210,7 @@ void StageEdit::HasUpdate()
 		// Gizmoに当たってなければ衝突判定をとる
 		if(!isHit)
 		{
+			// 一番近いオブジェクトの格納
 			Object3D* temp = nullptr;
 			// 探索された最初のオブジェクトか
 			bool firstFlag = true;
@@ -211,11 +219,11 @@ void StageEdit::HasUpdate()
 			// 当たったオブジェクトのなかでの最短距離
 			float minDistance = 0.0f;
 			// Gizmo以外のオブジェクトを調べる
-			std::list<Object3D*> objs = ObjectManager::FindGameObjectsWithOutTag<Object3D>("Gizmo");
+			list<Object3D*> objs = ObjectManager::FindGameObjectsWithOutTag<Object3D>("Gizmo");
 			for (Object3D* obj : objs)
 			{
 				VECTOR3 hit;
-				// カーソルのワールド座標の近視点から遠視点の距離を伸ばした点までのRayを飛ばしす
+				// カーソルのワールド座標の近視点から遠視点までのRayを飛ばす
 				if (obj->HitLineToMesh(nearWorldPos, farWorldPos, &hit))
 				{
 					// 当たった場所への距離を求めて一番近いオブジェクトを格納する
@@ -227,15 +235,13 @@ void StageEdit::HasUpdate()
 						minDistance = distance;
 						firstFlag = false;
 					}
-					else
+					// 二回目以降距離が近ければ
+					else if(minDistance > distance)
 					{
-						if (minDistance > distance)
+						if(obj != temp)
 						{
-							if(obj != temp)
-							{
-								temp = obj;
-								minDistance = distance;
-							}
+							temp = obj;
+							minDistance = distance;
 						}
 					}
 				}
@@ -317,7 +323,7 @@ void StageEdit::HasUpdate()
 
 	if (getObj->editObj.name == "MoveBox")
 	{
-
+		// ここにMoveBoxで移動速度、移動量を渡す
 	}
 
 	// 操作変更
@@ -642,19 +648,23 @@ void StageEdit::DupeObj(Object3D* ob)
 {
 	if (ob->editObj.name == "Box")
 	{
-		getObj = new Box();
+		SelectObj(new Box());
 	}
 	else if (ob->editObj.name == "MoveBax")
 	{
-		getObj = new MoveBox();
+		SelectObj(new MoveBox());
 	}
 	else if (ob->editObj.name == "Ball")
 	{
-		getObj = new Ball();
+		SelectObj(new Ball(false));
 	}
 	else if (ob->editObj.name == "Player")
 	{
-		getObj = new Player(1);
+		if (pNum <= 1)
+		{
+			SelectObj(new Player(pNum, false));
+			pNum++;
+		}
 	}
 	getObj->SetPosition(ob->Position());
 	getObj->SetRotation(ob->Rotation());
@@ -666,10 +676,10 @@ void StageEdit::Save(int n)
 	char name[64];
 	sprintf_s<64>(name, "data/Stage%02d.csv", n);
 	// ファイルを開く
-	std::ofstream ofs(name); // 引数にファイル名
+	ofstream ofs(name); // 引数にファイル名
 	// データを書く
 	// セーブするためにオブジェクト探索
-	std::list<Object3D*> objs = ObjectManager::FindGameObjects<Object3D>();
+	list<Object3D*> objs = ObjectManager::FindGameObjects<Object3D>();
 	for (Object3D* ob : objs)
 	{
 		// Box
@@ -703,7 +713,7 @@ void StageEdit::Save(int n)
 			ofs << ob->pObj.e << "," << ob->pObj.f << "," << ob->pObj.mass;
 		}
 		// 改行
-		ofs << std::endl;
+		ofs << endl;
 	}
 	// ファイルを閉じる
 	ofs.close();
@@ -711,7 +721,7 @@ void StageEdit::Save(int n)
 
 void StageEdit::Load(int n)
 {
-	std::list<Object3D*> objs = ObjectManager::FindGameObjects<Object3D>();
+	list<Object3D*> objs = ObjectManager::FindGameObjects<Object3D>();
 	for (Object3D* obj : objs)
 	{
 		if (obj->editObj.name == "Box" || obj->editObj.name == "MoveBox"|| obj->editObj.name == "Player"|| obj->editObj.name == "Ball")
@@ -725,7 +735,7 @@ void StageEdit::Load(int n)
 	CsvReader* csv = new CsvReader(name);
 
 	for (int i = 1; i < csv->GetLines(); i++) { // １行ずつ読む
-		std::string str = csv->GetString(i, 0); // 先頭の数字を取る
+		string str = csv->GetString(i, 0); // 先頭の数字を取る
 		Object3D* obj = nullptr;
 		// 先頭が「0」の場合はスキップ
 		if (str == "0")

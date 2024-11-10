@@ -70,7 +70,7 @@ void Box::Update()
 void Box::Draw()
 {
 	mesh->Render(transform.matrix());
-
+	
 	// 選択されている場合自身のアウトライを表示させる
 	if(editObj.isSelect)
 	{

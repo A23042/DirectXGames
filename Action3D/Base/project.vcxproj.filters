@@ -276,16 +276,10 @@
     <ClInclude Include="Src\Player.h">
       <Filter>ソース ファイル\08_PlayScene</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Ground.h">
-      <Filter>ソース ファイル\08_PlayScene</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Animator.h">
       <Filter>ソース ファイル\08_PlayScene</Filter>
     </ClInclude>
     <ClInclude Include="Src\Object3D.h">
-      <Filter>ソース ファイル\08_PlayScene</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Door.h">
       <Filter>ソース ファイル\08_PlayScene</Filter>
     </ClInclude>
     <ClInclude Include="Src\CsvReader.h">
@@ -293,9 +287,6 @@
     </ClInclude>
     <ClInclude Include="Src\MeshCollider.h">
       <Filter>ソース ファイル\02_ゲームライブラリ</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Dancer.h">
-      <Filter>ソース ファイル\08_PlayScene</Filter>
     </ClInclude>
     <ClInclude Include="Src\Camera.h">
       <Filter>ソース ファイル\08_PlayScene</Filter>
@@ -428,16 +419,10 @@
     <ClCompile Include="Src\Player.cpp">
       <Filter>ソース ファイル\08_PlayScene</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Ground.cpp">
-      <Filter>ソース ファイル\08_PlayScene</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Animator.cpp">
       <Filter>ソース ファイル\08_PlayScene</Filter>
     </ClCompile>
     <ClCompile Include="SRC\OBJECT3D.CPP">
-      <Filter>ソース ファイル\08_PlayScene</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Door.cpp">
       <Filter>ソース ファイル\08_PlayScene</Filter>
     </ClCompile>
     <ClCompile Include="Src\CsvReader.cpp">
@@ -445,9 +430,6 @@
     </ClCompile>
     <ClCompile Include="Src\MeshCollider.cpp">
       <Filter>ソース ファイル\02_ゲームライブラリ</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Dancer.cpp">
-      <Filter>ソース ファイル\08_PlayScene</Filter>
     </ClCompile>
     <ClCompile Include="Src\Camera.cpp">
       <Filter>ソース ファイル\08_PlayScene</Filter>

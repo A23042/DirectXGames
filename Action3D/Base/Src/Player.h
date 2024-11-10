@@ -1,5 +1,4 @@
 #pragma once
-// Player.h
 #include "Object3D.h"
 #include "Animator.h"
 
@@ -20,12 +19,10 @@ private:
 	enum State {
 		sNormal = 0,
 		sJump,
-		sAttack,
 	}state;
 
 	void UpdateNormal();
 	void UpdateJump();
-	void UpdateAttack();
 
 	bool isPhysic;
 

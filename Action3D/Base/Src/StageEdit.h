@@ -22,29 +22,30 @@ public:
 	void HasUpdate();
 
 	/// <summary>
-	/// ギズモ表示状態
+	/// 移動用Gizmo表示状態
 	/// HasUpdate()の中で呼ぶ
 	/// </summary>
 	void PosGizmoUpdate();
 
 	/// <summary>
-	/// 
+	/// 回転用Gizmo表示状態
 	/// </summary>
 	void RotGizmoUpdate();
 	
 	/// <summary>
-	/// 
+	/// スケール用Gizmo表示状態
 	/// </summary>
 	void ScaleGizmoUpdate();
 
 	/// <summary>
-	/// ActiveとVisibleを切り替える
+	/// 操作中のGizmoを表示
+	/// それ以外のGizmoを非表示
 	/// </summary>
 	/// <param name="gState">Gizmoステータス</param>
 	void SetGizmo(int gState);
 	
 	/// <summary>
-	/// オブジェクト選択が選択される時に呼ばれる
+	/// オブジェクトが選択される時に呼ばれる
 	/// </summary>
 	/// <param name="ob">選択されたオブジェクト</param>
 	void SelectObj(Object3D* ob);
@@ -75,7 +76,7 @@ public:
 	void Load(int n);
 
 	/// <summary>
-	/// ワールド座標変換
+	/// マウスカーソルをワールド座標変換
 	/// </summary>
 	void GetWorldPos();
 
@@ -89,13 +90,13 @@ private:
 		sGizmo,		// ギズモ選択状態
 	}nState;
 
-	// ギズモ関連のステータス
+	// Gizmo関連のステータス
 	enum GizmoState
 	{
-		sNoneGizmo = 0,
-		sPosGizmo,
-		sRotGizmo,
-		sScaleGizmo,
+		sNoneGizmo = 0,	// ギズモ未選択
+		sPosGizmo,		// 移動操作時
+		sRotGizmo,		// 回転操作
+		sScaleGizmo,	// スケール操作
 	}gState;
 
 	CDirectInput* pDI = GameDevice()->m_pDI;	// pDIショートカット
@@ -126,23 +127,18 @@ private:
 	Object3D* scaleGizmoY = nullptr;
 	Object3D* scaleGizmoZ = nullptr;
 
-	// アウトライン
-	Object3D* outlineBox = nullptr;
-	Object3D* outlineSphere = nullptr;
-
 	// マウススクリーン座標
 	POINT mousePos;		
 
 	// 近視点
 	VECTOR3 nearWorldPos;
+	// 近視点からdirection方向に伸ばした点
 	VECTOR3 extendedNearWorldPos;
 	// 遠視点
-	VECTOR3 farWorldPos;	
-	// 遠視点方向に距離を伸ばした点
-	VECTOR3 extendedFarWorldPos;	
-	// 方向
+	VECTOR3 farWorldPos;		
+	// 近視点から遠視点への方向
 	VECTOR3 direction;	
-	// 1フレーム前の座標
+	// 1フレーム前のカーソル近視点座標
 	VECTOR3 prevMousePos;
 
 	// ImGu格納用変数
@@ -154,7 +150,6 @@ private:
 	float e;
 	float f;
 	float mass;
-
 	int pNum = 0;
 	int stageNum = 0;
 };
