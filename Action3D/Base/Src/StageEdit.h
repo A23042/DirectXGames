@@ -1,4 +1,11 @@
 #pragma once
+/// <summary>
+/// マップエディット機能
+/// 
+/// </summary>
+/// <author>S.Matsunaga</author>
+
+
 #include "Object3D.h"
 #include "CsvReader.h"
 

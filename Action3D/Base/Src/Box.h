@@ -1,4 +1,11 @@
 #pragma once
+/// <summary>
+/// 直方体の作成
+/// サイズから頂点辺面を求める
+/// 各面辺頂点と球体の衝突判定を行う
+/// </summary>
+/// <author>S.Matsunaga</author>
+
 #include "Object3D.h"
 
 class Box : public Object3D {
@@ -38,20 +45,20 @@ public:
 
 private:
 	VECTOR3 normal[6] = {};		// 法線
-	VECTOR3 ten[8] = {};		// 頂点
-	VECTOR3 plane[6] = {};		// 法線
+	VECTOR3 vertex[8] = {};		// 頂点
+	VECTOR3 plane[6] = {};		// 平面の法線	
 	VECTOR3 v[12] = {};			// 辺
-	VECTOR3 edge[12] = {};		// 辺
+	VECTOR3 edge[12] = {};		// 辺ベクトル
 	VECTOR3 pt[8] = {};			// 各頂点からプレイヤーへのベクトル
-	VECTOR3 distanceV[12] = {};	// 各頂点からプレイヤーへの距離
-	VECTOR3 vPos = {};			// 
+	VECTOR3 distanceV[12] = {};	// 各辺からプレイヤーへのベクトル
+	VECTOR3 vPos = {};
 
 	VECTOR3 pushVec;
 	VECTOR3 HitPoint;
 	VECTOR3 refVec;
 
-	float d[6] = {};
-	float distance[6] = {};
+	float d[6] = {};	// 平面の定数
+	float distance[6] = {};	// 面との距離
 	float Tpt[12] = {};
 
 	XMMATRIX rotationMatrix;

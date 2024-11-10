@@ -14,6 +14,7 @@ namespace { // ‚±‚ÌcppˆÈŠO‚Å‚ÍŽg‚¦‚È‚¢
 
 Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
 {
+	//SetTag("STAGEOBJ");
 	editObj.name = "Player";
 
 	mesh = new CFbxMesh();
@@ -31,6 +32,7 @@ Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
 	//pObj.radius *= transform.scale.x;
 
 	pObj.isPlayer = true;
+	pObj.pNum = playerNum;
 }
 
 Player::~Player()

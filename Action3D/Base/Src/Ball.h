@@ -1,4 +1,6 @@
 #pragma once
+// S.Matsunaga
+
 #include "Object3D.h"
 
 class Ball : public Object3D {
@@ -9,5 +11,5 @@ public:
 	void Start() override;
 	void PushVec(VECTOR3 pushVec, VECTOR3 RefVec);
 private:
-	bool isPhysic;
+	bool isPhysic = true;
 };

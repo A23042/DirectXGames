@@ -1,9 +1,13 @@
 #pragma once
+/// <summary>
+/// StageEditで使用するGizmoのクラス
+/// GizmoXYZをCenterに、親として他のGizmoを作る
+/// </summary>
+/// <author>S.Matsunaga</author>
+
 #include "Object3D.h"
 
-class GizmoX;
-class GizmoY;
-class GizmoZ;
+
 
 // 親ギズモ
 class GizmoXYZ : public Object3D

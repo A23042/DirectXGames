@@ -197,7 +197,7 @@ void Camera::updateCamera(int counter, VECTOR3 pos, VECTOR3 rot)
 				}
 			}
 			//end‚©‚ç0.2Žè‘O‚É’u‚­;
-			transform.position = XMVector3Normalize(camVec) * ((end - start).Length() - 0.2f) + start;
+			//transform.position = XMVector3Normalize(camVec) * ((end - start).Length() - 0.2f) + start;
 
 
 			// ------------------------------------------------------------------

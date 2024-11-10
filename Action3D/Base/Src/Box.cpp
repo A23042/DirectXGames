@@ -36,14 +36,14 @@ Box::Box(VECTOR3 size, VECTOR3 rot) : vPos(size / 2)
 void Box::Start()
 {
 	pObj.center = transform.position;
-	//CubeSize(vPos.x, vPos.y, vPos.z);
+	CubeSize(vPos.x, vPos.y, vPos.z);
 }
 
 void Box::Update()
 {
 	transform.position = pObj.center;
-	vPos = transform.scale / 2;
-	CubeSize(vPos.x, vPos.y, vPos.z);
+	//vPos = transform.scale / 2;
+	//CubeSize(vPos.x, vPos.y, vPos.z);
 
 	// 衝突判定の関数呼び出しはそれぞれのクラスで行う
 #if 0
@@ -74,6 +74,9 @@ void Box::Draw()
 	// 選択されている場合自身のアウトライを表示させる
 	if(editObj.isSelect)
 	{
+		vPos = transform.scale / 2;
+		CubeSize(vPos.x, vPos.y, vPos.z);
+	
 		// 各辺の頂点パーツ
 		int edgePoint[12][2] = {
 			{0, 1}, {1, 2}, {2, 3}, {3, 0},//正面：右、　下、　左、　下
@@ -83,8 +86,8 @@ void Box::Draw()
 
 		// 辺ベクトル作成
 		for (int i = 0; i < 12; i++) {
-			edge[i] = ten[edgePoint[i][1]] - ten[edgePoint[i][0]];
-			spr->DrawLine3D(ten[edgePoint[i][1]], ten[edgePoint[i][0]], RGB(0, 255, 50), 1.0f);
+			edge[i] = vertex[edgePoint[i][1]] - vertex[edgePoint[i][0]];
+			spr->DrawLine3D(vertex[edgePoint[i][1]], vertex[edgePoint[i][0]], RGB(0, 255, 50), 1.0f);
 		}
 	}
 }
@@ -92,29 +95,27 @@ void Box::Draw()
 void Box::CubeSize(float x, float y, float z)
 {
 	// 立方体の各頂点座標
-	ten[0] = VECTOR3(x, y, -z);
-	ten[1] = VECTOR3(x, -y, -z);
-	ten[2] = VECTOR3(-x, -y, -z);
-	ten[3] = VECTOR3(-x, y, -z);
-	ten[4] = VECTOR3(x, y, z);
-	ten[5] = VECTOR3(x, -y, z);
-	ten[6] = VECTOR3(-x, -y, z);
-	ten[7] = VECTOR3(-x, y, z);
+	vertex[0] = VECTOR3(x, y, -z);
+	vertex[1] = VECTOR3(x, -y, -z);
+	vertex[2] = VECTOR3(-x, -y, -z);
+	vertex[3] = VECTOR3(-x, y, -z);
+	vertex[4] = VECTOR3(x, y, z);
+	vertex[5] = VECTOR3(x, -y, z);
+	vertex[6] = VECTOR3(-x, -y, z);
+	vertex[7] = VECTOR3(-x, y, z);
 
-	// 回転させるテスト
-	//transform.rotation.y += 1.0f / 180.0f * XM_PI;
-	
+
 	// 回転を顧慮する
 	rotationMatrix = XMMatrixRotationRollPitchYaw(transform.rotation.x, transform.rotation.y, transform.rotation.z);
 
 	// 各頂点に回転行列を掛ける
 	for (int i = 0; i < 8; i++) {
-		ten[i] *= rotationMatrix;
+		vertex[i] *= rotationMatrix;
 	}
 
 	// transform.positionを各頂点に加算
 	for (int i = 0; i < 8; i++) {
-		ten[i] += transform.position;
+		vertex[i] += transform.position;
 	}
 	
 	// 各辺の頂点パーツ
@@ -127,7 +128,7 @@ void Box::CubeSize(float x, float y, float z)
 	
 	// 辺ベクトル作成
 	for (int i = 0; i < 12; i++) {
-		edge[i] = ten[edgePoint[i][1]] - ten[edgePoint[i][0]];
+		edge[i] = vertex[edgePoint[i][1]] - vertex[edgePoint[i][0]];
 	}
 
 	int planePoit[6][3] = {
@@ -140,10 +141,10 @@ void Box::CubeSize(float x, float y, float z)
 
 	// 面の法線と定数の計算
 	for (int i = 0; i < 6; i++) {
-		VECTOR3 v1 = ten[planePoit[i][0]] - ten[planePoit[i][1]];
-		VECTOR3 v2 = ten[planePoit[i][2]] - ten[planePoit[i][1]];
+		VECTOR3 v1 = vertex[planePoit[i][0]] - vertex[planePoit[i][1]];
+		VECTOR3 v2 = vertex[planePoit[i][2]] - vertex[planePoit[i][1]];
 		plane[i] = normalize(cross(v1, v2));	// 平面の法線	
-		d[i] = dot(-plane[i], ten[planePoit[i][1]]);// 平面の定数
+		d[i] = dot(-plane[i], vertex[planePoit[i][1]]);// 平面の定数
 	}
 	return ;
 }
@@ -155,7 +156,7 @@ VECTOR3 Box::HitSphereToCubeplane(PhysicsObject& tObj, VECTOR3 &refVec)
 
 	// 球の中心点から各頂点へのベクトル
 	for (int i = 0; i < 8; i++) {
-		pt[i] = tObj.center - ten[i];
+		pt[i] = tObj.center - vertex[i];
 	}
 
 	int TptPoint[12] = {
@@ -163,8 +164,8 @@ VECTOR3 Box::HitSphereToCubeplane(PhysicsObject& tObj, VECTOR3 &refVec)
 		{0}, {1}, {2}, {3},
 		{4}, {5}, {6}, {7}
 	};
+
 	// 球の中心点から辺に垂線を下ろしたときに辺の範囲内にあるかどうか
-	// 1~0が範囲内
 	for (int i = 0; i < 12; i++) {
 		Tpt[i] = dot(edge[i], pt[TptPoint[i]]) / edge[i].LengthSquare();
 	}
@@ -235,7 +236,7 @@ VECTOR3 Box::HitSphereToCubeVertices(PhysicsObject& tObj, VECTOR3& refVec)
 	for (int i = 0; i < 8; i++) {
 		if (pt[i].Length() < tObj.radius) {
 			refVec = ReflectionVec(tObj, normalize(pt[i]));
-			pushVec = normalize(ten[i] - tObj.center) * (tObj.radius - pt[i].Length());
+			pushVec = normalize(vertex[i] - tObj.center) * (tObj.radius - pt[i].Length());
 			return pushVec;
 		}
 	}

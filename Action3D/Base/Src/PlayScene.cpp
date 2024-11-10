@@ -12,10 +12,18 @@
 
 PlayScene::PlayScene()
 {
+
 	// テキストファイルの読み方
+	char name[64];
+	sprintf_s<64>(name, "data/Stage%02d.csv", 2);
+#if 0
 	CsvReader* csv = new CsvReader("Data/map00.csv");
+#else
+	CsvReader* csv = new CsvReader(name);
+#endif
+
 	assert(csv->GetLines() > 0);
-	for (int i = 1; i < csv->GetLines(); i++) { // １行ずつ読む
+	for (int i = 0; i < csv->GetLines(); i++) { // １行ずつ読む
 		std::string str = csv->GetString(i, 0); // 先頭の数字を取る
 		Object3D* obj = nullptr;
 		// 先頭が「0」の場合はスキップ

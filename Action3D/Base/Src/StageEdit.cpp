@@ -271,7 +271,6 @@ void StageEdit::HasUpdate()
 		ImGui::SetNextWindowSize(ImVec2(290, 400));
 	}
 	string name = "OBJINFO:" + getObj->editObj.name;
-	//sprintf_s<64>(name, "data/Stage%02d.csv", n);
 	ImGui::Begin(name.c_str());
 	// 反発係数・摩擦・質量
 	ImGui::SliderFloat("e", &e, 0.0f, 1.0f, "%.1f");
@@ -300,8 +299,12 @@ void StageEdit::HasUpdate()
 	ImGui::End();
 
 	// ImGuiで入力された値をオブジェクトに適用
+	
+	getObj->pObj.e = e;
+	getObj->pObj.f = f;
+	getObj->pObj.mass = mass;
 	// 場所はObjectが持っている構造体のCenterに適用させる
-	// <-それぞれのオブジェクトのUpdateでCenterをtransform.positinonに適用させてるから
+	// それぞれのオブジェクトのUpdateでCenterをtransform.positinonに適用させてるから
 	getObj->pObj.center = objPos;	// 場所
 	// 回転角度をラジアンから度数に変換
 	VECTOR3 Rot = getObj->Rotation();
@@ -631,6 +634,11 @@ void StageEdit::SelectObj(Object3D* ob)
 	objPos = getObj->pObj.center;
 	objRot = getObj->Rotation() * 180.0f / XM_PI;
 	objScale = getObj->Scale();
+
+	e = getObj->pObj.e;
+	f = getObj->pObj.f;
+	mass = getObj->pObj.mass;
+
 	
 	getObj->editObj.isSelect = true;
 	nState = sHas;
@@ -646,29 +654,37 @@ void StageEdit::DeselectObj()
 
 void StageEdit::DupeObj(Object3D* ob)
 {
+	Object3D* temp = nullptr;
 	if (ob->editObj.name == "Box")
 	{
-		SelectObj(new Box());
+		temp = new Box();
 	}
 	else if (ob->editObj.name == "MoveBax")
 	{
-		SelectObj(new MoveBox());
+		temp = new MoveBox();
 	}
 	else if (ob->editObj.name == "Ball")
 	{
-		SelectObj(new Ball(false));
+		temp = new Ball(false);
 	}
 	else if (ob->editObj.name == "Player")
 	{
 		if (pNum <= 1)
 		{
-			SelectObj(new Player(pNum, false));
+			temp = new Player(pNum, false);
 			pNum++;
 		}
 	}
-	getObj->SetPosition(ob->Position());
-	getObj->SetRotation(ob->Rotation());
-	getObj->SetScale(ob->Scale());
+
+	temp->pObj.center = ob->pObj.center;
+	temp->SetRotation(ob->Rotation());
+	temp->SetScale(ob->Scale());
+
+	temp->pObj.e = ob->pObj.e;
+	temp->pObj.f = ob->pObj.f;
+	temp->pObj.mass = ob->pObj.mass;
+
+	SelectObj(temp);
 }
 
 void StageEdit::Save(int n)
@@ -679,7 +695,33 @@ void StageEdit::Save(int n)
 	ofstream ofs(name); // 引数にファイル名
 	// データを書く
 	// セーブするためにオブジェクト探索
-	list<Object3D*> objs = ObjectManager::FindGameObjects<Object3D>();
+	list<Player*> players = ObjectManager::FindGameObjects<Player>();
+	for (Player* player : players)
+	{
+		// Player
+		if(player->editObj.name == "Player")
+		{
+			ofs << "1" << "," << "PLAYER" << ",";
+			ofs << player->Position().x << "," << player->Position().y << "," << player->Position().z << ",";
+			ofs << player->pObj.e << "," << player->pObj.f << "," << player->pObj.mass << ",";
+			ofs << player->pObj.pNum;
+		}
+		// 改行
+		ofs << endl;
+	}
+	list<Ball*> balls = ObjectManager::FindGameObjects<Ball>();
+	for (Ball* ball : balls)
+	{
+		if (ball->editObj.name == "Ball")
+		{
+			ofs << "1" << "," << "BALL" << ",";
+			ofs << ball->Position().x << "," << ball->Position().y << "," << ball->Position().z << ",";
+			ofs << ball->pObj.e << "," << ball->pObj.f << "," << ball->pObj.mass;
+		}
+		// 改行
+		ofs << endl;
+	}
+	list<Object3D*> objs = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ");
 	for (Object3D* ob : objs)
 	{
 		// Box
@@ -697,20 +739,6 @@ void StageEdit::Save(int n)
 			ofs << "1" << "," << "MBox" << ",";
 			ofs << ob->Position().x << "," << ob->Position().y << "," << ob->Position().z << ",";
 			ofs << ob->Scale().x << "," << ob->Scale().y << "," << ob->Scale().z << ",";
-		}
-		// Player
-		else if (ob->editObj.name == "Player")
-		{
-			ofs << "1" << "," << "PLAYER" << ",";
-			ofs << ob->Position().x << "," << ob->Position().y << "," << ob->Position().z << ",";
-			ofs << ob->pObj.e << "," << ob->pObj.f << "," << ob->pObj.mass << ",";
-			ofs << ob->pObj.pNum;
-		}
-		else if (ob->editObj.name == "Ball")
-		{
-			ofs << "1" << "," << "BALL" << ",";
-			ofs << ob->Position().x << "," << ob->Position().y << "," << ob->Position().z << ",";
-			ofs << ob->pObj.e << "," << ob->pObj.f << "," << ob->pObj.mass;
 		}
 		// 改行
 		ofs << endl;

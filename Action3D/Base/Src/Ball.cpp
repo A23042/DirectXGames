@@ -9,9 +9,9 @@ namespace { // ‚±‚ÌcppˆÈŠO‚Å‚ÍŽg‚¦‚È‚¢
 	static const float MoveSpeed = 0.8f;
 };
 
-Ball::Ball(bool isPhysic) : isPhysic(isPhysic)
+Ball::Ball(bool isPhysic)
 {
-	//SetTag("STAGEOBJ");
+	SetTag("BALL");
 	editObj.name = "Ball";
 	mesh = new CFbxMesh();
 	mesh->Load("Data/Object/ball01.mesh");
@@ -20,6 +20,7 @@ Ball::Ball(bool isPhysic) : isPhysic(isPhysic)
 
 	pObj.radius = 0.5f;
 	pObj.isPlayer = false;
+	this->isPhysic = isPhysic;
 }
 
 Ball::~Ball()
