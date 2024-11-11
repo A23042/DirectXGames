@@ -132,6 +132,16 @@ public:
 	/// <returns>衝突していたらtrue</returns>
 	virtual bool HitSphereToSphere(PhysicsObject& target);
 
+	/// 2024.11.11 S.Matsunaga
+	/// <summary>
+	/// 球体とAABBで簡易的な衝突判定
+	/// 衝突していたらHitSphereCubeplaneを回すようにする
+	/// 衝突していても衝突点や反射ベクトルなどを計算しない
+	/// </summary>
+	/// <param name="pOgj">衝突判定を取る球体の構造体</param>
+	/// <returns>衝突していたらtrue</returns>
+	virtual bool CheckSphereAABBCollision(PhysicsObject& pOgj);
+
 protected:
 	CFbxMesh* mesh;
 	MeshCollider* meshCol;

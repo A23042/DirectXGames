@@ -9,10 +9,12 @@ Object3D::Object3D()
 
 Object3D::~Object3D()
 {
-	if (mesh != nullptr) {
+	if (mesh != nullptr) 
+	{
 		delete mesh;
 	}
-	if (meshCol != nullptr) {
+	if (meshCol != nullptr) 
+	{
 		delete meshCol;
 	}
 }
@@ -190,6 +192,11 @@ bool Object3D::HitSphereToSphere(PhysicsObject& target)
 		this->pObj.velocity = resultP2Vec;
 		return true;
 	}
+}
+
+bool Object3D::CheckSphereAABBCollision(PhysicsObject& pOgj)
+{
+	return false;
 }
 
 const MATRIX4X4 Transform::matrix()

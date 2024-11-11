@@ -113,7 +113,6 @@ private:
 	MATRIX4X4 mPrj;
 	MATRIX4X4 identity;
 
-	CsvReader* csv;
 	// 選択状態のオブジェクト
 	Object3D* getObj = nullptr;	
 	// 選択状態のGizmo
@@ -135,7 +134,7 @@ private:
 	Object3D* scaleGizmoZ = nullptr;
 
 	// マウススクリーン座標
-	POINT mousePos;		
+	POINT mousePos = {};
 
 	// 近視点
 	VECTOR3 nearWorldPos;

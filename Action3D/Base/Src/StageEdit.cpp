@@ -36,8 +36,8 @@ StageEdit::StageEdit()
 	nState = sNone;
 	gState = sNoneGizmo;
 
-	e = 0.8;
-	f = 0.98;
+	e = 0.8f;
+	f = 0.98f;
 	mass = 1;
 }
 
@@ -135,10 +135,12 @@ void StageEdit::NoneUpdate()
 	ImGui::SetNextWindowSize(ImVec2(200, 130));
 	ImGui::Begin("MENU");
 	ImGui::InputInt("Stage", &stageNum);
-	if (ImGui::Button("SAVE")) {
+	if (ImGui::Button("SAVE")) 
+	{
 		Save(stageNum);
 	}
-	if (ImGui::Button("LOAD")) {
+	if (ImGui::Button("LOAD")) 
+	{
 		Load(stageNum);
 	}
 	ImGui::End();
@@ -271,6 +273,10 @@ void StageEdit::HasUpdate()
 		ImGui::SetNextWindowSize(ImVec2(290, 400));
 	}
 	string name = "OBJINFO:" + getObj->editObj.name;
+	if (getObj->editObj.name == "Player")
+	{
+		name = name + to_string(getObj->pObj.pNum);
+	}
 	ImGui::Begin(name.c_str());
 	// 反発係数・摩擦・質量
 	ImGui::SliderFloat("e", &e, 0.0f, 1.0f, "%.1f");
@@ -654,6 +660,7 @@ void StageEdit::DeselectObj()
 
 void StageEdit::DupeObj(Object3D* ob)
 {
+	// コピーされたオブジェクトをtempに保存する
 	Object3D* temp = nullptr;
 	if (ob->editObj.name == "Box")
 	{
@@ -675,16 +682,18 @@ void StageEdit::DupeObj(Object3D* ob)
 			pNum++;
 		}
 	}
+	if(temp != nullptr)
+	{
+		temp->pObj.center = ob->pObj.center;
+		temp->SetRotation(ob->Rotation());
+		temp->SetScale(ob->Scale());
 
-	temp->pObj.center = ob->pObj.center;
-	temp->SetRotation(ob->Rotation());
-	temp->SetScale(ob->Scale());
+		temp->pObj.e = ob->pObj.e;
+		temp->pObj.f = ob->pObj.f;
+		temp->pObj.mass = ob->pObj.mass;
 
-	temp->pObj.e = ob->pObj.e;
-	temp->pObj.f = ob->pObj.f;
-	temp->pObj.mass = ob->pObj.mass;
-
-	SelectObj(temp);
+		SelectObj(temp);
+	}
 }
 
 void StageEdit::Save(int n)
@@ -762,7 +771,7 @@ void StageEdit::Load(int n)
 
 	CsvReader* csv = new CsvReader(name);
 
-	for (int i = 1; i < csv->GetLines(); i++) { // １行ずつ読む
+	for (int i = 0; i < csv->GetLines(); i++) { // １行ずつ読む
 		string str = csv->GetString(i, 0); // 先頭の数字を取る
 		Object3D* obj = nullptr;
 		// 先頭が「0」の場合はスキップ
@@ -774,7 +783,8 @@ void StageEdit::Load(int n)
 		else if (str == "1")
 		{
 			str = csv->GetString(i, 1);
-			if (str == "PLAYER") {
+			if (str == "PLAYER") 
+			{
 				float e = csv->GetFloat(i, 5);
 				float f = csv->GetFloat(i, 6);
 				float mass = csv->GetFloat(i, 7);
@@ -784,7 +794,8 @@ void StageEdit::Load(int n)
 				obj->pObj.f = f;
 				obj->pObj.mass = mass;
 			}
-			else if (str == "BOX") {
+			else if (str == "BOX") 
+			{
 				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
 				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
 				float e = csv->GetFloat(i, 11);
@@ -793,7 +804,8 @@ void StageEdit::Load(int n)
 				obj->pObj.e = e;
 				obj->pObj.f = f;
 			}
-			else if (str == "MBox") {
+			else if (str == "MBox") 
+			{
 				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
 				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
 				VECTOR3 move = VECTOR3(csv->GetFloat(i, 11), csv->GetFloat(i, 12), csv->GetFloat(i, 13));
@@ -804,7 +816,8 @@ void StageEdit::Load(int n)
 				obj->pObj.e = e;
 				obj->pObj.f = f;
 			}
-			else if (str == "BALL") {
+			else if (str == "BALL")
+			{
 				float e = csv->GetFloat(i, 5);
 				float f = csv->GetFloat(i, 6);
 				float mass = csv->GetFloat(i, 7);
@@ -813,7 +826,8 @@ void StageEdit::Load(int n)
 				obj->pObj.f = f;
 				obj->pObj.mass = mass;
 			}
-			else {
+			else 
+			{
 				assert(false);
 			}
 			float x = csv->GetFloat(i, 2);

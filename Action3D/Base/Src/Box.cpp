@@ -1,6 +1,7 @@
 #include "Box.h"
 #include "Player.h"
 #include "Ball.h"
+#include <fstream>
 // 動かないBoxオブジェクト
 
 // 初期化リスト　生成と同時に初期値が入るコンストラクタに書くよりも高速
@@ -37,6 +38,7 @@ void Box::Start()
 {
 	pObj.center = transform.position;
 	CubeSize(vPos.x, vPos.y, vPos.z);
+	isStart = true;
 }
 
 void Box::Update()
@@ -71,23 +73,32 @@ void Box::Draw()
 {
 	mesh->Render(transform.matrix());
 	
-	// 選択されている場合自身のアウトライを表示させる
-	if(editObj.isSelect)
-	{
-		vPos = transform.scale / 2;
-		CubeSize(vPos.x, vPos.y, vPos.z);
-	
-		// 各辺の頂点パーツ
+	// 各辺の頂点パーツ
 		int edgePoint[12][2] = {
 			{0, 1}, {1, 2}, {2, 3}, {3, 0},//正面：右、　下、　左、　下
 			{0, 4}, {1, 5}, {2, 6}, {3, 7},//側面：右上、右下、左下、左上
 			{4, 5}, {5, 6}, {6, 7}, {7, 4} //背面：右、　下、　左、　下、
 		};
 
+	// 選択されている場合自身のアウトライを表示させる
+	if(editObj.isSelect)
+	{
+		vPos = transform.scale / 2;
+		CubeSize(vPos.x, vPos.y, vPos.z);
+	
+		
 		// 辺ベクトル作成
-		for (int i = 0; i < 12; i++) {
-			edge[i] = vertex[edgePoint[i][1]] - vertex[edgePoint[i][0]];
+		for (int i = 0; i < 12; i++)
+		{
+			//edge[i] = vertex[edgePoint[i][1]] - vertex[edgePoint[i][0]];
 			spr->DrawLine3D(vertex[edgePoint[i][1]], vertex[edgePoint[i][0]], RGB(0, 255, 50), 1.0f);
+		}
+	}
+	else
+	{
+		for (int i = 0; i < 12; i++)
+		{
+			spr->DrawLine3D(vertex[edgePoint[i][1]], vertex[edgePoint[i][0]], RGB(0, 0, 0), 1.0f);
 		}
 	}
 }
@@ -109,15 +120,30 @@ void Box::CubeSize(float x, float y, float z)
 	rotationMatrix = XMMatrixRotationRollPitchYaw(transform.rotation.x, transform.rotation.y, transform.rotation.z);
 
 	// 各頂点に回転行列を掛ける
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < 8; i++) 
+	{
 		vertex[i] *= rotationMatrix;
 	}
 
 	// transform.positionを各頂点に加算
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < 8; i++) 
+	{
 		vertex[i] += transform.position;
 	}
 	
+	// AABBの最小点、最大点を求める
+	//for (int i = 0; i < sizeof(vertex); i++)
+	for (int i = 0; i < 8; i++)
+	{
+		max.x = fmax(max.x, vertex[i].x);
+		max.y = fmax(max.y, vertex[i].y);
+		max.z = fmax(max.z, vertex[i].z);
+
+		min.x = fmin(min.x, vertex[i].x);
+		min.y = fmin(min.y, vertex[i].y);
+		min.z = fmin(min.z, vertex[i].z);
+	}
+
 	// 各辺の頂点パーツ
 	int edgePoint[12][2] = {
 		{0, 1}, {1, 2}, {2, 3}, {3, 0},//正面：右、　下、　左、　下
@@ -140,7 +166,8 @@ void Box::CubeSize(float x, float y, float z)
 	};
 
 	// 面の法線と定数の計算
-	for (int i = 0; i < 6; i++) {
+	for (int i = 0; i < 6; i++) 
+	{
 		VECTOR3 v1 = vertex[planePoit[i][0]] - vertex[planePoit[i][1]];
 		VECTOR3 v2 = vertex[planePoit[i][2]] - vertex[planePoit[i][1]];
 		plane[i] = normalize(cross(v1, v2));	// 平面の法線	
@@ -155,7 +182,8 @@ VECTOR3 Box::HitSphereToCubeplane(PhysicsObject& tObj, VECTOR3 &refVec)
 	pushVec = VECTOR3(0, 0, 0);
 
 	// 球の中心点から各頂点へのベクトル
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < 8; i++) 
+	{
 		pt[i] = tObj.center - vertex[i];
 	}
 
@@ -166,7 +194,8 @@ VECTOR3 Box::HitSphereToCubeplane(PhysicsObject& tObj, VECTOR3 &refVec)
 	};
 
 	// 球の中心点から辺に垂線を下ろしたときに辺の範囲内にあるかどうか
-	for (int i = 0; i < 12; i++) {
+	for (int i = 0; i < 12; i++) 
+	{
 		Tpt[i] = dot(edge[i], pt[TptPoint[i]]) / edge[i].LengthSquare();
 	}
 
@@ -176,13 +205,16 @@ VECTOR3 Box::HitSphereToCubeplane(PhysicsObject& tObj, VECTOR3 &refVec)
 	};
 
 	// 平面との距離計算
-	for (int i = 0; i < 6; i++) {
+	for (int i = 0; i < 6; i++)
+	{
 		distance[i] = abs(dot(plane[i], tObj.center) + d[i]) / plane[i].Length();
 
 		// 衝突していたらあとの距離計算を省く
-		if (distance[i] <= tObj.radius) {
+		if (distance[i] <= tObj.radius) 
+		{
 			// 無限平面に衝突していたら辺に垂線を下ろせるか
-			if (Tpt[pair[i][0]] >= 0 && Tpt[pair[i][0]] <= 1 && Tpt[pair[i][1]] >= 0 && Tpt[pair[i][1]] <= 1) {
+			if (Tpt[pair[i][0]] >= 0 && Tpt[pair[i][0]] <= 1 && Tpt[pair[i][1]] >= 0 && Tpt[pair[i][1]] <= 1) 
+			{
 				HitPoint = tObj.center - plane[i] * distance[i];	// 衝突点
 				refVec = ReflectionVec(tObj, plane[i]);	// 球体を反射させる
 				pushVec = plane[i] * (tObj.radius - distance[i]);	// めり込みを解除するための計算
@@ -210,11 +242,13 @@ VECTOR3 Box::HitSphereToCubeEdge(PhysicsObject& tObj, VECTOR3& refVec)
 	};
 
 	// 辺と球との距離計算
-	for (int i = 0; i < 12; i++) {
+	for (int i = 0; i < 12; i++) 
+	{
 		distanceV[i] = edge[i] * dot(edge[i], pt[TptPoint[i]]) / edge[i].LengthSquare() - pt[TptPoint[i]];
 		if (distanceV[i].Length() <= tObj.radius) {
 			//　垂線をおろせるか
-			if (0 <= Tpt[i] && Tpt[i] <= 1) {
+			if (0 <= Tpt[i] && Tpt[i] <= 1) 
+			{
 				//VECTOR3 vNormal = normalize(plane[pair[i][0]] + plane[pair[i][1]]) / 2;	// 辺の法線ベクトル
 				VECTOR3 vNormal = normalize(distanceV[i]);	// 辺の法線ベクトル
 
@@ -233,8 +267,10 @@ VECTOR3 Box::HitSphereToCubeEdge(PhysicsObject& tObj, VECTOR3& refVec)
 // 頂点との衝突
 VECTOR3 Box::HitSphereToCubeVertices(PhysicsObject& tObj, VECTOR3& refVec)
 {
-	for (int i = 0; i < 8; i++) {
-		if (pt[i].Length() < tObj.radius) {
+	for (int i = 0; i < 8; i++) 
+	{
+		if (pt[i].Length() < tObj.radius) 
+		{
 			refVec = ReflectionVec(tObj, normalize(pt[i]));
 			pushVec = normalize(vertex[i] - tObj.center) * (tObj.radius - pt[i].Length());
 			return pushVec;
@@ -264,9 +300,32 @@ VECTOR3 Box::ReflectionVec(PhysicsObject& tObj, VECTOR3 normal)
 	return VECTOR3(b);
 }
 
+// 35 -> 40
+bool Box::CheckSphereAABBCollision(PhysicsObject& tObj)
+{
+	if (!isStart)
+	{
+		Start();
+	}
+	
+	// 球体の中心から最も近いAABBの頂点を取得する
+	float x = std::fmax(min.x, std::fmin(tObj.center.x, max.x));
+	float y = std::fmax(min.y, std::fmin(tObj.center.y, max.y));
+	float z = std::fmax(min.z, std::fmin(tObj.center.z, max.z));
+
+	VECTOR3 closest = VECTOR3(x, y, z);
+	float distance = sqrt(
+		(closest.x - tObj.center.x) * (closest.x - tObj.center.x) +
+		(closest.y - tObj.center.y) * (closest.y - tObj.center.y) +
+		(closest.z - tObj.center.z) * (closest.z - tObj.center.z));
+
+	return distance <= tObj.radius;
+}
+
 Box::~Box()
 {
-	if (mesh != nullptr) {
+	if (mesh != nullptr) 
+	{
 		delete mesh;
 		mesh = nullptr;
 	}

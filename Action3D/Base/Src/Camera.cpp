@@ -2,8 +2,8 @@
 #include "Player.h"
 #include "Ball.h"
 //                                      後方視点　　　　　　真上視点
-static const VECTOR3 CameraPos[] = { VECTOR3(0, 4, -10), VECTOR3(0, 10, -0.5) };
-static const VECTOR3 LookPos[] =   { VECTOR3(0, 0,  5), VECTOR3(0,  1,  1  ) };
+static const VECTOR3 CameraPos[] = { VECTOR3(0, 6, -16), VECTOR3(0, 10, -0.5) };
+static const VECTOR3 LookPos[] =   { VECTOR3(0, 0,  3), VECTOR3(0,  1,  1  ) };
 static const float CHANGE_TIME_LIMIT = 0.5f; // 秒
 
 Camera::Camera()
@@ -136,7 +136,8 @@ void Camera::Update()
 			*/
 		}
 	}
-	else {
+	else 
+	{
 		// １画面のときPlayer視点
 		Player* pc = ObjectManager::FindGameObject<Player>();
 		if (pc != nullptr)
@@ -165,11 +166,13 @@ void Camera::updateCamera(int counter, VECTOR3 pos, VECTOR3 rot)
 			MATRIX4X4 m = rotY * trans;
 			// プレイヤーが回転・移動してない時のカメラ位置に
 			// プレイヤーの回転・移動行列を掛けると、
-			if (changeTime >= CHANGE_TIME_LIMIT) {
+			if (changeTime >= CHANGE_TIME_LIMIT) 
+			{
 				transform.position = CameraPos[viewType] * m;
 				lookPosition = LookPos[viewType] * m;
 			}
-			else { // 視点切り替え中
+			else 
+			{	// 視点切り替え中
 				changeTime += 1.0f / 60.0f;
 				float timeRate = changeTime / CHANGE_TIME_LIMIT; // 0.0～1.0
 				float rate = timeRate;
@@ -191,7 +194,8 @@ void Camera::updateCamera(int counter, VECTOR3 pos, VECTOR3 rot)
 				for (Object3D* g : objList)
 				{
 					VECTOR3 hit;
-					if (g->HitLineToMesh(start, end, &hit)) {
+					if (g->HitLineToMesh(start, end, &hit)) 
+					{
 						end = hit;
 					}
 				}

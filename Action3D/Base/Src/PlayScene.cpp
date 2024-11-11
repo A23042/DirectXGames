@@ -12,10 +12,9 @@
 
 PlayScene::PlayScene()
 {
-
 	// テキストファイルの読み方
 	char name[64];
-	sprintf_s<64>(name, "data/Stage%02d.csv", 2);
+	sprintf_s<64>(name, "data/Stage%02d.csv", 3);
 #if 0
 	CsvReader* csv = new CsvReader("Data/map00.csv");
 #else
@@ -23,7 +22,8 @@ PlayScene::PlayScene()
 #endif
 
 	assert(csv->GetLines() > 0);
-	for (int i = 0; i < csv->GetLines(); i++) { // １行ずつ読む
+	for (int i = 0; i < csv->GetLines(); i++) 
+	{	// １行ずつ読む
 		std::string str = csv->GetString(i, 0); // 先頭の数字を取る
 		Object3D* obj = nullptr;
 		// 先頭が「0」の場合はスキップ
@@ -35,7 +35,8 @@ PlayScene::PlayScene()
 		else if (str == "1")
 		{
 			str = csv->GetString(i, 1);
-			if (str == "PLAYER") {
+			if (str == "PLAYER")
+			{
 				float e = csv->GetFloat(i, 5);
 				float f = csv->GetFloat(i, 6);
 				float mass = csv->GetFloat(i, 7);
@@ -45,7 +46,8 @@ PlayScene::PlayScene()
 				obj->pObj.f = f;
 				obj->pObj.mass = mass;
 			}
-			else if (str == "BOX") {
+			else if (str == "BOX") 
+			{
 				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
 				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
 				float e = csv->GetFloat(i, 11);
@@ -54,7 +56,8 @@ PlayScene::PlayScene()
 				obj->pObj.e = e;
 				obj->pObj.f = f;
 			}
-			else if (str == "MBox") {
+			else if (str == "MBox") 
+			{
 				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
 				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
 				VECTOR3 move = VECTOR3(csv->GetFloat(i, 11), csv->GetFloat(i, 12), csv->GetFloat(i, 13));
@@ -65,7 +68,8 @@ PlayScene::PlayScene()
 				obj->pObj.e = e;
 				obj->pObj.f = f;
 			}
-			else if (str == "BALL") {
+			else if (str == "BALL") 
+			{
 				float e = csv->GetFloat(i, 5);
 				float f = csv->GetFloat(i, 6);
 				float mass = csv->GetFloat(i, 7);
@@ -74,7 +78,8 @@ PlayScene::PlayScene()
 				obj->pObj.f = f;
 				obj->pObj.mass = mass;
 			}
-			else {
+			else 
+			{
 				assert(false);
 			}
 			float x = csv->GetFloat(i, 2);
@@ -85,7 +90,8 @@ PlayScene::PlayScene()
 	}
 	Instantiate<Camera>();
 	Score* sc = ObjectManager::FindGameObject<Score>();
-	if (sc == nullptr) {
+	if (sc == nullptr) 
+	{
 		sc = Instantiate<Score>();
 		sc->DontDestroyMe(); // シーンが切り替わっても消えない
 	}
@@ -104,10 +110,12 @@ void PlayScene::Update()
 	//if (dancers.size() == 0) {
 		//SceneManager::ChangeScene("TitleScene");
 	//}
-	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_R)) {
+	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_R)) 
+	{
 		SceneManager::ChangeScene("ResultScene");
 	}
-	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_T)) {
+	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_T)) 
+	{
 		SceneManager::ChangeScene("TitleScene");
 	}
 	

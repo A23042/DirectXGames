@@ -4,7 +4,8 @@
 #include "MoveBox.h"
 #include "Ball.h"
 
-namespace { // このcpp以外では使えない
+namespace 
+{	// このcpp以外では使えない
 	static const float Gravity = 9.8f * 3; // 重力加速度(正の値)
 	// C++の定数定義（型が付く）
 	static const float JumpPower = 0.3f;
@@ -37,7 +38,8 @@ Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
 
 Player::~Player()
 {
-	if (meshCol != nullptr) {
+	if (meshCol != nullptr) 
+	{
 		delete meshCol;
 		meshCol = nullptr;
 	}
@@ -66,21 +68,28 @@ void Player::Update()
 
 		// 各Boxとの衝突判定
 		std::list<Object3D*> objes = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ");
-		for (Object3D* obj : objes) {
-			VECTOR3 refVec = VECTOR3(0, 0, 0);
-			VECTOR3 pushVec = VECTOR3(0, 0, 0);
-			pushVec = obj->HitSphereToCubeplane(this->pObj, refVec);
-			if (pushVec.Length() > 0)
+		for (Object3D* obj : objes) 
+		{
+			// 先にAABBと簡易的な衝突判定をして衝突していればHitSphereCubeplaneを回す
+			if (obj->CheckSphereAABBCollision(this->pObj))
 			{
-				PushVec(-pushVec, refVec);
+				VECTOR3 refVec = VECTOR3(0, 0, 0);
+				VECTOR3 pushVec = VECTOR3(0, 0, 0);
+				pushVec = obj->HitSphereToCubeplane(this->pObj, refVec);
+				if (pushVec.Length() > 0)
+				{
+					PushVec(-pushVec, refVec);
+				}
 			}
 		}
 		// Ball
 		std::list<Ball*> balles = ObjectManager::FindGameObjects<Ball>();
-		for (Ball* ball : balles) {
+		for (Ball* ball : balles) 
+		{
 			VECTOR3 refVec = VECTOR3(0, 0, 0);
 			//VECTOR3 pushVec = VECTOR3(0, 0, 0);
-			if (ball->HitSphereToSphere(this->pObj)) {
+			if (ball->HitSphereToSphere(this->pObj)) 
+			{
 				ball->SetPosition(ball->pObj.center);
 				transform.position = pObj.center;
 			}
@@ -93,7 +102,8 @@ void Player::Update()
 			{
 				VECTOR3 refVec = VECTOR3(0, 0, 0);
 				//VECTOR3 pushVec = VECTOR3(0, 0, 0);
-				if (otherplayer->HitSphereToSphere(this->pObj)) {
+				if (otherplayer->HitSphereToSphere(this->pObj)) 
+				{
 					otherplayer->SetPosition(otherplayer->pObj.center);
 					transform.position = pObj.center;
 				}
@@ -102,7 +112,8 @@ void Player::Update()
 
 
 		//animator->Update(); // 毎フレーム、Updateを呼ぶ
-		switch (state) {
+		switch (state) 
+		{
 		case sNormal:
 			UpdateNormal();
 			break;
@@ -122,55 +133,19 @@ void Player::Update()
 		ImGui::InputFloat("Z", &pObj.velocity.z);
 		ImGui::End();
 
-		ImGui::Begin("SUMVELOCITY");
-		ImGui::InputFloat("X", &sumVelocity.x);
-		ImGui::InputFloat("Y", &sumVelocity.y);
-		ImGui::InputFloat("Z", &sumVelocity.z);
-		ImGui::End();
-
 	}
 
-
-	// ダンサーとめり込まないようにする
-#if 0
-	// Dancerにめり込まないようにする
-	// 自分の座標は、transform.position
-	// Dancerの座標を知る
-	std::list<Dancer*> dancers = 
-			ObjectManager::FindGameObjects<Dancer>();
-	// ①イテレーター版
-	//for (std::list<Dancer*>::iterator itr = dancers.begin();
-	//				itr != dancers.end(); itr++) {
-	//	Dancer* dancer = *itr;
-	// ②イテレータの変更
-	//for (auto itr = dancers.begin(); itr != dancers.end(); itr++) {
-	//	Dancer* dancer = *itr;
-	// ③for(:)で回す
-	for (Dancer* dancer : dancers) {
-	// 以上３バージョン
-		SphereCollider tCol = dancer->Collider();
-		SphereCollider pCol = Collider();
-		VECTOR3 pushVec = pCol.center - tCol.center;
-		float rSum = pCol.radius + tCol.radius;
-		if (pushVec.LengthSquare() < rSum * rSum) { // 球の当たり判定
-			// 当たってる
-			// 押し出す方向はpushVec
-			// 押し出す長さを求める
-			float pushLen = rSum - pushVec.Length();
-			pushVec = XMVector3Normalize(pushVec); // pushVecの長さを１にする
-			transform.position += pushVec * pushLen;
-		}
-	}
-#endif
 	// ステージオブジェクトと衝突判定
 #if 0
 	std::list<Object3D*> objects = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ"); // ドアのオブジェクトを見つける
-	for (auto object : objects) {
+	for (auto object : objects) 
+	{
 		SphereCollider coll;
 		coll.center = transform.position + VECTOR3(0, 0, 0); // 自分の球を作る
 		coll.radius = 0.5f;
 		VECTOR3 push;
-		if (object->HitSphereToMesh(coll, &push)) {
+		if (object->HitSphereToMesh(coll, &push)) 
+		{
 			transform.position += push;
 			sphere.center = transform.position;
 		}
@@ -181,12 +156,14 @@ void Player::Update()
 #if 0
 	// プレイヤー同士の衝突判定
 	std::list<Ball*> players = ObjectManager::FindGameObjects<Ball>();
-	for (auto player : players) {
+	for (auto player : players) 
+	{
 			Sphere tSph = player->sphere;
 			VECTOR3 nVec = tSph.center - this->sphere.center;
 			float rsum = tSph.radius + this->sphere.radius;
 			// 衝突
-		if (nVec.LengthSquare() <= rsum * rsum) {
+		if (nVec.LengthSquare() <= rsum * rsum)
+		{
 			normalize(nVec);
 			// めり込み解消
 			VECTOR3 pushVec = nVec * (this->sphere.radius + tSph.radius - (tSph.center - this->sphere.center).Length());
@@ -271,7 +248,8 @@ void Player::PushVec(VECTOR3 pushVec, VECTOR3 RefVec)
 {	
 	pObj.center += pushVec;
 	transform.position = pObj.center;
-	if (RefVec.Length() > 0) {
+	if (RefVec.Length() > 0) 
+	{
 		pObj.velocity = RefVec;
 	}
 	return;
@@ -283,13 +261,15 @@ void Player::UpdateNormal()
 	if(playerNum == 0)
 	{
 
-		if (pDI->CheckKey(KD_DAT, DIK_W)) {
+		if (pDI->CheckKey(KD_DAT, DIK_W))
+		{
 			// 行列でやる場合
 			VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
 			MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
 			pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
 		}
-		else if (pDI->CheckKey(KD_DAT, DIK_S)) {
+		else if (pDI->CheckKey(KD_DAT, DIK_S)) 
+		{
 			// 行列でやる場合
 			VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
 			MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
@@ -297,21 +277,25 @@ void Player::UpdateNormal()
 
 		}
 
-		if (pDI->CheckKey(KD_DAT, DIK_A)) {
+		if (pDI->CheckKey(KD_DAT, DIK_A)) 
+		{
 			transform.rotation.y -= RotationSpeed / 180.0f * XM_PI;
 		}
-		if (pDI->CheckKey(KD_DAT, DIK_D)) {
+		if (pDI->CheckKey(KD_DAT, DIK_D))
+		{
 			transform.rotation.y += RotationSpeed / 180.0f * XM_PI;
 		}
 		//if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_SPACE)) {
-		if (pDI->CheckKey(KD_TRG, DIK_SPACE)) {
+		if (pDI->CheckKey(KD_TRG, DIK_SPACE)) 
+		{
 			//transform.position.y += 0.1f;
 			//sphere.center = transform.position;
 			//speedY = JumpPower;
 			state = sJump;
 			//sphere.velocity.y += 15.0f * SceneManager::DeltaTime();
 		}
-		else if (pDI->CheckKey(KD_TRG, DIK_LSHIFT)) {
+		else if (pDI->CheckKey(KD_TRG, DIK_LSHIFT)) 
+		{
 			//transform.position.y -= 0.1f;
 			//sphere.center = transform.position;
 			//speedY = JumpPower;
@@ -321,13 +305,15 @@ void Player::UpdateNormal()
 	}
 	else if (playerNum == 1)
 	{
-		if (pDI->CheckKey(KD_DAT, DIK_UP)) {
+		if (pDI->CheckKey(KD_DAT, DIK_UP)) 
+		{
 			// 行列でやる場合
 			VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
 			MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
 			pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
 		}
-		else if (pDI->CheckKey(KD_DAT, DIK_DOWN)) {
+		else if (pDI->CheckKey(KD_DAT, DIK_DOWN)) 
+		{
 			// 行列でやる場合
 			VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
 			MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
@@ -335,21 +321,25 @@ void Player::UpdateNormal()
 
 		}
 
-		if (pDI->CheckKey(KD_DAT, DIK_LEFT)) {
+		if (pDI->CheckKey(KD_DAT, DIK_LEFT)) 
+		{
 			transform.rotation.y -= RotationSpeed / 180.0f * XM_PI;
 		}
-		if (pDI->CheckKey(KD_DAT, DIK_RIGHT)) {
+		if (pDI->CheckKey(KD_DAT, DIK_RIGHT)) 
+		{
 			transform.rotation.y += RotationSpeed / 180.0f * XM_PI;
 		}
 		//if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_SPACE)) {
-		if (pDI->CheckKey(KD_TRG, DIK_SPACE)) {
+		if (pDI->CheckKey(KD_TRG, DIK_SPACE)) 
+		{
 			//transform.position.y += 0.1f;
 			//sphere.center = transform.position;
 			//speedY = JumpPower;
 			state = sJump;
 			//sphere.velocity.y += 15.0f * SceneManager::DeltaTime();
 		}
-		else if (pDI->CheckKey(KD_TRG, DIK_LSHIFT)) {
+		else if (pDI->CheckKey(KD_TRG, DIK_LSHIFT))
+		{
 			//transform.position.y -= 0.1f;
 			//sphere.center = transform.position;
 			//speedY = JumpPower;

@@ -25,7 +25,8 @@ Ball::Ball(bool isPhysic)
 
 Ball::~Ball()
 {
-	if (mesh != nullptr) {
+	if (mesh != nullptr) 
+	{
 		delete mesh;
 		mesh = nullptr;
 	}
@@ -50,11 +51,15 @@ void Ball::Update()
 	{
 		// Box‚Æ‚ÌÕ“Ë”»’è
 		std::list<Box*> boxes = ObjectManager::FindGameObjects<Box>();
-		for (Box* box : boxes) {
-			VECTOR3 refVec = VECTOR3(0, 0, 0);
-			VECTOR3 pushVec = VECTOR3(0, 0, 0);
-			pushVec = box->HitSphereToCubeplane(this->pObj, refVec);
-			PushVec(-pushVec, refVec);
+		for (Box* box : boxes) 
+		{
+			if (box->CheckSphereAABBCollision(this->pObj))
+			{
+				VECTOR3 refVec = VECTOR3(0, 0, 0);
+				VECTOR3 pushVec = VECTOR3(0, 0, 0);
+				pushVec = box->HitSphereToCubeplane(this->pObj, refVec);
+				PushVec(-pushVec, refVec);
+			}
 		}
 		// ©•ªˆÈŠO‚ÌBall‚ÆÕ“Ë”»’è
 		std::list<Ball*> otherBall = ObjectManager::FindGameObjects<Ball>();
@@ -76,7 +81,8 @@ void Ball::PushVec(VECTOR3 pushVec, VECTOR3 RefVec)
 {
 	pObj.center += pushVec;
 	transform.position = pObj.center;
-	if (RefVec.Length() > 0) {
+	if (RefVec.Length() > 0) 
+	{
 		pObj.velocity = RefVec;
 	}
 	return;
