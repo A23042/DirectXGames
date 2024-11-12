@@ -9,6 +9,39 @@
 #include "GizmoXYZ.h"
 #include <fstream>
 
+namespace
+{
+	// 各ImGuiの座標とサイズ指定
+	// ImGui上のクリックではオブジェクト選択を飛ばすため
+	ImVec2 createObjImPos = ImVec2(30, 30);
+	ImVec2 createObjImSize = ImVec2(130, 130);
+
+	ImVec2 stageImPos = ImVec2(170, 30);
+	ImVec2 stageImSize = ImVec2(200, 130);
+	
+	ImVec2 objInfoImPos = ImVec2(30, 170);
+	ImVec2 objInfoImSize0 = ImVec2(290, 310);
+	ImVec2 objInfoImSize1 = ImVec2(290, 400);
+
+	// 判定を飛ばすエリア指定左上の座標と右下の座標
+	VECTOR4 judgeSkipArea0 = VECTOR4(
+		createObjImPos.x, createObjImPos.y,
+		createObjImSize.x, createObjImSize.y
+	);
+	VECTOR4 judgeSkipArea1 = VECTOR4(
+		stageImPos.x, stageImPos.y,
+		stageImSize.x, stageImSize.y
+	);
+	VECTOR4 judgeSkipArea2 = VECTOR4(
+		objInfoImPos.x, objInfoImPos.y,
+		objInfoImSize0.x, objInfoImSize0.y
+	);
+	VECTOR4 judgeSkipArea3 = VECTOR4(
+		objInfoImPos.x, objInfoImPos.y,
+		objInfoImSize1.x, objInfoImSize1.y
+	);
+};
+
 // マウスのドラッグアンドドロップでステージオブジェクトの配置が理想
 // Tankのレティクルの画面座標をワールド座標に変換するのが使えそう？
 // オブジェクトを配置、削除したらcsvの行を詰めたい
@@ -51,7 +84,7 @@ void StageEdit::Update()
 	mView = GameDevice()->m_mView;
 	mPrj = GameDevice()->m_mProj;
 	identity = XMMatrixIdentity();
-	GetWorldPos();
+	judgeArea = GetWorldPos();
 
 	// 3DGizmo表示位置
 	// Windowの左下
@@ -69,10 +102,9 @@ void StageEdit::Update()
 	default:
 		break;
 	}
-
 	// オブジェクト作成ボタンImGui
-	ImGui::SetNextWindowPos(ImVec2(30, 30));
-	ImGui::SetNextWindowSize(ImVec2(130, 130));
+	ImGui::SetNextWindowPos(createObjImPos);
+	ImGui::SetNextWindowSize(createObjImSize);
 	ImGui::Begin("NEWOBJ");
 	if (ImGui::Button("Box"))
 	{
@@ -108,16 +140,19 @@ void StageEdit::Draw()
 
 void StageEdit::NoneUpdate()
 {
-	if (GameDevice()->m_pDI->CheckMouse(KD_TRG, 0))
+	if (judgeArea)
 	{
-		list<Object3D*> objs = ObjectManager::FindGameObjects<Object3D>();
-		for (Object3D* obj : objs)
+		if (GameDevice()->m_pDI->CheckMouse(KD_TRG, 0))
 		{
-			VECTOR3 hit;
-			if (obj->HitLineToMesh(nearWorldPos, farWorldPos, &hit))
+			list<Object3D*> objs = ObjectManager::FindGameObjects<Object3D>();
+			for (Object3D* obj : objs)
 			{
-				SelectObj(obj);
-				return;	// 以下コード省略
+				VECTOR3 hit;
+				if (obj->HitLineToMesh(nearWorldPos, farWorldPos, &hit))
+				{
+					SelectObj(obj);
+					return;	// 以下コード省略
+				}
 			}
 		}
 	}
@@ -131,8 +166,8 @@ void StageEdit::NoneUpdate()
 	}
 
 	// Stage読み書き用
-	ImGui::SetNextWindowPos(ImVec2(170, 30));
-	ImGui::SetNextWindowSize(ImVec2(200, 130));
+	ImGui::SetNextWindowPos(stageImPos);
+	ImGui::SetNextWindowSize(stageImSize);
 	ImGui::Begin("MENU");
 	ImGui::InputInt("Stage", &stageNum);
 	if (ImGui::Button("SAVE")) 
@@ -163,94 +198,97 @@ void StageEdit::HasUpdate()
 		return;
 	}
 	// マウス左クリック
-	if (GameDevice()->m_pDI->CheckMouse(KD_TRG, 0))
+	if(judgeArea)
 	{
-		bool isHit = false;
-		// オブジェクト探索
-		// 先に表示中のGizmoだけ衝突判定をとる
-		list<GizmoXYZ*> gizmos = ObjectManager::FindGameObjectsVisible<GizmoXYZ>();
-		for (GizmoXYZ* gizmo : gizmos)
+		if (GameDevice()->m_pDI->CheckMouse(KD_TRG, 0))
 		{
-			// 探索された最初のオブジェクトか
-			bool firstFlag = true;
-			// naerWorldPosから当たった場所までの距離
-			float distance = 0.0f;
-			// 当たったオブジェクトのなかでの最短距離
-			float minDistance = 0.0f;
-			VECTOR3 hit;
-			if (gizmo->HitLineToMesh(nearWorldPos, farWorldPos, &hit))
+			bool isHit = false;
+			// オブジェクト探索
+			// 先に表示中のGizmoだけ衝突判定をとる
+			list<GizmoXYZ*> gizmos = ObjectManager::FindGameObjectsVisible<GizmoXYZ>();
+			for (GizmoXYZ* gizmo : gizmos)
 			{
-				// 当たった場所への距離を求めて一番近いオブジェクトを格納する
-				distance = (hit - nearWorldPos).Length();
-				float exDistance = (nearWorldPos - getObj->Position()).Length();
-				extendedNearWorldPos = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
-				prevMousePos = extendedNearWorldPos;
-				// 違うオブジェクトがクリックされたら選択オブジェクト変更
-				if (firstFlag)
+				// 探索された最初のオブジェクトか
+				bool firstFlag = true;
+				// naerWorldPosから当たった場所までの距離
+				float distance = 0.0f;
+				// 当たったオブジェクトのなかでの最短距離
+				float minDistance = 0.0f;
+				VECTOR3 hit;
+				if (gizmo->HitLineToMesh(nearWorldPos, farWorldPos, &hit))
 				{
-					minDistance = distance;
-					firstFlag = false;
-					//float exDistance = (nearWorldPos - getObj->Position()).Length();
-					//extendedNearWorldPos = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
-					//prevMousePos = extendedNearWorldPos;
-					getGizmo = gizmo;
-				}
-				else
-				{
-					if (minDistance > distance)
+					// 当たった場所への距離を求めて一番近いオブジェクトを格納する
+					distance = (hit - nearWorldPos).Length();
+					float exDistance = (nearWorldPos - getObj->Position()).Length();
+					extendedNearWorldPos = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
+					prevMousePos = extendedNearWorldPos;
+					// 違うオブジェクトがクリックされたら選択オブジェクト変更
+					if (firstFlag)
 					{
 						minDistance = distance;
+						firstFlag = false;
 						//float exDistance = (nearWorldPos - getObj->Position()).Length();
 						//extendedNearWorldPos = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
 						//prevMousePos = extendedNearWorldPos;
 						getGizmo = gizmo;
 					}
-				}					
-				isHit = true;
-			}
-		}
-		// Gizmoに当たってなければ衝突判定をとる
-		if(!isHit)
-		{
-			// 一番近いオブジェクトの格納
-			Object3D* temp = nullptr;
-			// 探索された最初のオブジェクトか
-			bool firstFlag = true;
-			// naerWorldPosから当たった場所までの距離
-			float distance = 0.0f;
-			// 当たったオブジェクトのなかでの最短距離
-			float minDistance = 0.0f;
-			// Gizmo以外のオブジェクトを調べる
-			list<Object3D*> objs = ObjectManager::FindGameObjectsWithOutTag<Object3D>("Gizmo");
-			for (Object3D* obj : objs)
-			{
-				VECTOR3 hit;
-				// カーソルのワールド座標の近視点から遠視点までのRayを飛ばす
-				if (obj->HitLineToMesh(nearWorldPos, farWorldPos, &hit))
-				{
-					// 当たった場所への距離を求めて一番近いオブジェクトを格納する
-					distance = (hit - nearWorldPos).Length();
-					// 違うオブジェクトがクリックされたら選択オブジェクト変更
-					if (firstFlag)
+					else
 					{
-						temp = obj;
-						minDistance = distance;
-						firstFlag = false;
+						if (minDistance > distance)
+						{
+							minDistance = distance;
+							//float exDistance = (nearWorldPos - getObj->Position()).Length();
+							//extendedNearWorldPos = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
+							//prevMousePos = extendedNearWorldPos;
+							getGizmo = gizmo;
+						}
 					}
-					// 二回目以降距離が近ければ
-					else if(minDistance > distance)
+					isHit = true;
+				}
+			}
+			// Gizmoに当たってなければ衝突判定をとる
+			if (!isHit)
+			{
+				// 一番近いオブジェクトの格納
+				Object3D* temp = nullptr;
+				// 探索された最初のオブジェクトか
+				bool firstFlag = true;
+				// naerWorldPosから当たった場所までの距離
+				float distance = 0.0f;
+				// 当たったオブジェクトのなかでの最短距離
+				float minDistance = 0.0f;
+				// Gizmo以外のオブジェクトを調べる
+				list<Object3D*> objs = ObjectManager::FindGameObjectsWithOutTag<Object3D>("Gizmo");
+				for (Object3D* obj : objs)
+				{
+					VECTOR3 hit;
+					// カーソルのワールド座標の近視点から遠視点までのRayを飛ばす
+					if (obj->HitLineToMesh(nearWorldPos, farWorldPos, &hit))
 					{
-						if(obj != temp)
+						// 当たった場所への距離を求めて一番近いオブジェクトを格納する
+						distance = (hit - nearWorldPos).Length();
+						// 違うオブジェクトがクリックされたら選択オブジェクト変更
+						if (firstFlag)
 						{
 							temp = obj;
 							minDistance = distance;
+							firstFlag = false;
+						}
+						// 二回目以降距離が近ければ
+						else if (minDistance > distance)
+						{
+							if (obj != temp)
+							{
+								temp = obj;
+								minDistance = distance;
+							}
 						}
 					}
 				}
-			}
-			if (temp != nullptr)
-			{
-				SelectObj(temp);
+				if (temp != nullptr)
+				{
+					SelectObj(temp);
+				}
 			}
 		}
 	}
@@ -263,14 +301,14 @@ void StageEdit::HasUpdate()
 	}
 
 	// ImGuiで場所、回転、スケールを変える
-	ImGui::SetNextWindowPos(ImVec2(30, 170));
+	ImGui::SetNextWindowPos(objInfoImPos);
 	if (getObj->editObj.name != "MoveBox")
 	{
-		ImGui::SetNextWindowSize(ImVec2(290, 310));
+		ImGui::SetNextWindowSize(objInfoImSize0);
 	}
 	else
 	{
-		ImGui::SetNextWindowSize(ImVec2(290, 400));
+		ImGui::SetNextWindowSize(objInfoImSize0);
 	}
 	string name = "OBJINFO:" + getObj->editObj.name;
 	if (getObj->editObj.name == "Player")
@@ -404,8 +442,10 @@ void StageEdit::PosGizmoUpdate()
 			{
 				if (getGizmo->editObj.name == "posGizmoX")
 				{
-					objPos.x +=  diff.x;
+
+					objPos.x += diff.x;
 					getObj->pObj.center.x += diff.x;
+
 				}
 				else if (getGizmo->editObj.name == "posGizmoY")
 				{
@@ -417,6 +457,11 @@ void StageEdit::PosGizmoUpdate()
 					objPos.z += diff.z;
 					getObj->pObj.center.z += diff.z;
 				}
+				else if (getGizmo->editObj.name == "gizmoCenter")
+				{
+					objPos += diff;
+					getObj->pObj.center += diff;
+				}
 			}
 		}
 		prevMousePos = extendedNearWorldPos;
@@ -424,7 +469,7 @@ void StageEdit::PosGizmoUpdate()
 	// getObjのスクリーン座標
 	VECTOR3 objScreenPos = XMVector3Project(getObj->Position(), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
 	// getObjのスクリーン座標をワールド座標に変換
-	VECTOR3 gizmoWorldPos = XMVector3Unproject(VECTOR3(objScreenPos.x, objScreenPos.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+	VECTOR3 gizmoWorldPos = XMVector3Unproject(VECTOR3(objScreenPos.x, objScreenPos.y, 0.2f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
 	gizmoC->SetPosition(gizmoWorldPos);
 	if (pDI->CheckMouse(KD_UTRG, 0))
 	{
@@ -464,17 +509,15 @@ void StageEdit::RotGizmoUpdate()
 			{
 				if (getGizmo->editObj.name == "rotGizmoX")
 				{
-					//objRot.x = (objRot.x / 180.0f * XM_PI) + (diff.x * 10 / 180.0f * XM_PI);
-					//getObj->SetRotation(VECTOR3((objRot.x / 180.0f * XM_PI) + (diff.x * 10 / 180.0f * XM_PI), getObj->Rotation().y, getObj->Rotation().z));
+					objRot.x = (objRot.x) + (diff.y * 200 / 180.0f * XM_PI);
 				}
 				else if (getGizmo->editObj.name == "rotGizmoY")
 				{
-					objRot.y = (objRot.y / 180.0f * XM_PI) + (diff.y * 10 / 180.0f * XM_PI);
-					getObj->SetRotation(VECTOR3(objRot.x, (objRot.y / 180.0f * XM_PI) + (diff.y * 10 / 180.0f * XM_PI), objRot.z));
+					objRot.y = (objRot.y) + (diff.x * 100 / 180.0f * XM_PI) + (diff.z * 100 / 180.0f * XM_PI);
 				}
 				else if (getGizmo->editObj.name == "rotGizmoZ")
 				{
-					//objRot.z = diff.z / 180.0f * XM_PI;
+					objRot.z = (objRot.z) + (diff.y * 200 / 180.0f * XM_PI);
 				}
 			}
 		}
@@ -485,7 +528,7 @@ void StageEdit::RotGizmoUpdate()
 	// getObjのスクリーン座標
 	VECTOR3 objScreenPos = XMVector3Project(getObj->Position(), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
 	// getObjのスクリーン座標をワールド座標に変換
-	VECTOR3 gizmoWorldPos = XMVector3Unproject(VECTOR3(objScreenPos.x, objScreenPos.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+	VECTOR3 gizmoWorldPos = XMVector3Unproject(VECTOR3(objScreenPos.x, objScreenPos.y, 0.2f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
 	gizmoC->SetPosition(gizmoWorldPos);
 	if (pDI->CheckMouse(KD_UTRG, 0))
 	{
@@ -498,6 +541,7 @@ void StageEdit::RotGizmoUpdate()
 
 void StageEdit::ScaleGizmoUpdate()
 {
+	gizmoC->SetRotation(getObj->Rotation());
 	// ここでGizmoを触ってオブジェクトを動かす
 	if (getGizmo != nullptr)
 	{
@@ -525,6 +569,7 @@ void StageEdit::ScaleGizmoUpdate()
 			{
 				if (getGizmo->editObj.name == "scaleGizmoX")
 				{
+					
 					objScale.x += diff.x * 2;
 				}
 				else if (getGizmo->editObj.name == "scaleGizmoY")
@@ -549,7 +594,7 @@ void StageEdit::ScaleGizmoUpdate()
 	// getObjのスクリーン座標
 	VECTOR3 objScreenPos = XMVector3Project(getObj->Position(), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
 	// getObjのスクリーン座標をワールド座標に変換
-	VECTOR3 gizmoWorldPos = XMVector3Unproject(VECTOR3(objScreenPos.x, objScreenPos.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+	VECTOR3 gizmoWorldPos = XMVector3Unproject(VECTOR3(objScreenPos.x, objScreenPos.y, 0.2f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
 	gizmoC->SetPosition(gizmoWorldPos);
 	if (pDI->CheckMouse(KD_UTRG, 0))
 	{
@@ -793,6 +838,7 @@ void StageEdit::Load(int n)
 				obj->pObj.e = e;
 				obj->pObj.f = f;
 				obj->pObj.mass = mass;
+				pNum++;
 			}
 			else if (str == "BOX") 
 			{
@@ -840,16 +886,59 @@ void StageEdit::Load(int n)
 }
 
 // マウスカーソルのワールド座標の取得
-void StageEdit::GetWorldPos()
+bool StageEdit::GetWorldPos()
 {
 	// マウス座標取得
 	mousePos = GameDevice()->m_pDI->GetMousePos();
-	
+	if (pDI->CheckMouse(KD_DAT, 0))
+	{
+		// オブジェクトのスケールと回転を変えるときウィンドウをループするようにしたい
+		if (mousePos.x > WINDOW_WIDTH)
+		{
+			//ClientToScreen(GameDevice()->m_pMain->m_hWnd, &mousePos);
+			SetCursorPos(0, mousePos.y);
+		}
+		else if (mousePos.x < 0)
+		{
+			SetCursorPos(WINDOW_WIDTH, mousePos.y);
+		}
+		if (mousePos.y > WINDOW_HEIGHT)
+		{
+			SetCursorPos(mousePos.x, 0);
+		}
+		else if (mousePos.y < 0)
+		{
+			SetCursorPos(mousePos.x, WINDOW_HEIGHT);
+		}
+	}
+
 	// 近視点(0)と遠視点(1)
 	nearWorldPos = XMVector3Unproject(VECTOR3(mousePos.x, mousePos.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
 	farWorldPos = XMVector3Unproject(VECTOR3(mousePos.x, mousePos.y, 1.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
-	
+
 	// 方向ベクトルを正規化して長さを延ばす
 	direction = XMVector3Normalize(farWorldPos - nearWorldPos);
-	return;
+
+	if (mousePos.x > judgeSkipArea0.x && mousePos.x < judgeSkipArea0.x + judgeSkipArea0.z &&
+		mousePos.y > judgeSkipArea0.y && mousePos.y < judgeSkipArea0.y + judgeSkipArea0.w ||
+		mousePos.x > judgeSkipArea1.x && mousePos.x < judgeSkipArea1.x + judgeSkipArea1.z &&
+		mousePos.y > judgeSkipArea1.y && mousePos.y < judgeSkipArea1.y + judgeSkipArea1.w)
+	return false;
+
+if(getObj != nullptr)
+{
+	if (getObj->editObj.name != "MoveBox")
+	{
+		if (mousePos.x > judgeSkipArea2.x && mousePos.x < judgeSkipArea2.x + judgeSkipArea2.z &&
+			mousePos.y > judgeSkipArea2.y && mousePos.y < judgeSkipArea2.y + judgeSkipArea2.w)
+			return false;
+	}
+	else
+	{
+		if (mousePos.x > judgeSkipArea3.x && mousePos.x < judgeSkipArea3.x + judgeSkipArea3.z &&
+			mousePos.y > judgeSkipArea3.y && mousePos.y < judgeSkipArea3.y + judgeSkipArea3.w)
+			return false;
+	}
+}
+	return true;
 }

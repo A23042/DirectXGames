@@ -6,9 +6,9 @@
 
 namespace 
 {	// このcpp以外では使えない
-	static const float Gravity = 9.8f * 3; // 重力加速度(正の値)
+	static const float Gravity = 9.8 * 4.0f; // 重力加速度(正の値)
 	// C++の定数定義（型が付く）
-	static const float JumpPower = 0.3f;
+	static const float JumpPower = 12.0f;
 	static const float RotationSpeed = 3.0f; // 回転速度(度)
 	static const float MoveSpeed = 0.8f;
 };
@@ -353,6 +353,6 @@ void Player::UpdateNormal()
 
 void Player::UpdateJump()
 {
-	pObj.velocity.y = 10.0f;
+	pObj.velocity.y = JumpPower;
 	state = sNormal();
 }

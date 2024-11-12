@@ -329,6 +329,11 @@ Box::~Box()
 		delete mesh;
 		mesh = nullptr;
 	}
+	if (meshCol != nullptr)
+	{
+		delete meshCol;
+		meshCol = nullptr;
+	}
 }
 
 

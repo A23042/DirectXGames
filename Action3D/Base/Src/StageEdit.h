@@ -84,8 +84,10 @@ public:
 
 	/// <summary>
 	/// マウスカーソルをワールド座標変換
+	/// ImGui上にカーソルがあるかどうかの判定も取る
 	/// </summary>
-	void GetWorldPos();
+	/// <returns>ImGuiの上にカーソルがあればfalse</returns>
+	bool GetWorldPos();
 
 private:
 	// sステータス
@@ -158,4 +160,6 @@ private:
 	float mass;
 	int pNum = 0;
 	int stageNum = 0;
+
+	bool judgeArea = true;
 };

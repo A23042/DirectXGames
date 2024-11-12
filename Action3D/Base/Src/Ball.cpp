@@ -30,6 +30,11 @@ Ball::~Ball()
 		delete mesh;
 		mesh = nullptr;
 	}
+	if (meshCol != nullptr)
+	{
+		delete meshCol;
+		meshCol = nullptr;
+	}
 }
 
 void Ball::Start()
