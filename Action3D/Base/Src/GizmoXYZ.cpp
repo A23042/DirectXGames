@@ -39,7 +39,7 @@ PosGizmoX::PosGizmoX(Object3D* parent)
 	mesh->Load("Data/Gizmo/PosGizmoX.mesh");
 	meshCol = new MeshCollider;
 	meshCol->MakeFromMesh(mesh);
-	transform.rotation.z = (180.0f / 180 * XM_PI);
+	//transform.rotation.z = (180.0f / 180 * XM_PI);
 	ObjectManager::SetVisible(this, false);
 }
 
@@ -100,7 +100,8 @@ PosGizmoZ::PosGizmoZ(Object3D* parent)
 	mesh->Load("Data/Gizmo/PosGizmoZ.mesh");
 	meshCol = new MeshCollider;
 	meshCol->MakeFromMesh(mesh);
-	transform.rotation.x = (180.0f / 180 * XM_PI);
+	// ‰ñ“]‚³‚¹‚é‚Æ”»’è‚ª‚¤‚Ü‚­Žæ‚ê‚È‚¢
+	//transform.rotation.x = (180.0f / 180 * XM_PI);
 	ObjectManager::SetVisible(this, false);
 }
 
@@ -160,7 +161,7 @@ RotGizmoX::RotGizmoX(Object3D* parent)
 	mesh->Load("Data/Gizmo/RotGizmoX.mesh");
 	meshCol = new MeshCollider;
 	meshCol->MakeFromMesh(mesh);
-	transform.rotation.x = (180.0f / 180 * XM_PI);
+//transform.rotation.x = (180.0f / 180 * XM_PI);
 	ObjectManager::SetVisible(this, false);
 }
 
@@ -190,7 +191,7 @@ RotGizmoY::RotGizmoY(Object3D* parent)
 	mesh->Load("Data/Gizmo/RotGizmoY.mesh");
 	meshCol = new MeshCollider;
 	meshCol->MakeFromMesh(mesh);
-	transform.rotation.x = (180.0f / 180 * XM_PI);
+	//transform.rotation.x = (180.0f / 180 * XM_PI);
 	ObjectManager::SetVisible(this, false);
 }
 
@@ -220,7 +221,7 @@ RotGizmoZ::RotGizmoZ(Object3D* parent)
 	mesh->Load("Data/Gizmo/RotGizmoZ.mesh");
 	meshCol = new MeshCollider;
 	meshCol->MakeFromMesh(mesh);
-	transform.rotation.x = (180.0f / 180 * XM_PI);
+	//transform.rotation.x = (180.0f / 180 * XM_PI);
 	ObjectManager::SetVisible(this, false);
 }
 
@@ -251,7 +252,7 @@ ScaleGizmoX::ScaleGizmoX(Object3D* parent)
 	mesh->Load("Data/Gizmo/ScaleGizmoX.mesh");
 	meshCol = new MeshCollider;
 	meshCol->MakeFromMesh(mesh);
-	transform.rotation.z = (180.0f / 180 * XM_PI);
+	//transform.rotation.z = (180.0f / 180 * XM_PI);
 	ObjectManager::SetVisible(this, false);
 }
 
@@ -310,7 +311,7 @@ ScaleGizmoZ::ScaleGizmoZ(Object3D* parent)
 	mesh->Load("Data/Gizmo/ScaleGizmoZ.mesh");
 	meshCol = new MeshCollider;
 	meshCol->MakeFromMesh(mesh);
-	transform.rotation.x = (180.0f / 180 * XM_PI);
+	//transform.rotation.x = (180.0f / 180 * XM_PI);
 	ObjectManager::SetVisible(this, false);
 }
 

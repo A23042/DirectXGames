@@ -203,13 +203,13 @@ void StageEdit::HasUpdate()
 		if (GameDevice()->m_pDI->CheckMouse(KD_TRG, 0))
 		{
 			bool isHit = false;
+			// 探索された最初のオブジェクトか
+			bool firstFlag = true;
 			// オブジェクト探索
 			// 先に表示中のGizmoだけ衝突判定をとる
 			list<GizmoXYZ*> gizmos = ObjectManager::FindGameObjectsVisible<GizmoXYZ>();
 			for (GizmoXYZ* gizmo : gizmos)
 			{
-				// 探索された最初のオブジェクトか
-				bool firstFlag = true;
 				// naerWorldPosから当たった場所までの距離
 				float distance = 0.0f;
 				// 当たったオブジェクトのなかでの最短距離
@@ -919,6 +919,7 @@ bool StageEdit::GetWorldPos()
 	// 方向ベクトルを正規化して長さを延ばす
 	direction = XMVector3Normalize(farWorldPos - nearWorldPos);
 
+	// ImGui範囲内の時はfalseを返す
 	if (mousePos.x > judgeSkipArea0.x && mousePos.x < judgeSkipArea0.x + judgeSkipArea0.z &&
 		mousePos.y > judgeSkipArea0.y && mousePos.y < judgeSkipArea0.y + judgeSkipArea0.w ||
 		mousePos.x > judgeSkipArea1.x && mousePos.x < judgeSkipArea1.x + judgeSkipArea1.z &&
