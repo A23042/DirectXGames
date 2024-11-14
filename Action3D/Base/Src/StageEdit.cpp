@@ -128,6 +128,23 @@ void StageEdit::Update()
 		}
 	}
 	ImGui::End();
+
+
+	// Stageì«Ç›èëÇ´óp
+	ImGui::SetNextWindowPos(stageImPos);
+	ImGui::SetNextWindowSize(stageImSize);
+	ImGui::Begin("MENU");
+	ImGui::InputInt("Stage", &stageNum);
+	if (ImGui::Button("SAVE"))
+	{
+		Save(stageNum);
+	}
+	if (ImGui::Button("LOAD"))
+	{
+		Load(stageNum);
+	}
+	ImGui::End();
+
 }
 
 #if 1
@@ -144,7 +161,7 @@ void StageEdit::NoneUpdate()
 	{
 		if (GameDevice()->m_pDI->CheckMouse(KD_TRG, 0))
 		{
-			list<Object3D*> objs = ObjectManager::FindGameObjects<Object3D>();
+			list<Object3D*> objs = ObjectManager::FindGameObjectsWithOutTag<Object3D>("Gizmo");
 			for (Object3D* obj : objs)
 			{
 				VECTOR3 hit;
@@ -164,22 +181,6 @@ void StageEdit::NoneUpdate()
 	{
 		SelectObj(new Player(false));
 	}
-
-	// Stageì«Ç›èëÇ´óp
-	ImGui::SetNextWindowPos(stageImPos);
-	ImGui::SetNextWindowSize(stageImSize);
-	ImGui::Begin("MENU");
-	ImGui::InputInt("Stage", &stageNum);
-	if (ImGui::Button("SAVE")) 
-	{
-		Save(stageNum);
-	}
-	if (ImGui::Button("LOAD")) 
-	{
-		Load(stageNum);
-	}
-	ImGui::End();
-
 }
 
 void StageEdit::HasUpdate()
