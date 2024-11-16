@@ -1,4 +1,9 @@
 #pragma once
+/// <summary>
+/// マップエディタで使用するカメラ
+/// </summary>
+/// <author>S.Matsunaga</author>
+
 #include "Object3D.h"
 
 class EditorCamera : public Object3D

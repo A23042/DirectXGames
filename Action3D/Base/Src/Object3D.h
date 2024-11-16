@@ -54,7 +54,7 @@ public:
 	};
 
 	// S.Matsunaga
-	// 物理演算や衝突判定を適用させるオブジェクト
+	// 物理演算や衝突判定を適用させるオブジェクト用構造体
 	struct PhysicsObject
 	{
 		VECTOR3 velocity = VECTOR3(0, 0, 0);	// 速度

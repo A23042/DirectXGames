@@ -38,7 +38,7 @@ namespace SceneManager {
 	/// シーンの名前とクラスの関係は、SceneFactory()に記述してください。
 	/// </summary>
 	/// <param name="sceneName">シーン名</param>
-	void ChangeScene(const std::string& sceneName);
+	void ChangeScene(const std::string& sceneName, int num = 0);
 
 	/// <summary>
 	/// 前のフレームからの経過時間（秒）
@@ -49,7 +49,4 @@ namespace SceneManager {
 	float DeltaTime();
 
 	void Exit();
-
-	// string型で
-	std::string CurrentSceneName();
 };

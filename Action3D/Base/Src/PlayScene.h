@@ -4,7 +4,7 @@
 class PlayScene : public SceneBase
 {
 public:
-	PlayScene();
+	PlayScene(int num = 1);
 	~PlayScene();
 	void Update() override;
 	void Draw() override;

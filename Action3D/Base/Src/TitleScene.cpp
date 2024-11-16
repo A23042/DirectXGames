@@ -24,12 +24,16 @@ void TitleScene::Update()
 	}
 	if (GameDevice()->m_pDI->
 			CheckKey(KD_TRG, DIK_P)) {
-		SceneManager::ChangeScene("PlayScene");
+		SceneManager::ChangeScene("PlayScene", stageNum);
 	}
 	if (GameDevice()->m_pDI->
 		CheckKey(KD_TRG, DIK_E)) {
 		SceneManager::ChangeScene("MapEditScene");
 	}
+
+	ImGui::Begin("STAGENUM");
+	ImGui::InputInt("Number", &stageNum);
+	ImGui::End();
 }
 
 void TitleScene::Draw()

@@ -6,7 +6,7 @@
 
 namespace 
 {	// このcpp以外では使えない
-	static const float Gravity = 9.8 * 4.0f; // 重力加速度(正の値)
+	static const float Gravity = 9.8f * 4.0f; // 重力加速度(正の値)
 	// C++の定数定義（型が付く）
 	static const float JumpPower = 12.0f;
 	static const float RotationSpeed = 3.0f; // 回転速度(度)
@@ -28,9 +28,6 @@ Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
 	pObj.center = transform.position;
 	pObj.radius = 0.5f;
 	pObj.velocity = VECTOR3(0, 0, 0);
-
-	// サイズ調整
-	//pObj.radius *= transform.scale.x;
 
 	pObj.isPlayer = true;
 	pObj.pNum = playerNum;
@@ -63,9 +60,6 @@ void Player::Update()
 
 	if (isPhysic)
 	{
-		// ここで空間分割を使って処理負荷の軽減をする？
-		// 空間分割よくわかってない
-
 		// 各Boxとの衝突判定
 		std::list<Object3D*> objes = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ");
 		for (Object3D* obj : objes) 
@@ -127,10 +121,12 @@ void Player::Update()
 		ImGui::InputFloat("Z", &transform.position.z);
 		ImGui::End();
 
+		float velocity = pObj.velocity.Length();
 		ImGui::Begin("VELOCITY");
-		ImGui::InputFloat("X", &pObj.velocity.x);
-		ImGui::InputFloat("Y", &pObj.velocity.y);
-		ImGui::InputFloat("Z", &pObj.velocity.z);
+		ImGui::InputFloat("Velocity", &velocity);
+		//ImGui::InputFloat("X", &pObj.velocity.x);
+		//ImGui::InputFloat("Y", &pObj.velocity.y);
+		//ImGui::InputFloat("Z", &pObj.velocity.z);
 		ImGui::End();
 
 	}
@@ -224,24 +220,6 @@ void Player::Update()
 void Player::Draw()
 {
 	Object3D::Draw(); // 継承元の関数を呼ぶ
-//	MATRIX4X4 tip = XMMatrixRotationRollPitchYawFromVector(VECTOR3(-33, 82, 0) * DegToRad);
-//	VECTOR3 tipPos = VECTOR3(0, 0, 1.2f) * tip;
-//	VECTOR3 tipPos = VECTOR3(0.9966, 0.6536, 0.140);
-//	MATRIX4X4 mat = transform.matrix(); // 世界（ワールド）の中で、プレイヤーの位置と向き
-//	MATRIX4X4 bone = mesh->GetFrameMatrices(34); // プレイヤーの原点からの手首の位置(34は手首)
-//	VECTOR3 start = VECTOR3(0, 0, 0) * bone * mat;
-//	VECTOR3 end = tipPos * bone * mat;
-
-//	CSprite spr;
-	//spr.DrawLine3D(start, end, RGB(255, 0, 0), 0);
-}
-
-SphereCollider Player::Collider()
-{
-	SphereCollider col;
-	col.center = transform.position;
-	col.radius = 0.5f;
-	return col;
 }
 
 void Player::PushVec(VECTOR3 pushVec, VECTOR3 RefVec)
@@ -255,6 +233,7 @@ void Player::PushVec(VECTOR3 pushVec, VECTOR3 RefVec)
 	return;
 }
 
+// Playerの操作はコントローラーに変える
 void Player::UpdateNormal()
 {
 	auto pDI = GameDevice()->m_pDI;
@@ -291,16 +270,18 @@ void Player::UpdateNormal()
 			//transform.position.y += 0.1f;
 			//sphere.center = transform.position;
 			//speedY = JumpPower;
-			state = sJump;
+			//state = sJump;
 			//sphere.velocity.y += 15.0f * SceneManager::DeltaTime();
 		}
 		else if (pDI->CheckKey(KD_TRG, DIK_LSHIFT)) 
 		{
-			//transform.position.y -= 0.1f;
-			//sphere.center = transform.position;
-			//speedY = JumpPower;
-			//state = sJump;
-			//sphere.velocity.y -= 10.0f * SceneManager::DeltaTime();
+			state = sJump;
+		}
+		else if (pDI->CheckKey(KD_TRG, DIK_LCONTROL))
+		{
+			VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * 40); // 回転してない時の移動量
+			MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
+			pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
 		}
 	}
 	else if (playerNum == 1)
@@ -335,16 +316,18 @@ void Player::UpdateNormal()
 			//transform.position.y += 0.1f;
 			//sphere.center = transform.position;
 			//speedY = JumpPower;
-			state = sJump;
+			//state = sJump;
 			//sphere.velocity.y += 15.0f * SceneManager::DeltaTime();
 		}
-		else if (pDI->CheckKey(KD_TRG, DIK_LSHIFT))
+		else if (pDI->CheckKey(KD_TRG, DIK_RSHIFT))
 		{
-			//transform.position.y -= 0.1f;
-			//sphere.center = transform.position;
-			//speedY = JumpPower;
-			//state = sJump;
-			//sphere.velocity.y -= 10.0f * SceneManager::DeltaTime();
+			state = sJump;
+		}
+		else if (pDI->CheckKey(KD_TRG, DIK_RCONTROL))
+		{
+			VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * 40); // 回転してない時の移動量
+			MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
+			pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
 		}
 	}
 

@@ -21,5 +21,5 @@ public:
 	/// </summary>
 	/// <param name="name">シーンの名称</param>
 	/// <returns>作成したインスタンス</returns>
-	SceneBase* Create(const std::string& name);
+	SceneBase* Create(const std::string& name, int num = 1);
 };

@@ -213,6 +213,7 @@ const MATRIX4X4 Transform::matrix()
 		position.x, position.y, position.z);
 	//return scaleM * rotZ * rotX * rotY * trans;
 	MATRIX4X4 mat = scaleM * rotZ * rotX * rotY * trans;
+	// 親がいる場合は親のマトリクスを掛ける
 	if (parent != nullptr)
 	{
 		mat = mat * parent->Matrix();

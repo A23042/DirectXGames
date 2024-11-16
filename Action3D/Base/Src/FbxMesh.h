@@ -96,12 +96,12 @@ struct BONE {
 
 // アニメーション構造体
 struct ANIMATION {
-	int    used;
-	int    startFrame;
-	int    endFrame;
-	int    RootBoneMesh;       // -- 2020.12.15 -- 3
-	int    RootBone;           // -- 2020.12.15 -- 3
-	bool   loop; // ループフラグをここに持たせる
+	int    used = 0;
+	int    startFrame = 0;
+	int    endFrame = 0;
+	int    RootBoneMesh = 0;       // -- 2020.12.15 -- 3
+	int    RootBone = 0;           // -- 2020.12.15 -- 3
+	bool   loop = false; // ループフラグをここに持たせる
 	ANIMATION() {
 		used = false;
 	}

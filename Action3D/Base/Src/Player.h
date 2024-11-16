@@ -10,10 +10,10 @@ public:
 	void Update() override;
 	void Draw() override;
 
-	SphereCollider Collider() override;
-
+	// Box‚ÆÕ“Ë‚µ‚½‚Æ‚«‚ÉŒÄ‚Î‚ê‚é”½ËŠÖ”
 	void PushVec(VECTOR3 pushVec, VECTOR3 RefVec);
 
+	// Player”Ô†æ“¾
 	int GetPlNum() { return playerNum; }
 private:
 	enum State {
@@ -24,6 +24,7 @@ private:
 	void UpdateNormal();
 	void UpdateJump();
 
+	// Mapeditor‚ÅÕ“Ë”»’è‚È‚Ç‚µ‚È‚¢‚½‚ß‚ÌBool
 	bool isPhysic;
 
 	VECTOR3 sumVelocity;

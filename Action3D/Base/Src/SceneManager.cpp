@@ -10,6 +10,8 @@ namespace {
 	SceneBase* currentScene; // 今のシーンのインスタンスを保持
 	SceneFactory* factory;   // シーン切り替え用のFactoryのポインター
 
+	int stageNum = 1;	// PlayScene用のステージ番号
+
 	// DeltaTime用
 	LARGE_INTEGER freq;
 	LARGE_INTEGER current;
@@ -67,7 +69,7 @@ void SceneManager::Update()
 			currentScene = nullptr;
 		}
 		currentName = nextName;
-		currentScene = factory->Create(nextName); // 次のシーンを作成
+		currentScene = factory->Create(nextName,stageNum); // 次のシーンを作成
 	}
 	if (currentScene != nullptr)
 		currentScene->Update();
@@ -100,9 +102,10 @@ void SceneManager::SetCurrentScene(SceneBase* scene)
 	currentScene = scene;
 }
 
-void SceneManager::ChangeScene(const std::string& sceneName)
+void SceneManager::ChangeScene(const std::string& sceneName, int num)
 {
 	nextName = sceneName;
+	stageNum = num;
 }
 
 float SceneManager::DeltaTime()

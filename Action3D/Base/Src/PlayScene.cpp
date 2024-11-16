@@ -10,11 +10,11 @@
 #include "Ball.h"
 #include "MoveBox.h"
 
-PlayScene::PlayScene()
+PlayScene::PlayScene(int num)
 {
 	// テキストファイルの読み方
 	char name[64];
-	sprintf_s<64>(name, "data/Stage%02d.csv", 3);
+	sprintf_s<64>(name, "data/Stage%02d.csv", num);
 #if 0
 	CsvReader* csv = new CsvReader("Data/map00.csv");
 #else

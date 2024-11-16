@@ -86,11 +86,8 @@ void Box::Draw()
 		vPos = transform.scale / 2;
 		CubeSize(vPos.x, vPos.y, vPos.z);
 	
-		
-		// 辺ベクトル作成
 		for (int i = 0; i < 12; i++)
 		{
-			//edge[i] = vertex[edgePoint[i][1]] - vertex[edgePoint[i][0]];
 			spr->DrawLine3D(vertex[edgePoint[i][1]], vertex[edgePoint[i][0]], RGB(0, 255, 50), 1.0f);
 		}
 	}
@@ -289,10 +286,12 @@ VECTOR3 Box::ReflectionVec(PhysicsObject& tObj, VECTOR3 normal)
 	VECTOR3 refNormal = dot(tObj.velocity, normal) * normal;
 
 	VECTOR3 refSessen = tObj.velocity - refNormal;
+
 	// 衝突したふたつのオブジェクトの反発係数と摩擦を考慮する
 	float e2 = (this->pObj.e + tObj.e) / 2;
 	float f2 = (this->pObj.f + tObj.f) / 2;
-	VECTOR3 b = -refNormal * e2 + refSessen * f2;
+
+	VECTOR3 b = -refNormal * e2 + refSessen * (1 - f2);
 
 	// 順番の修正
 	// 埋め込みを解除->反射	〇
@@ -313,12 +312,14 @@ bool Box::CheckSphereAABBCollision(PhysicsObject& tObj)
 	float y = std::fmax(min.y, std::fmin(tObj.center.y, max.y));
 	float z = std::fmax(min.z, std::fmin(tObj.center.z, max.z));
 
+	// AABBと球体のもっとも近い点との距離計算
 	VECTOR3 closest = VECTOR3(x, y, z);
 	float distance = sqrt(
 		(closest.x - tObj.center.x) * (closest.x - tObj.center.x) +
 		(closest.y - tObj.center.y) * (closest.y - tObj.center.y) +
 		(closest.z - tObj.center.z) * (closest.z - tObj.center.z));
 
+	// 距離が半径よりも小さければtrue
 	return distance <= tObj.radius;
 }
 

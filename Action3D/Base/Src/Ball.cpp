@@ -54,6 +54,10 @@ void Ball::Update()
 
 	if (isPhysic)
 	{
+		//
+		// Œ»Ýˆê“xBallA‚©‚çBallB‚ÉÕ“Ë”»’è‚ð‚µ‚Ä‚à
+		//			BallB‚©‚çBallA‚ÉÕ“Ë”»’è‚ðŽæ‚Á‚Ä‚¢‚é‚Ì‚Åˆê“x‚µ‚©Õ“Ë”»’è‚ð‚µ‚È‚¢—l‚É‰ü‘P‚·‚é
+		// 
 		// Box‚Æ‚ÌÕ“Ë”»’è
 		std::list<Box*> boxes = ObjectManager::FindGameObjects<Box>();
 		for (Box* box : boxes) 

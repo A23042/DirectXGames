@@ -11,4 +11,5 @@ public:
 private: // クラスのメンバー変数はprivateにする
 	int positionX;
 	int speedX;
+	int stageNum = 1;
 };

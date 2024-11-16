@@ -40,6 +40,10 @@ namespace
 		objInfoImPos.x, objInfoImPos.y,
 		objInfoImSize1.x, objInfoImSize1.y
 	);
+
+	static const float e = 0.8f;
+	static const float f = 0.2f;
+	static const float mass = 1;
 };
 
 // マウスのドラッグアンドドロップでステージオブジェクトの配置が理想
@@ -69,9 +73,9 @@ StageEdit::StageEdit()
 	nState = sNone;
 	gState = sNoneGizmo;
 
-	e = 0.8f;
-	f = 0.98f;
-	mass = 1;
+	tempE = e;
+	tempF = f;
+	tempMass = mass;
 }
 
 StageEdit::~StageEdit()
@@ -108,14 +112,17 @@ void StageEdit::Update()
 	ImGui::Begin("NEWOBJ");
 	if (ImGui::Button("Box"))
 	{
+		isNew = true;
 		SelectObj(new Box());
 	}
 	if (ImGui::Button("MoveBox"))
 	{
+		isNew = true;
 		SelectObj(new MoveBox());
 	}
 	if (ImGui::Button("Ball"))
 	{
+		isNew = true;
 		SelectObj(new Ball(false));
 	}
 	// Playerは２つまで
@@ -123,6 +130,7 @@ void StageEdit::Update()
 	{
 		if (ImGui::Button("Player"))
 		{
+			isNew = true;
 			SelectObj(new Player(pNum,false));
 			pNum++;
 		}
@@ -143,6 +151,11 @@ void StageEdit::Update()
 	{
 		Load(stageNum);
 	}
+	if (ImGui::Button("PLAY"))
+	{
+		//Save(stageNum);
+		SceneManager::ChangeScene("PlayScene",stageNum);
+	}
 	ImGui::End();
 
 }
@@ -157,30 +170,59 @@ void StageEdit::Draw()
 
 void StageEdit::NoneUpdate()
 {
+	// ImGui外でマウス左クリック
 	if (judgeArea)
 	{
 		if (GameDevice()->m_pDI->CheckMouse(KD_TRG, 0))
 		{
+			Object3D* temp = nullptr;
+			// 探索された最初のオブジェクトか
+			bool firstFlag = true;
+			// naerWorldPosから当たった場所までの距離
+			float distance = 0.0f;
+			// 当たったオブジェクトのなかでの最短距離
+			float minDistance = 0.0f;
+
+			// Gizmo以外のオブジェクトと衝突判定
 			list<Object3D*> objs = ObjectManager::FindGameObjectsWithOutTag<Object3D>("Gizmo");
 			for (Object3D* obj : objs)
 			{
 				VECTOR3 hit;
 				if (obj->HitLineToMesh(nearWorldPos, farWorldPos, &hit))
 				{
-					SelectObj(obj);
-					return;	// 以下コード省略
+					// 当たった場所への距離を求めて一番近いオブジェクトを格納する
+					distance = (hit - nearWorldPos).Length();
+					if (firstFlag)
+					{
+						minDistance = distance;
+						firstFlag = false;
+						temp = obj;
+					}
+					else
+					{
+						if (minDistance > distance)
+						{
+							minDistance = distance;
+							temp = obj;
+						}
+					}
 				}
+			}
+			if (temp != nullptr)
+			{
+				SelectObj(temp);
+				return;
 			}
 		}
 	}
-	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_1))
+	/*if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_1))
 	{
 		SelectObj(new Box());
 	}
 	else if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_2))
 	{
 		SelectObj(new Player(false));
-	}
+	}*/
 }
 
 void StageEdit::HasUpdate()
@@ -206,15 +248,16 @@ void StageEdit::HasUpdate()
 			bool isHit = false;
 			// 探索された最初のオブジェクトか
 			bool firstFlag = true;
+			// naerWorldPosから当たった場所までの距離
+			float distance = 0.0f;
+			// 当たったオブジェクトのなかでの最短距離
+			float minDistance = 0.0f;
+
 			// オブジェクト探索
 			// 先に表示中のGizmoだけ衝突判定をとる
 			list<GizmoXYZ*> gizmos = ObjectManager::FindGameObjectsVisible<GizmoXYZ>();
 			for (GizmoXYZ* gizmo : gizmos)
 			{
-				// naerWorldPosから当たった場所までの距離
-				float distance = 0.0f;
-				// 当たったオブジェクトのなかでの最短距離
-				float minDistance = 0.0f;
 				VECTOR3 hit;
 				if (gizmo->HitLineToMesh(nearWorldPos, farWorldPos, &hit))
 				{
@@ -318,9 +361,9 @@ void StageEdit::HasUpdate()
 	}
 	ImGui::Begin(name.c_str());
 	// 反発係数・摩擦・質量
-	ImGui::SliderFloat("e", &e, 0.0f, 1.0f, "%.1f");
-	ImGui::SliderFloat("f", &f, 0.0f, 1.0f, "%.2f");
-	ImGui::InputFloat("mass", &mass, 0.5f, 1.0f);
+	ImGui::SliderFloat("e", &tempE, 0.0f, 1.0f, "%.1f");
+	ImGui::SliderFloat("f", &tempF, 0.0f, 0.1f, "%.2f");
+	ImGui::InputFloat("mass", &tempMass, 0.5f, 1.0f);
 	// 場所
 	ImGui::InputFloat("PositionX", &objPos.x, 0.5f);
 	ImGui::InputFloat("PositionY", &objPos.y, 0.5f);
@@ -345,9 +388,9 @@ void StageEdit::HasUpdate()
 
 	// ImGuiで入力された値をオブジェクトに適用
 	
-	getObj->pObj.e = e;
-	getObj->pObj.f = f;
-	getObj->pObj.mass = mass;
+	getObj->pObj.e = tempE;
+	getObj->pObj.f = tempF;
+	getObj->pObj.mass = tempMass;
 	// 場所はObjectが持っている構造体のCenterに適用させる
 	// それぞれのオブジェクトのUpdateでCenterをtransform.positinonに適用させてるから
 	getObj->pObj.center = objPos;	// 場所
@@ -382,12 +425,12 @@ void StageEdit::HasUpdate()
 			gState = sPosGizmo;
 			SetGizmo(gState);
 		}
-		else if (pDI->CheckKey(KD_TRG, DIK_E))
+		else if (pDI->CheckKey(KD_TRG, DIK_R))
 		{	
 			gState = sScaleGizmo;
 			SetGizmo(gState);
 		}
-		else if (pDI->CheckKey(KD_TRG, DIK_R))
+		else if (pDI->CheckKey(KD_TRG, DIK_E))
 		{	
 			gState = sRotGizmo;
 			SetGizmo(gState);
@@ -410,13 +453,11 @@ void StageEdit::HasUpdate()
 		break;
 	}
 }
-//
-// Gizmoをクリック出来ない問題発生中
-// Gizmoのサイズが小さすぎてメッシュコライダーがうまく作られていない？
 // 
 // Position移動Gizmo表示中
 void StageEdit::PosGizmoUpdate()
 {
+	gizmoC->SetRotation(VECTOR3());
 	if (getGizmo != nullptr)
 	{
 		// 選択されているGizmoのみ表示
@@ -483,6 +524,7 @@ void StageEdit::PosGizmoUpdate()
 
 void StageEdit::RotGizmoUpdate()
 {
+	gizmoC->SetRotation(getObj->Rotation());
 	// ここでGizmoを触ってオブジェクトを動かす
 	if (getGizmo != nullptr)
 	{
@@ -514,7 +556,7 @@ void StageEdit::RotGizmoUpdate()
 				}
 				else if (getGizmo->editObj.name == "rotGizmoY")
 				{
-					objRot.y = (objRot.y) + (diff.x * 100 / 180.0f * XM_PI) + (diff.z * 100 / 180.0f * XM_PI);
+					objRot.y = (objRot.y) - (diff.x * 100 / 180.0f * XM_PI) + (-diff.z * 100 / 180.0f * XM_PI);
 				}
 				else if (getGizmo->editObj.name == "rotGizmoZ")
 				{
@@ -667,41 +709,57 @@ void StageEdit::SetGizmo(int gState)
 
 void StageEdit::SelectObj(Object3D* ob)
 {
-	// 選択されてるオブジェクトの保存
-	if (getObj != ob)
+	if (isNew)
 	{
 		if (getObj != nullptr)DeselectObj();
 		getObj = ob;
+		getObj->pObj.e = e;
+		getObj->pObj.f = f;
+		getObj->pObj.mass = mass;
+		isNew = false;
 	}
+	else if (getObj == ob)
+	{
+		return;
+	}
+	else
+	{
+		if (getObj != nullptr)DeselectObj();
+	}
+	getObj = ob;
+
 	// 選択されてるオブジェクトのGizmo表示
 	// 初めてGizmoが出る場合posGizmoを出す
 	if (gState == sNoneGizmo)
 	{
 		gState = sPosGizmo;
 	}
-	// ステータスによって表示するGizmoを変える
-	SetGizmo(gState);
 
 	// それぞれの値をImGui用の変数に保管
 	objPos = getObj->pObj.center;
 	objRot = getObj->Rotation() * 180.0f / XM_PI;
 	objScale = getObj->Scale();
 
-	e = getObj->pObj.e;
-	f = getObj->pObj.f;
-	mass = getObj->pObj.mass;
+	tempE = getObj->pObj.e;
+	tempF = getObj->pObj.f;
+	tempMass = getObj->pObj.mass;
 
-	
+	// ステータスによって表示するGizmoを変える
+	SetGizmo(gState);
+
 	getObj->editObj.isSelect = true;
 	nState = sHas;
 }
 
 void StageEdit::DeselectObj()
 {
-	getObj->editObj.isSelect = false;
-	getObj = nullptr;
-	nState = sNone;
-	SetGizmo(sNoneGizmo);
+	if(getObj != nullptr)
+	{
+		getObj->editObj.isSelect = false;
+		getObj = nullptr;
+		nState = sNone;
+		SetGizmo(sNoneGizmo);
+	}
 }
 
 void StageEdit::DupeObj(Object3D* ob)
@@ -804,6 +862,10 @@ void StageEdit::Save(int n)
 
 void StageEdit::Load(int n)
 {
+	// 選択されてるオブジェクトがあれば選択解除
+	DeselectObj();
+	
+	// 現在配置されているオブジェクトをリセット
 	list<Object3D*> objs = ObjectManager::FindGameObjects<Object3D>();
 	for (Object3D* obj : objs)
 	{
@@ -812,9 +874,9 @@ void StageEdit::Load(int n)
 			obj->DestroyMe();
 		}
 	}
+	pNum = 0;
 	char name[64];
 	sprintf_s<64>(name, "data/Stage%02d.csv", n);
-
 	CsvReader* csv = new CsvReader(name);
 
 	for (int i = 0; i < csv->GetLines(); i++) { // １行ずつ読む
@@ -891,9 +953,11 @@ bool StageEdit::GetWorldPos()
 {
 	// マウス座標取得
 	mousePos = GameDevice()->m_pDI->GetMousePos();
+/*
 	if (pDI->CheckMouse(KD_DAT, 0))
 	{
 		// オブジェクトのスケールと回転を変えるときウィンドウをループするようにしたい
+
 		if (mousePos.x > WINDOW_WIDTH)
 		{
 			//ClientToScreen(GameDevice()->m_pMain->m_hWnd, &mousePos);
@@ -912,6 +976,7 @@ bool StageEdit::GetWorldPos()
 			SetCursorPos(mousePos.x, WINDOW_HEIGHT);
 		}
 	}
+*/
 
 	// 近視点(0)と遠視点(1)
 	nearWorldPos = XMVector3Unproject(VECTOR3(mousePos.x, mousePos.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);

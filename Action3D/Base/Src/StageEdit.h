@@ -1,7 +1,6 @@
 #pragma once
 /// <summary>
 /// マップエディット機能
-/// 
 /// </summary>
 /// <author>S.Matsunaga</author>
 
@@ -155,11 +154,12 @@ private:
 	VECTOR3 objScale;
 	VECTOR3 moveVolumu = {};	// MoveBoxの移動量
 	float moveSpeed = 0;	// MoveBoxの移動速度
-	float e;
-	float f;
-	float mass;
+	float tempE;
+	float tempF;
+	float tempMass;
 	int pNum = 0;
 	int stageNum = 0;
 
-	bool judgeArea = true;
+	bool judgeArea = true;	// ImGuiの判定エリア
+	bool isNew = false;	// 新規オブジェクト生成か
 };
