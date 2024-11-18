@@ -9,8 +9,8 @@ namespace
 	static const float Gravity = 9.8f * 4.0f; // 重力加速度(正の値)
 	// C++の定数定義（型が付く）
 	static const float JumpPower = 12.0f;
-	static const float RotationSpeed = 3.0f; // 回転速度(度)
-	static const float MoveSpeed = 0.8f;
+	static const float RotationSpeed = 2.0f; // 回転速度(度)
+	static const float MoveSpeed = 0.4f;
 };
 
 Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
@@ -237,6 +237,49 @@ void Player::PushVec(VECTOR3 pushVec, VECTOR3 RefVec)
 void Player::UpdateNormal()
 {
 	auto pDI = GameDevice()->m_pDI;
+
+	// コントローラーのLスティックの入力状態を取る
+	float LX = pDI->GetJoyState(playerNum).lX / 1000.0f;
+	float LY = pDI->GetJoyState(playerNum).lY / 1000.0f;
+
+	float RX = pDI->GetJoyState(playerNum).lZ / 32768.0f -1;
+	float RY = pDI->GetJoyState(playerNum).lRz / 32768.0f -1;
+
+
+	ImGui::Begin("JoyR");
+	ImGui::InputFloat("RX", &RX);
+	ImGui::InputFloat("RY", &RY);
+	ImGui::InputFloat("LX", &LX);
+	ImGui::InputFloat("LY", &LY);
+	ImGui::End();
+
+
+	if (fabs(LX) > 0 || fabs(LY) > 0)
+	{
+		VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * -LY); // 回転してない時の移動量
+		MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
+		pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
+
+		VECTOR3 side = VECTOR3(MoveSpeed * LX, 0, 0); // 回転してない時の移動量
+		pObj.velocity += side * rotY; // キャラの向いてる方への移動速度
+	}
+	if (fabs(RX) > 0)
+	{
+		transform.rotation.y += RotationSpeed * RX / 180.0f * XM_PI;
+	}
+
+	if (pDI->CheckJoy(KD_TRG, 0, playerNum))
+	{
+		VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * 40); // 回転してない時の移動量
+		MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
+		pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
+	}
+	if (pDI->CheckJoy(KD_TRG, 1, playerNum))
+	{
+		state = sJump;
+	}
+	
+#if 0
 	if(playerNum == 0)
 	{
 
@@ -330,7 +373,7 @@ void Player::UpdateNormal()
 			pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
 		}
 	}
-
+#endif
 
 }
 

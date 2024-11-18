@@ -160,6 +160,7 @@ void Camera::Draw()
 
 void Camera::updateCamera(int counter, VECTOR3 pos, VECTOR3 rot)
 {
+
 			// プレイヤーの行列を求める
 			MATRIX4X4 rotY = XMMatrixRotationY(rot.y);
 			MATRIX4X4 trans = XMMatrixTranslation(pos.x, pos.y / 2.0f + 0.0f, pos.z);
