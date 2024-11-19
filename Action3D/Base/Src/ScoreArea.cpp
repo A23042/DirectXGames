@@ -100,7 +100,7 @@ bool ScoreArea::CheckSphereAABBCollision(PhysicsObject& tObj)
 		(closest.y - tObj.center.y) * (closest.y - tObj.center.y) +
 		(closest.z - tObj.center.z) * (closest.z - tObj.center.z));
 
-	// ’†S‚ª”ÍˆÍ“à‚Å‚ ‚ê‚Îtrue
+	// ”ÍˆÍ“à‚Å‚ ‚ê‚Îtrue
 	return distance <= tObj.radius;
 }
 

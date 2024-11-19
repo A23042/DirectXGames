@@ -93,7 +93,13 @@ void Ball::Update()
 			if (area->CheckSphereAABBCollision(this->pObj))
 			{
 				area->ScoreCount(this->pObj);
+				break;
 			}
+			else
+			{
+				pObj.score = 0;
+			}
+
 		}
 
 
