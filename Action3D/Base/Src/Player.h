@@ -19,16 +19,21 @@ public:
 private:
 	enum State {
 		sNormal = 0,
+		sWait,
 		sJump,
 	}state;
 
 	void UpdateNormal();
+	void UpdateWait();
 	void UpdateJump();
 
 	// MapeditorÇ≈è’ìÀîªíËÇ»Ç«ÇµÇ»Ç¢ÇΩÇﬂÇÃBool
 	bool isPhysic;
 
+	Object3D* myBall = nullptr;
+
 	VECTOR3 sumVelocity;
+	VECTOR3 StartPos;
 
 	int playerNum;
 	int score = 0;

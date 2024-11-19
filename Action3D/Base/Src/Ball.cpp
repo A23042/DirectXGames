@@ -10,7 +10,7 @@ namespace { // このcpp以外では使えない
 	static const float MoveSpeed = 0.8f;
 };
 
-Ball::Ball(bool isPhysic)
+Ball::Ball(bool isPhysic,int pNum)
 {
 	SetTag("BALL");
 	editObj.name = "Ball";
@@ -21,6 +21,7 @@ Ball::Ball(bool isPhysic)
 
 	pObj.radius = 0.5f;
 	pObj.isPlayer = false;
+	pObj.pNum = pNum;
 	this->isPhysic = isPhysic;
 }
 
@@ -60,7 +61,7 @@ void Ball::Update()
 		//			BallBからBallAに衝突判定を取っているので一度しか衝突判定をしない様に改善する
 		// 
 		// Boxとの衝突判定
-		std::list<Box*> boxes = ObjectManager::FindGameObjects<Box>();
+		std::list<Box*> boxes = ObjectManager::FindGameObjectsWithTag<Box>("STAGEOBJ");
 		for (Box* box : boxes) 
 		{
 			if (box->CheckSphereAABBCollision(this->pObj))

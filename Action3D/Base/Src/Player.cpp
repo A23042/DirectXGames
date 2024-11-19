@@ -48,14 +48,22 @@ Player::~Player()
 void Player::Start()
 {
 	pObj.center = transform.position;
+	StartPos = transform.position;
 }
 
 void Player::Update()
 {
 	ImGui::Begin("PUSH");
-	ImGui::InputFloat("P0", &pushTime[0]);
-	ImGui::InputFloat("P1", &pushTime[1]);
+	if (playerNum == 0)
+	{
+		ImGui::InputFloat("P0", &pushTime[0]);
+	}
+	else if (playerNum == 0)
+	{
+		ImGui::InputFloat("P1", &pushTime[1]);
+	}
 	ImGui::End();
+
 	if (isPhysic)
 	{
 		pObj.velocity.y -= Gravity * SceneManager::DeltaTime();
@@ -126,6 +134,9 @@ void Player::Update()
 		case sNormal:
 			UpdateNormal();
 			break;
+		case sWait:
+			UpdateWait();
+			break;
 		case sJump:
 			UpdateJump();
 			break;
@@ -136,7 +147,8 @@ void Player::Update()
 		ImGui::InputFloat("Z", &transform.position.z);
 		ImGui::End();
 
-		float velocity = pObj.velocity.Length();
+		//float velocity = pObj.velocity.Length();
+		float velocity = pObj.velocity.x + pObj.velocity.z;
 		ImGui::Begin("VELOCITY");
 		ImGui::InputFloat("Velocity", &velocity);
 		//ImGui::InputFloat("X", &pObj.velocity.x);
@@ -237,6 +249,27 @@ void Player::Draw()
 	Object3D::Draw(); // 継承元の関数を呼ぶ
 }
 
+void Player::UpdateWait()
+{
+	// XZの速度が0.2以下になったらXZ速度を0にする
+	if (fabs(pObj.velocity.x) + fabs(pObj.velocity.z) <= 0.01f)
+	{
+		pObj.velocity.x = 0;
+		pObj.velocity.z = 0;
+	}
+
+	if (fabs(pObj.velocity.x) + fabs(pObj.velocity.z) <= 0.0f)
+	{
+		myBall = new Ball(true, playerNum);
+		VECTOR3 temp = pObj.center;
+		pObj.center = StartPos;
+		pObj.velocity = VECTOR3();
+		myBall->pObj.center = temp;
+		myBall->SetPosition(myBall->pObj.center);
+		state = sNormal;
+	}
+}
+
 void Player::PushVec(VECTOR3 pushVec, VECTOR3 RefVec)
 {	
 	pObj.center += pushVec;
@@ -328,11 +361,21 @@ void Player::UpdateNormal()
 			{
 				state = sJump;
 			}
-			else if (pDI->CheckKey(KD_TRG, DIK_LCONTROL))
+			else if (pDI->CheckKey(KD_DAT, DIK_LCONTROL))
 			{
-				VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * 40); // 回転してない時の移動量
+				pushTime[playerNum] += SceneManager::DeltaTime();
+				if (pushTime[playerNum] > MaxPushTime)
+				{
+					pushTime[playerNum] = MaxPushTime;
+				}
+			}
+			if (pDI->CheckKey(KD_UTRG, DIK_LCONTROL))
+			{
+				VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * Power * pushTime[playerNum]); // 回転してない時の移動量
 				MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
 				pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
+				pushTime[playerNum] = 0;
+				state = sWait;
 			}
 		}
 		else if (playerNum == 1)
@@ -365,11 +408,21 @@ void Player::UpdateNormal()
 			{
 				state = sJump;
 			}
-			else if (pDI->CheckKey(KD_TRG, DIK_RCONTROL))
+			else if (pDI->CheckKey(KD_DAT, DIK_RCONTROL))
 			{
-				VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * 40); // 回転してない時の移動量
+				pushTime[playerNum] += SceneManager::DeltaTime();
+				if (pushTime[playerNum] > MaxPushTime)
+				{
+					pushTime[playerNum] = MaxPushTime;
+				}
+			}
+			if (pDI->CheckKey(KD_UTRG, DIK_RCONTROL))
+			{
+				VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * Power * pushTime[playerNum]); // 回転してない時の移動量
 				MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
 				pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
+				pushTime[playerNum] = 0;
+				state = sWait;
 			}
 		}
 
@@ -445,6 +498,7 @@ void Player::UpdateNormal()
 				MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
 				pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
 				pushTime[playerNum] = 0;
+				state = sWait;
 			}
 
 			if (pDI->CheckJoy(KD_TRG, DIJ_A, playerNum))
@@ -498,6 +552,7 @@ void Player::UpdateNormal()
 				MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
 				pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
 				pushTime[playerNum] = 0;
+				state = sWait;
 			}
 
 		}
@@ -540,6 +595,7 @@ void Player::UpdateNormal()
 			MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
 			pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
 			pushTime[playerNum] = 0;
+			state = sWait;
 		}
 
 		if (pDI->CheckJoy(KD_TRG, DIJ_A, playerNum))

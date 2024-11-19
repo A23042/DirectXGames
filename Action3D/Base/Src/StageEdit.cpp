@@ -381,17 +381,17 @@ void StageEdit::HasUpdate()
 	ImGui::SliderFloat("f", &tempF, 0.0f, 0.1f, "%.2f");
 	ImGui::InputFloat("mass", &tempMass, 0.5f, 1.0f);
 	// êŠ
-	ImGui::InputFloat("PositionX", &objPos.x, 0.5f);
-	ImGui::InputFloat("PositionY", &objPos.y, 0.5f);
-	ImGui::InputFloat("PositionZ", &objPos.z, 0.5f);
+	ImGui::InputFloat("PositionX", &objPos.x, 0.1f, 0.5f, "%.2f");
+	ImGui::InputFloat("PositionY", &objPos.y, 0.1f, 0.5f, "%.2f");
+	ImGui::InputFloat("PositionZ", &objPos.z, 0.1f, 0.5f, "%.2f");
 	// ‰ñ“]
-	ImGui::InputFloat("RotateX", &objRot.x, 0.5f);
-	ImGui::InputFloat("RotateY", &objRot.y, 0.5f);
-	ImGui::InputFloat("RotateZ", &objRot.z, 0.5f);
+	ImGui::InputFloat("RotateX", &objRot.x, 0.1f, 0.5f, "%.2f");
+	ImGui::InputFloat("RotateY", &objRot.y, 0.1f, 0.5f, "%.2f");
+	ImGui::InputFloat("RotateZ", &objRot.z, 0.1f, 0.5f, "%.2f");
 	// ƒXƒP[ƒ‹
-	ImGui::InputFloat("ScaleX", &objScale.x, 0.5f);
-	ImGui::InputFloat("scaleY", &objScale.y, 0.5f);
-	ImGui::InputFloat("ScaleZ", &objScale.z, 0.5f);
+	ImGui::InputFloat("ScaleX", &objScale.x, 0.1f, 0.5f, "%.2f");
+	ImGui::InputFloat("scaleY", &objScale.y, 0.1f, 0.5f, "%.2f");
+	ImGui::InputFloat("ScaleZ", &objScale.z, 0.1f, 0.5f, "%.2f");
 	// MoveBox‚Ìê‡ˆÚ“®‘¬‚ÆˆÚ“®—Ê
 	if (getObj->editObj.name == "MoveBox")
 	{

@@ -59,10 +59,10 @@ public:
 	{
 		VECTOR3 velocity = VECTOR3(0, 0, 0);	// ‘¬“x
 		VECTOR3 center = VECTOR3(0, 0, 0);		// ’†S“_
-		float e;	// ”½”­ŒW”
-		float f;	// –€C
-		float radius = 0.0f;	// ‹…‘Ì—p”¼Œa
-		float mass = 0.0f;
+		float e = 0.9f;	// ”½”­ŒW”
+		float f = 0.01f;	// –€C
+		float radius = 0.5f;	// ‹…‘Ì—p”¼Œa
+		float mass = 1.0f;
 		bool isPlayer = false;
 		int pNum = 0;
 		int score = 0;
