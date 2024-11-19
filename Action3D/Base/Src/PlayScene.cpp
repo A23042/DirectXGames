@@ -9,6 +9,7 @@
 #include "Box.h"
 #include "Ball.h"
 #include "MoveBox.h"
+#include "ScoreArea.h"
 
 PlayScene::PlayScene(int num)
 {
@@ -77,6 +78,24 @@ PlayScene::PlayScene(int num)
 				obj->pObj.e = e;
 				obj->pObj.f = f;
 				obj->pObj.mass = mass;
+			}
+			else if (str == "Area1")
+			{
+				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
+				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
+				obj = new ScoreArea1(size, rot);
+			}
+			else if (str == "Area2")
+			{
+				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
+				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
+				obj = new ScoreArea2(size, rot);
+			}
+			else if (str == "Area3")
+			{
+				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
+				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
+				obj = new ScoreArea3(size, rot);
 			}
 			else 
 			{

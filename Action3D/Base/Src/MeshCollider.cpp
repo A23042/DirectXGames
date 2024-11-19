@@ -90,12 +90,12 @@ bool MeshCollider::CheckCollisionLine(const MATRIX4X4& trans, const VECTOR3& fro
         return false;
     }
     // バウンディングボックスで判定
-    if (bBox.min.x > invFrom.x && bBox.min.x > invTo.x) return false;
-    if (bBox.max.x < invFrom.x && bBox.max.x < invTo.x) return false;
-    if (bBox.min.y > invFrom.y && bBox.min.y > invTo.y) return false;
-    if (bBox.max.y < invFrom.y && bBox.max.y < invTo.y) return false;
-    if (bBox.min.z > invFrom.z && bBox.min.z > invTo.z) return false;
-    if (bBox.max.z < invFrom.z && bBox.max.z < to.z) return false;
+//    if (bBox.min.x > invFrom.x && bBox.min.x > invTo.x) return false;
+//    if (bBox.max.x < invFrom.x && bBox.max.x < invTo.x) return false;
+//    if (bBox.min.y > invFrom.y && bBox.min.y > invTo.y) return false;
+//    if (bBox.max.y < invFrom.y && bBox.max.y < invTo.y) return false;
+//    if (bBox.min.z > invFrom.z && bBox.min.z > invTo.z) return false;
+//    if (bBox.max.z < invFrom.z && bBox.max.z < to.z) return false;
 
     float maxLengthSq = (to - from).LengthSquare();
     float minLengthSq = maxLengthSq;

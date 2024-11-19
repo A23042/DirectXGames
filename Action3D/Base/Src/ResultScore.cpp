@@ -16,6 +16,7 @@ ResultScore::~ResultScore()
 
 void ResultScore::Update()
 {
+#if 0
 	timer += SceneManager::DeltaTime();
 	Score* sc = ObjectManager::FindGameObject<Score>();
 	if (timer >= scoreUpTime+scoreViewTime) {
@@ -27,10 +28,12 @@ void ResultScore::Update()
 			SceneManager::ChangeScene("TitleScene");
 		}
 	}
+#endif
 }
 
 void ResultScore::Draw()
 {
+#if 0
 	GameDevice()->m_pFont->Draw(400, 0, "RESULT", 64, RGB(255, 255, 255));
 	if (timer >= scoreViewTime) {
 		char str[64]; // •¶Žš—ñ‚ð—pˆÓ
@@ -42,4 +45,5 @@ void ResultScore::Draw()
 	if (viewScore >= sc->GetScore()) {
 		GameDevice()->m_pFont->Draw(600, 0, "PUSH T KEY", 64, RGB(255, 255, 255));
 	}
+#endif
 }

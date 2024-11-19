@@ -1,7 +1,6 @@
 #include "Box.h"
 #include "Player.h"
 #include "Ball.h"
-#include <fstream>
 // 動かないBoxオブジェクト
 
 // 初期化リスト　生成と同時に初期値が入るコンストラクタに書くよりも高速
@@ -127,6 +126,9 @@ void Box::CubeSize(float x, float y, float z)
 	{
 		vertex[i] += transform.position;
 	}
+
+	min = vertex[0];
+	max = vertex[0];
 	
 	// AABBの最小点、最大点を求める
 	//for (int i = 0; i < sizeof(vertex); i++)

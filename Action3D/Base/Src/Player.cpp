@@ -3,6 +3,7 @@
 #include "Box.h"
 #include "MoveBox.h"
 #include "Ball.h"
+#include "ScoreArea.h"
 
 namespace 
 {	// このcpp以外では使えない
@@ -11,6 +12,8 @@ namespace
 	static const float JumpPower = 12.0f;
 	static const float RotationSpeed = 2.0f; // 回転速度(度)
 	static const float MoveSpeed = 0.4f;
+	static const float MaxPushTime = 1.0f;
+	static const int Power = 180;
 };
 
 Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
@@ -49,6 +52,10 @@ void Player::Start()
 
 void Player::Update()
 {
+	ImGui::Begin("PUSH");
+	ImGui::InputFloat("P0", &pushTime[0]);
+	ImGui::InputFloat("P1", &pushTime[1]);
+	ImGui::End();
 	if (isPhysic)
 	{
 		pObj.velocity.y -= Gravity * SceneManager::DeltaTime();
@@ -103,7 +110,15 @@ void Player::Update()
 				}
 			}
 		}
-
+		// スコアエリアの中にいるか
+		std::list<ScoreArea*> areaes = ObjectManager::FindGameObjectsWithTag<ScoreArea>("SCOREAREA");
+		for (ScoreArea* area : areaes)
+		{
+			if (area->CheckSphereAABBCollision(this->pObj))
+			{
+				area->ScoreCount(this->pObj);
+			}
+		}
 
 		//animator->Update(); // 毎フレーム、Updateを呼ぶ
 		switch (state) 
@@ -237,48 +252,303 @@ void Player::PushVec(VECTOR3 pushVec, VECTOR3 RefVec)
 void Player::UpdateNormal()
 {
 	auto pDI = GameDevice()->m_pDI;
-
+	// DirectInput
 	// コントローラーのLスティックの入力状態を取る
 	float LX = pDI->GetJoyState(playerNum).lX / 1000.0f;
-	float LY = pDI->GetJoyState(playerNum).lY / 1000.0f;
+	float LY = -pDI->GetJoyState(playerNum).lY / 1000.0f;
+	// コントローラーのRスティックの入力状態を取る
+	float RX = pDI->GetJoyState(playerNum).lZ / 32768.0f - 1;
+	float RY = -pDI->GetJoyState(playerNum).lRz / 32768.0f - 1;
 
-	float RX = pDI->GetJoyState(playerNum).lZ / 32768.0f -1;
-	float RY = pDI->GetJoyState(playerNum).lRz / 32768.0f -1;
+#if 0
+	// XInput
+	XInputGetState(playerNum, &m_state);
 
+	// 左スティックの生の値
+	SHORT lx = m_state.Gamepad.sThumbLX;
+	SHORT ly = m_state.Gamepad.sThumbLY;
+	// 右スティックの生の値
+	SHORT rx = m_state.Gamepad.sThumbRX;
+	SHORT ry = m_state.Gamepad.sThumbRY;
 
-	ImGui::Begin("JoyR");
-	ImGui::InputFloat("RX", &RX);
-	ImGui::InputFloat("RY", &RY);
-	ImGui::InputFloat("LX", &LX);
-	ImGui::InputFloat("LY", &LY);
+	// 正規化（-32768 ～ 32767 を -1.0 ～ 1.0 に変換）
+	float Lx = lx / 32768.0f;
+	float Ly = ly / 32768.0f;
+	float Rx = rx / 32768.0f;
+	float Ry = ry / 32768.0f;
+
+	ImGui::Begin("JoyL");
+	ImGui::InputFloat("LX", &Lx);
+	ImGui::InputFloat("LY", &Ly);
+	ImGui::InputFloat("RX", &Rx);
+	ImGui::InputFloat("RY", &Ry);
 	ImGui::End();
-
-
-	if (fabs(LX) > 0 || fabs(LY) > 0)
-	{
-		VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * -LY); // 回転してない時の移動量
-		MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
-		pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
-
-		VECTOR3 side = VECTOR3(MoveSpeed * LX, 0, 0); // 回転してない時の移動量
-		pObj.velocity += side * rotY; // キャラの向いてる方への移動速度
-	}
-	if (fabs(RX) > 0)
-	{
-		transform.rotation.y += RotationSpeed * RX / 180.0f * XM_PI;
-	}
-
-	if (pDI->CheckJoy(KD_TRG, 0, playerNum))
-	{
-		VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * 40); // 回転してない時の移動量
-		MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
-		pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
-	}
-	if (pDI->CheckJoy(KD_TRG, 1, playerNum))
-	{
-		state = sJump;
-	}
+#endif
 	
+	// 振動のやり方
+	// 有効な値の範囲は 0 ~ 65,535 です。
+	//XINPUT_VIBRATION a;
+	//a.wLeftMotorSpeed = 300;
+	//XInputSetState(0, &a);
+	
+	XInputGetKeystroke(playerNum, 0, &m_keystroke);
+
+	// コントローラーの接続数
+	switch (pDI->GetJoyNum())
+	{
+	case 0:
+		if (playerNum == 0)
+		{
+
+			if (pDI->CheckKey(KD_DAT, DIK_W))
+			{
+				// 行列でやる場合
+				VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
+				MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
+				pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
+			}
+			else if (pDI->CheckKey(KD_DAT, DIK_S))
+			{
+				// 行列でやる場合
+				VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
+				MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
+				pObj.velocity += -forward * rotY; // キャラの向いてる方への移動速度
+
+			}
+
+			if (pDI->CheckKey(KD_DAT, DIK_A))
+			{
+				transform.rotation.y -= RotationSpeed / 180.0f * XM_PI;
+			}
+			if (pDI->CheckKey(KD_DAT, DIK_D))
+			{
+				transform.rotation.y += RotationSpeed / 180.0f * XM_PI;
+			}
+			else if (pDI->CheckKey(KD_TRG, DIK_LSHIFT))
+			{
+				state = sJump;
+			}
+			else if (pDI->CheckKey(KD_TRG, DIK_LCONTROL))
+			{
+				VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * 40); // 回転してない時の移動量
+				MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
+				pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
+			}
+		}
+		else if (playerNum == 1)
+		{
+			if (pDI->CheckKey(KD_DAT, DIK_UP))
+			{
+				// 行列でやる場合
+				VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
+				MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
+				pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
+			}
+			else if (pDI->CheckKey(KD_DAT, DIK_DOWN))
+			{
+				// 行列でやる場合
+				VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
+				MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
+				pObj.velocity += -forward * rotY; // キャラの向いてる方への移動速度
+
+			}
+
+			if (pDI->CheckKey(KD_DAT, DIK_LEFT))
+			{
+				transform.rotation.y -= RotationSpeed / 180.0f * XM_PI;
+			}
+			if (pDI->CheckKey(KD_DAT, DIK_RIGHT))
+			{
+				transform.rotation.y += RotationSpeed / 180.0f * XM_PI;
+			}
+			else if (pDI->CheckKey(KD_TRG, DIK_RSHIFT))
+			{
+				state = sJump;
+			}
+			else if (pDI->CheckKey(KD_TRG, DIK_RCONTROL))
+			{
+				VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * 40); // 回転してない時の移動量
+				MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
+				pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
+			}
+		}
+
+		break;
+	case 1:
+#if 0
+		ImGui::Begin("JoyR");
+		ImGui::InputFloat("RX", &RX);
+		ImGui::InputFloat("RY", &RY);
+		ImGui::InputFloat("LX", &LX);
+		ImGui::InputFloat("LY", &LY);
+		ImGui::End();
+
+		if (playerNum == 0)
+		{
+
+			if (fabs(LX) > 0 || fabs(LY) > 0)
+			{
+				VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * -LY); // 回転してない時の移動量
+				MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
+				pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
+
+				VECTOR3 side = VECTOR3(MoveSpeed * LX, 0, 0); // 回転してない時の移動量
+				pObj.velocity += side * rotY; // キャラの向いてる方への移動速度
+			}
+			if (fabs(RX) > 0)
+			{
+				transform.rotation.y += RotationSpeed * RX / 180.0f * XM_PI;
+			}
+
+			if (pDI->CheckJoy(KD_TRG, 0, playerNum))
+			{
+				VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * 60); // 回転してない時の移動量
+				MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
+				pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
+			}
+			if (pDI->CheckJoy(KD_TRG, 1, playerNum))
+			{
+				state = sJump;
+			}
+		}
+#endif
+
+		if (playerNum == 0)
+		{
+			if (fabs(LX) > 0.2 || fabs(LY) > 0.2)
+			{
+				VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * LY); // 回転してない時の移動量
+				MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
+				pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
+
+				VECTOR3 side = VECTOR3(MoveSpeed * LX, 0, 0); // 回転してない時の移動量
+				pObj.velocity += side * rotY; // キャラの向いてる方への移動速度
+			}
+			if (fabs(RX) > 0.1)
+			{
+				transform.rotation.y += RotationSpeed * RX / 180.0f * XM_PI;
+			}
+			//m_state.Gamepad.wButtons == XINPUT_GAMEPAD_A
+			//m_keystroke.VirtualKey
+			//if (m_state.Gamepad.wButtons == XINPUT_GAMEPAD_A && m_keystroke.Flags == XINPUT_KEYSTROKE_KEYDOWN)
+			if (pDI->CheckJoy(KD_DAT, DIJ_B, playerNum))
+			{
+				pushTime[playerNum] += SceneManager::DeltaTime();
+				if (pushTime[playerNum] > MaxPushTime)
+				{
+					pushTime[playerNum] = MaxPushTime;
+				}
+			}
+			if (pDI->CheckJoy(KD_UTRG, DIJ_B, playerNum))
+			{
+				VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * Power * pushTime[playerNum]); // 回転してない時の移動量
+				MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
+				pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
+				pushTime[playerNum] = 0;
+			}
+
+			if (pDI->CheckJoy(KD_TRG, DIJ_A, playerNum))
+			{
+				state = sJump;
+			}
+		}
+
+		if (playerNum == 1)
+		{
+
+			if (pDI->CheckKey(KD_DAT, DIK_W))
+			{
+				// 行列でやる場合
+				VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
+				MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
+				pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
+			}
+			else if (pDI->CheckKey(KD_DAT, DIK_S))
+			{
+				// 行列でやる場合
+				VECTOR3 forward = VECTOR3(0, 0, MoveSpeed); // 回転してない時の移動量
+				MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
+				pObj.velocity += -forward * rotY; // キャラの向いてる方への移動速度
+
+			}
+
+			if (pDI->CheckKey(KD_DAT, DIK_A))
+			{
+				transform.rotation.y -= RotationSpeed / 180.0f * XM_PI;
+			}
+			if (pDI->CheckKey(KD_DAT, DIK_D))
+			{
+				transform.rotation.y += RotationSpeed / 180.0f * XM_PI;
+			}
+			else if (pDI->CheckKey(KD_TRG, DIK_LSHIFT))
+			{
+				state = sJump;
+			}
+			else if (pDI->CheckKey(KD_DAT, DIK_LCONTROL))
+			{
+				pushTime[playerNum] += SceneManager::DeltaTime();
+				if (pushTime[playerNum] > MaxPushTime)
+				{
+					pushTime[playerNum] = MaxPushTime;
+				}
+			}
+			if (pDI->CheckKey(KD_UTRG, DIK_LCONTROL))
+			{
+				VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * Power * pushTime[playerNum]); // 回転してない時の移動量
+				MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
+				pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
+				pushTime[playerNum] = 0;
+			}
+
+		}
+
+		break;
+	case 2:
+		ImGui::Begin("JoyR");
+		ImGui::InputFloat("RX", &RX);
+		ImGui::InputFloat("RY", &RY);
+		ImGui::InputFloat("LX", &LX);
+		ImGui::InputFloat("LY", &LY);
+		ImGui::End();
+
+
+		if (fabs(LX) > 0.2 || fabs(LY) > 0.2)
+		{
+			VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * LY); // 回転してない時の移動量
+			MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
+			pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
+
+			VECTOR3 side = VECTOR3(MoveSpeed * LX, 0, 0); // 回転してない時の移動量
+			pObj.velocity += side * rotY; // キャラの向いてる方への移動速度
+		}
+		if (fabs(RX) > 0.2)
+		{
+			transform.rotation.y += RotationSpeed * RX / 180.0f * XM_PI;
+		}
+
+		if (pDI->CheckJoy(KD_DAT, DIJ_B, playerNum))
+		{
+			pushTime[playerNum] += SceneManager::DeltaTime();
+			if (pushTime[playerNum] > MaxPushTime)
+			{
+				pushTime[playerNum] = MaxPushTime;
+			}
+		}
+		if (pDI->CheckJoy(KD_UTRG, DIJ_B, playerNum))
+		{
+			VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * Power * pushTime[playerNum]); // 回転してない時の移動量
+			MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
+			pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
+			pushTime[playerNum] = 0;
+		}
+
+		if (pDI->CheckJoy(KD_TRG, DIJ_A, playerNum))
+		{
+			state = sJump;
+		}
+
+		break;
+	}
 #if 0
 	if(playerNum == 0)
 	{
@@ -306,15 +576,6 @@ void Player::UpdateNormal()
 		if (pDI->CheckKey(KD_DAT, DIK_D))
 		{
 			transform.rotation.y += RotationSpeed / 180.0f * XM_PI;
-		}
-		//if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_SPACE)) {
-		if (pDI->CheckKey(KD_TRG, DIK_SPACE)) 
-		{
-			//transform.position.y += 0.1f;
-			//sphere.center = transform.position;
-			//speedY = JumpPower;
-			//state = sJump;
-			//sphere.velocity.y += 15.0f * SceneManager::DeltaTime();
 		}
 		else if (pDI->CheckKey(KD_TRG, DIK_LSHIFT)) 
 		{
@@ -353,15 +614,6 @@ void Player::UpdateNormal()
 		{
 			transform.rotation.y += RotationSpeed / 180.0f * XM_PI;
 		}
-		//if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_SPACE)) {
-		if (pDI->CheckKey(KD_TRG, DIK_SPACE)) 
-		{
-			//transform.position.y += 0.1f;
-			//sphere.center = transform.position;
-			//speedY = JumpPower;
-			//state = sJump;
-			//sphere.velocity.y += 15.0f * SceneManager::DeltaTime();
-		}
 		else if (pDI->CheckKey(KD_TRG, DIK_RSHIFT))
 		{
 			state = sJump;
@@ -374,7 +626,6 @@ void Player::UpdateNormal()
 		}
 	}
 #endif
-
 }
 
 void Player::UpdateJump()

@@ -65,6 +65,7 @@ public:
 		float mass = 0.0f;
 		bool isPlayer = false;
 		int pNum = 0;
+		int score = 0;
 
 	}pObj;
 

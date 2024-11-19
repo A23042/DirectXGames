@@ -109,6 +109,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>XInput.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -319,6 +320,7 @@
     <ClInclude Include="Src\SceneFactory.h" />
     <ClInclude Include="Src\SceneManager.h" />
     <ClInclude Include="Src\Score.h" />
+    <ClInclude Include="Src\ScoreArea.h" />
     <ClInclude Include="Src\ScoreDraw.h" />
     <ClInclude Include="Src\Shader.h" />
     <ClInclude Include="Src\SplitScreen.h" />
@@ -368,6 +370,7 @@
     <ClCompile Include="Src\SceneFactory.cpp" />
     <ClCompile Include="Src\SceneManager.cpp" />
     <ClCompile Include="Src\Score.cpp" />
+    <ClCompile Include="Src\ScoreArea.cpp" />
     <ClCompile Include="Src\ScoreDraw.cpp" />
     <ClCompile Include="Src\Shader.cpp" />
     <ClCompile Include="Src\SplitScreen.cpp" />

@@ -7,6 +7,7 @@
 /// <author>S.Matsunaga</author>
 
 #include "Object3D.h"
+#include <fstream>
 
 class Box : public Object3D {
 public:
@@ -87,17 +88,20 @@ public:
 	/// </summary>
 	/// <param name="pOgj">衝突判定を取る球体の構造体</param>
 	/// <returns>衝突していたらtrue</returns>
-	bool CheckSphereAABBCollision(PhysicsObject& pOgj) override;
+	virtual bool CheckSphereAABBCollision(PhysicsObject& pOgj) override;
 
-private:
-	VECTOR3 normal[6] = {};		// 法線
+protected:
 	VECTOR3 vertex[8] = {};		// 頂点
+	CSprite* spr;
+	VECTOR3 vPos = {};
+
+//private:
+	VECTOR3 normal[6] = {};		// 法線
 	VECTOR3 plane[6] = {};		// 平面の法線	
 	VECTOR3 v[12] = {};			// 辺
 	VECTOR3 edge[12] = {};		// 辺ベクトル
 	VECTOR3 pt[8] = {};			// 各頂点からプレイヤーへのベクトル
 	VECTOR3 distanceV[12] = {};	// 各辺からプレイヤーへのベクトル
-	VECTOR3 vPos = {};
 
 	VECTOR3 pushVec;
 	VECTOR3 HitPoint;
@@ -111,8 +115,6 @@ private:
 	float Tpt[12] = {};
 
 	XMMATRIX rotationMatrix;
-
-	CSprite* spr;
 
 	bool isStart = false;
 };

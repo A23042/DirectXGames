@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "Gizmo3D.h"
 #include "GizmoXYZ.h"
+#include "ScoreArea.h"
 #include <fstream>
 
 namespace
@@ -119,6 +120,21 @@ void StageEdit::Update()
 	{
 		isNew = true;
 		SelectObj(new MoveBox());
+	}
+	if (ImGui::Button("Area1"))
+	{
+		isNew = true;
+		SelectObj(new ScoreArea1);
+	}
+	if (ImGui::Button("Area2"))
+	{
+		isNew = true;
+		SelectObj(new ScoreArea2);
+	}
+	if (ImGui::Button("Area3"))
+	{
+		isNew = true;
+		SelectObj(new ScoreArea3);
 	}
 	if (ImGui::Button("Ball"))
 	{
@@ -786,6 +802,18 @@ void StageEdit::DupeObj(Object3D* ob)
 			pNum++;
 		}
 	}
+	else if (ob->editObj.name == "scoreArea1")
+	{
+		temp = new ScoreArea1();
+	}
+	else if (ob->editObj.name == "scoreArea2")
+	{
+		temp = new ScoreArea2();
+	}
+	else if (ob->editObj.name == "scoreArea3")
+	{
+		temp = new ScoreArea3();
+	}
 	if(temp != nullptr)
 	{
 		temp->pObj.center = ob->pObj.center;
@@ -855,7 +883,35 @@ void StageEdit::Save(int n)
 		}
 		// 改行
 		ofs << endl;
+		}
+	list<Object3D*> areas = ObjectManager::FindGameObjectsWithTag<Object3D>("SCOREAREA");
+	for (Object3D* ob : areas)
+	{
+		if (ob->editObj.name == "scoreArea1")
+		{
+			ofs << "1" << "," << "Area1" << ",";
+			ofs << ob->Position().x << "," << ob->Position().y << "," << ob->Position().z << ",";
+			ofs << ob->Scale().x << "," << ob->Scale().y << "," << ob->Scale().z << ",";
+			ofs << ob->Rotation().x * 180.0f / XM_PI << "," << ob->Rotation().y * 180.0f / XM_PI << "," << ob->Rotation().z * 180.0f / XM_PI << ",";
+		}
+		else if (ob->editObj.name == "scoreArea2")
+		{
+			ofs << "1" << "," << "Area2" << ",";
+			ofs << ob->Position().x << "," << ob->Position().y << "," << ob->Position().z << ",";
+			ofs << ob->Scale().x << "," << ob->Scale().y << "," << ob->Scale().z << ",";
+			ofs << ob->Rotation().x * 180.0f / XM_PI << "," << ob->Rotation().y * 180.0f / XM_PI << "," << ob->Rotation().z * 180.0f / XM_PI << ",";
+		}
+		else if (ob->editObj.name == "scoreArea3")
+		{
+			ofs << "1" << "," << "Area3" << ",";
+			ofs << ob->Position().x << "," << ob->Position().y << "," << ob->Position().z << ",";
+			ofs << ob->Scale().x << "," << ob->Scale().y << "," << ob->Scale().z << ",";
+			ofs << ob->Rotation().x * 180.0f / XM_PI << "," << ob->Rotation().y * 180.0f / XM_PI << "," << ob->Rotation().z * 180.0f / XM_PI << ",";
+		}
+		ofs << endl;
+
 	}
+
 	// ファイルを閉じる
 	ofs.close();
 }
@@ -869,7 +925,14 @@ void StageEdit::Load(int n)
 	list<Object3D*> objs = ObjectManager::FindGameObjects<Object3D>();
 	for (Object3D* obj : objs)
 	{
-		if (obj->editObj.name == "Box" || obj->editObj.name == "MoveBox"|| obj->editObj.name == "Player"|| obj->editObj.name == "Ball")
+		if (obj->editObj.name == "Box" ||
+			obj->editObj.name == "MoveBox"||
+			obj->editObj.name == "Player"||
+			obj->editObj.name == "Ball" ||
+			obj->editObj.name == "scoreArea1" ||
+			obj->editObj.name == "scoreArea2" ||
+			obj->editObj.name == "scoreArea3"
+			)
 		{
 			obj->DestroyMe();
 		}
@@ -934,6 +997,24 @@ void StageEdit::Load(int n)
 				obj->pObj.e = e;
 				obj->pObj.f = f;
 				obj->pObj.mass = mass;
+			}
+			else if (str == "Area1")
+			{
+				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
+				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
+				obj = new ScoreArea1(size, rot);
+			}
+			else if (str == "Area2")
+			{
+				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
+				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
+				obj = new ScoreArea2(size, rot);
+			}
+			else if (str == "Area3")
+			{
+				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
+				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
+				obj = new ScoreArea3(size, rot);
 			}
 			else 
 			{

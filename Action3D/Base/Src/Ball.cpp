@@ -1,5 +1,6 @@
 #include "Ball.h"
 #include "Box.h"
+#include "ScoreArea.h"
 
 namespace { // このcpp以外では使えない
 	static const float Gravity = 9.8f * 3; // 重力加速度(正の値)
@@ -83,6 +84,18 @@ void Ball::Update()
 				}
 			}
 		}
+
+		// スコアエリアの中にいるか
+		std::list<ScoreArea*> areaes = ObjectManager::FindGameObjectsWithTag<ScoreArea>("SCOREAREA");
+		for (ScoreArea* area : areaes)
+		{
+			if (area->CheckSphereAABBCollision(this->pObj))
+			{
+				area->ScoreCount(this->pObj);
+			}
+		}
+
+
 	}
 }
 

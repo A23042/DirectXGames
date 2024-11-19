@@ -1,6 +1,7 @@
 #pragma once
 #include "Object3D.h"
 #include "Animator.h"
+#include <Xinput.h>
 
 class Player : public Object3D {
 public:
@@ -30,4 +31,10 @@ private:
 	VECTOR3 sumVelocity;
 
 	int playerNum;
+	int score = 0;
+	float pushTime[2] = {};
+
+	XINPUT_STATE m_state;
+	XINPUT_KEYSTROKE m_keystroke;
+
 };
