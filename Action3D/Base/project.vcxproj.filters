@@ -336,6 +336,9 @@
     <ClInclude Include="Src\ScoreArea.h">
       <Filter>ソース ファイル\08_PlayScene</Filter>
     </ClInclude>
+    <ClInclude Include="Src\FallCheck.h">
+      <Filter>ソース ファイル\08_PlayScene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Main.cpp">
@@ -480,6 +483,9 @@
       <Filter>ソース ファイル\10_MapEditScene</Filter>
     </ClCompile>
     <ClCompile Include="Src\ScoreArea.cpp">
+      <Filter>ソース ファイル\08_PlayScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\FallCheck.cpp">
       <Filter>ソース ファイル\08_PlayScene</Filter>
     </ClCompile>
   </ItemGroup>

@@ -8,6 +8,7 @@
 #include "Gizmo3D.h"
 #include "GizmoXYZ.h"
 #include "ScoreArea.h"
+#include "FallCheck.h"
 #include <fstream>
 
 namespace
@@ -70,6 +71,9 @@ StageEdit::StageEdit()
 	scaleGizmoX = new ScaleGizmoX(gizmoC);
 	scaleGizmoY = new ScaleGizmoY(gizmoC);
 	scaleGizmoZ = new ScaleGizmoZ(gizmoC);
+
+	fallCheck = new FallCheck();
+	fallCheck->pObj.center = VECTOR3(0, -5, 0);
 
 	nState = sNone;
 	gState = sNoneGizmo;
@@ -881,6 +885,11 @@ void StageEdit::Save(int n)
 			ofs << ob->Position().x << "," << ob->Position().y << "," << ob->Position().z << ",";
 			ofs << ob->Scale().x << "," << ob->Scale().y << "," << ob->Scale().z << ",";
 		}
+		else if (ob->editObj.name == "FallCheck")
+		{
+			ofs << "1" << "," << "FallCheck" << ",";
+			ofs << ob->Position().x << "," << ob->Position().y << "," << ob->Position().z << ",";
+		}
 		// 改行
 		ofs << endl;
 		}
@@ -909,7 +918,6 @@ void StageEdit::Save(int n)
 			ofs << ob->Rotation().x * 180.0f / XM_PI << "," << ob->Rotation().y * 180.0f / XM_PI << "," << ob->Rotation().z * 180.0f / XM_PI << ",";
 		}
 		ofs << endl;
-
 	}
 
 	// ファイルを閉じる
@@ -1016,9 +1024,18 @@ void StageEdit::Load(int n)
 				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
 				obj = new ScoreArea3(size, rot);
 			}
+			else if (str == "FallCheck")
+			{
+				float x = csv->GetFloat(i, 2);
+				float y = csv->GetFloat(i, 3);
+				float z = csv->GetFloat(i, 4);
+				fallCheck->pObj.center = VECTOR3(x, y, z);
+				continue;
+			}
 			else 
 			{
-				assert(false);
+				continue;
+				//assert(false);
 			}
 			float x = csv->GetFloat(i, 2);
 			float y = csv->GetFloat(i, 3);

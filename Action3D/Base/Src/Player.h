@@ -14,6 +14,11 @@ public:
 	// Boxと衝突したときに呼ばれる反射関数
 	void PushVec(VECTOR3 pushVec, VECTOR3 RefVec);
 
+	/// <summary>
+	/// スタートの位置に戻す
+	/// </summary>
+	void SetStartPos(bool isFall = false);
+
 	// Player番号取得
 	int GetPlNum() { return playerNum; }
 	int GetState() { return state; }
@@ -33,7 +38,7 @@ private:
 	bool isWait = false;
 
 	Object3D* myBall = nullptr;
-	Player* otherplayer;
+	Player* otherplayer = nullptr;
 
 	VECTOR3 sumVelocity;
 	VECTOR3 StartPos;

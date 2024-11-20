@@ -295,6 +295,7 @@
     <ClInclude Include="Src\Direct3D.h" />
     <ClInclude Include="Src\Displace.h" />
     <ClInclude Include="Src\EditorCamera.h" />
+    <ClInclude Include="Src\FallCheck.h" />
     <ClInclude Include="Src\FbxMesh.h" />
     <ClInclude Include="Src\GameMain.h" />
     <ClInclude Include="Src\GameObject.h" />
@@ -348,6 +349,7 @@
     <ClCompile Include="Src\Direct3D.cpp" />
     <ClCompile Include="Src\Displace.cpp" />
     <ClCompile Include="Src\EditorCamera.cpp" />
+    <ClCompile Include="Src\FallCheck.cpp" />
     <ClCompile Include="Src\FbxMesh.cpp" />
     <ClCompile Include="Src\GameMain.cpp" />
     <ClCompile Include="Src\Gizmo3D.cpp" />

@@ -10,6 +10,7 @@
 #include "Ball.h"
 #include "MoveBox.h"
 #include "ScoreArea.h"
+#include "FallCheck.h"
 
 PlayScene::PlayScene(int num)
 {
@@ -96,6 +97,10 @@ PlayScene::PlayScene(int num)
 				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
 				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
 				obj = new ScoreArea3(size, rot);
+			}
+			else if (str == "FallCheck")
+			{
+				obj = new FallCheck(true);
 			}
 			else 
 			{

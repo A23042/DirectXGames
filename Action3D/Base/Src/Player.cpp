@@ -264,17 +264,8 @@ void Player::UpdateWait()
 	{
 		pObj.velocity.x = 0;
 		pObj.velocity.z = 0;
-	}
-
-	if (fabs(pObj.velocity.x) + fabs(pObj.velocity.z) <= 0.0f)
-	{
-		myBall = new Ball(true, playerNum);
-		VECTOR3 temp = pObj.center;
-		pObj.center = StartPos;
-		pObj.velocity = VECTOR3();
-		myBall->pObj.center = temp;
-		myBall->SetPosition(myBall->pObj.center);
-		state = sNormal;
+		SetStartPos();
+		return;
 	}
 
 	auto pDI = GameDevice()->m_pDI;
@@ -358,6 +349,30 @@ void Player::PushVec(VECTOR3 pushVec, VECTOR3 RefVec)
 		pObj.velocity = RefVec;
 	}
 	return;
+}
+
+void Player::SetStartPos(bool isFall)
+{
+	if(!isFall)
+	{
+		if (fabs(pObj.velocity.x) + fabs(pObj.velocity.z) <= 0.0f)
+		{
+			myBall = new Ball(true, playerNum);
+			VECTOR3 temp = pObj.center;
+			pObj.center = StartPos;
+			pObj.velocity = VECTOR3();
+			myBall->pObj.center = temp;
+			myBall->SetPosition(myBall->pObj.center);
+			state = sNormal;
+		}
+	}
+	else
+	{
+		pObj.center = StartPos;
+		pObj.velocity = VECTOR3();
+		state = sNormal;
+	}
+
 }
 
 // Playerの操作はコントローラーに変える
