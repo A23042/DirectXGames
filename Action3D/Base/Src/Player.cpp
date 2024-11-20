@@ -22,7 +22,14 @@ Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
 	editObj.name = "Player";
 
 	mesh = new CFbxMesh();
-	mesh->Load("Data/Object/ball01.mesh");
+	if (playerNum == 0)
+	{
+		mesh->Load("Data/Object/blueBall.mesh");
+	}
+	else
+	{
+		mesh->Load("Data/Object/orengeBall.mesh");
+	}
 	meshCol = new MeshCollider();
 	meshCol->MakeFromMesh(mesh);
 
@@ -288,25 +295,25 @@ void Player::UpdateWait()
 		{
 			if (pDI->CheckKey(KD_DAT, DIK_A))
 			{
-				transform.rotation.y -= RotationSpeed / 180.0f * XM_PI;
+				tempRotSpeed.y = -1;
 			}
 			if (pDI->CheckKey(KD_DAT, DIK_D))
 			{
-				transform.rotation.y += RotationSpeed / 180.0f * XM_PI;
+				tempRotSpeed.y = 1;
 			}
 		}
 		else if (playerNum == 1)
 		{
 			if (pDI->CheckKey(KD_DAT, DIK_LEFT))
 			{
-				transform.rotation.y -= RotationSpeed / 180.0f * XM_PI;
+				tempRotSpeed.y = -1;
 			}
 			if (pDI->CheckKey(KD_DAT, DIK_RIGHT))
 			{
-				transform.rotation.y += RotationSpeed / 180.0f * XM_PI;
+				tempRotSpeed.y = 1;
 			}
 		}
-
+		Move(VECTOR3(), tempRotSpeed);
 		break;
 	case 1:
 
@@ -314,7 +321,7 @@ void Player::UpdateWait()
 		{
 			if (fabs(RX) > 0.1)
 			{
-				transform.rotation.y += RotationSpeed * RX / 180.0f * XM_PI;
+				tempRotSpeed.y = RX;
 			}
 		}
 
@@ -323,22 +330,24 @@ void Player::UpdateWait()
 
 			if (pDI->CheckKey(KD_DAT, DIK_A))
 			{
-				transform.rotation.y -= RotationSpeed / 180.0f * XM_PI;
+				tempRotSpeed.y = -1;
 			}
 			if (pDI->CheckKey(KD_DAT, DIK_D))
 			{
-				transform.rotation.y += RotationSpeed / 180.0f * XM_PI;
+				tempRotSpeed.y = 1;
 			}
 		}
-
+		Move(VECTOR3(), tempRotSpeed);
 		break;
 	case 2:
 		if (fabs(RX) > 0.2)
 		{
-			transform.rotation.y += RotationSpeed * RX / 180.0f * XM_PI;
+			tempRotSpeed.y = RX;
 		}
+		Move(VECTOR3(), tempRotSpeed);
 		break;
 	}
+	tempRotSpeed = VECTOR3();
 }
 
 void Player::PushVec(VECTOR3 pushVec, VECTOR3 RefVec)
@@ -467,7 +476,7 @@ void Player::UpdateNormal()
 			{
 				state = sJump;
 			}
-			if(isWait)
+			if(isWait && restShot > 0)
 			{
 				if (pDI->CheckKey(KD_DAT, DIK_LCONTROL))
 				{
@@ -510,7 +519,7 @@ void Player::UpdateNormal()
 			{
 				state = sJump;
 			}
-			if (isWait)
+			if(isWait && restShot > 0)
 			{
 				if (pDI->CheckKey(KD_DAT, DIK_RCONTROL))
 				{
@@ -582,23 +591,25 @@ void Player::UpdateNormal()
 			{
 				tempRotSpeed.y = RX;
 			}
-			if (pDI->CheckJoy(KD_DAT, DIJ_B, playerNum))
+			if (isWait && restShot > 0)
 			{
-				pushTime[playerNum] += SceneManager::DeltaTime();
-				if (pushTime[playerNum] > MaxPushTime)
+				if (pDI->CheckJoy(KD_DAT, DIJ_B, playerNum))
 				{
-					pushTime[playerNum] = MaxPushTime;
+					pushTime[playerNum] += SceneManager::DeltaTime();
+					if (pushTime[playerNum] > MaxPushTime)
+					{
+						pushTime[playerNum] = MaxPushTime;
+					}
+				}
+				if (pDI->CheckJoy(KD_UTRG, DIJ_B, playerNum))
+				{
+					VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * Power * pushTime[playerNum]); // ‰ñ“]‚µ‚Ä‚È‚¢Žž‚ÌˆÚ“®—Ê
+					MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Y‚Ì‰ñ“]s—ñ
+					pObj.velocity += forward * rotY; // ƒLƒƒƒ‰‚ÌŒü‚¢‚Ä‚é•û‚Ö‚ÌˆÚ“®‘¬“x
+					pushTime[playerNum] = 0;
+					state = sWait;
 				}
 			}
-			if (pDI->CheckJoy(KD_UTRG, DIJ_B, playerNum))
-			{
-				VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * Power * pushTime[playerNum]); // ‰ñ“]‚µ‚Ä‚È‚¢Žž‚ÌˆÚ“®—Ê
-				MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Y‚Ì‰ñ“]s—ñ
-				pObj.velocity += forward * rotY; // ƒLƒƒƒ‰‚ÌŒü‚¢‚Ä‚é•û‚Ö‚ÌˆÚ“®‘¬“x
-				pushTime[playerNum] = 0;
-				state = sWait;
-			}
-
 			if (pDI->CheckJoy(KD_TRG, DIJ_A, playerNum))
 			{
 				state = sJump;
@@ -629,7 +640,7 @@ void Player::UpdateNormal()
 			{
 				state = sJump;
 			}
-			if (isWait)
+			if (isWait && restShot > 0)
 			{
 				if (pDI->CheckKey(KD_DAT, DIK_LCONTROL))
 				{
@@ -669,7 +680,7 @@ void Player::UpdateNormal()
 		{
 			tempRotSpeed.y = RX;
 		}
-		if (isWait)
+		if (isWait && restShot > 0)
 		{
 			if (pDI->CheckJoy(KD_DAT, DIJ_B, playerNum))
 			{

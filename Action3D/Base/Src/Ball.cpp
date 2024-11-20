@@ -14,15 +14,24 @@ Ball::Ball(bool isPhysic,int pNum)
 {
 	SetTag("PLAYER");
 	editObj.name = "Ball";
-	mesh = new CFbxMesh();
-	mesh->Load("Data/Object/ball01.mesh");
-	meshCol = new MeshCollider();
-	meshCol->MakeFromMesh(mesh);
 
 	pObj.radius = 0.5f;
 	pObj.isPlayer = false;
 	pObj.pNum = pNum;
 	this->isPhysic = isPhysic;
+
+	mesh = new CFbxMesh();
+	if (pObj.pNum == 0)
+	{
+		mesh->Load("Data/Object/blueBall.mesh");
+	}
+	else
+	{
+		mesh->Load("Data/Object/orengeBall.mesh");
+	}
+	meshCol = new MeshCollider();
+	meshCol->MakeFromMesh(mesh);
+
 }
 
 Ball::~Ball()
