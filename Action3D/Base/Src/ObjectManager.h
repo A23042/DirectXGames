@@ -51,6 +51,31 @@ namespace ObjectManager {
 		return nullptr;
 	}
 
+	/// 2024.11.20 S.Matsunaga
+	/// <summary>
+	/// クラス名で自分以外のオブジェクトを探す
+	/// </summary>
+	/// <typeparam name="C">クラス</typeparam>
+	/// <returns>オブジェクトの実態（存在しなければnullptr）</returns>
+	template<class C> C* FindOtherGameObject(GameObject* me)
+	{
+		const std::list<GameObject*> objs = GetAllObjects();
+
+		for (GameObject* node : objs) 
+		{
+			C* obj = dynamic_cast<C*>(node);
+			if (obj != nullptr)
+			{
+				if (obj != me)
+				{
+					return obj;
+				}
+			}
+		}
+		return nullptr;
+	}
+
+
 	/// <summary>
 	/// クラスのオブジェクトをすべて探す
 	/// </summary>

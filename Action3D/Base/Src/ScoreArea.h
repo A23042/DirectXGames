@@ -36,7 +36,7 @@ private:
 class ScoreArea1 : public ScoreArea
 {
 public:
-	ScoreArea1(VECTOR3 size = VECTOR3(1, 0.1, 1), VECTOR3 rot = VECTOR3(0, 0, 0));
+	ScoreArea1(VECTOR3 size = VECTOR3(1, 0.1f, 1), VECTOR3 rot = VECTOR3(0, 0, 0));
 	~ScoreArea1();
 	void Update() override;
 	void ScoreCount(PhysicsObject& pObj) override
@@ -50,7 +50,7 @@ private:
 class ScoreArea2 : public ScoreArea
 {
 public:
-	ScoreArea2(VECTOR3 size = VECTOR3(1, 0.1, 1), VECTOR3 rot = VECTOR3(0, 0, 0));
+	ScoreArea2(VECTOR3 size = VECTOR3(1, 0.1f, 1), VECTOR3 rot = VECTOR3(0, 0, 0));
 	~ScoreArea2();
 	void Update() override;
 	void ScoreCount(PhysicsObject& pObj)override
@@ -66,7 +66,7 @@ private:
 class ScoreArea3 : public ScoreArea
 {
 public:
-	ScoreArea3(VECTOR3 size = VECTOR3(1, 0.1, 1), VECTOR3 rot = VECTOR3(0, 0, 0));
+	ScoreArea3(VECTOR3 size = VECTOR3(1, 0.1f, 1), VECTOR3 rot = VECTOR3(0, 0, 0));
 	~ScoreArea3();
 	void Update() override;
 	void ScoreCount(PhysicsObject& pObj)override

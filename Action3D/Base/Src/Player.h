@@ -16,6 +16,7 @@ public:
 
 	// Playerî‘çÜéÊìæ
 	int GetPlNum() { return playerNum; }
+	int GetState() { return state; }
 private:
 	enum State {
 		sNormal = 0,
@@ -29,8 +30,10 @@ private:
 
 	// MapeditorÇ≈è’ìÀîªíËÇ»Ç«ÇµÇ»Ç¢ÇΩÇﬂÇÃBool
 	bool isPhysic;
+	bool isWait = false;
 
 	Object3D* myBall = nullptr;
+	Player* otherplayer;
 
 	VECTOR3 sumVelocity;
 	VECTOR3 StartPos;
@@ -39,7 +42,7 @@ private:
 	int score = 0;
 	float pushTime[2] = {};
 
-	XINPUT_STATE m_state;
-	XINPUT_KEYSTROKE m_keystroke;
+	//XINPUT_STATE m_state;
+	//XINPUT_KEYSTROKE m_keystroke;
 
 };
