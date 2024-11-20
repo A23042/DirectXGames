@@ -12,6 +12,9 @@ EditorCamera::EditorCamera()
 	direction = VECTOR3(0, 0, 0);
 	moveSpeed = 0.5f;
 	rotationSpeed = 1.2f;
+
+	float fAspect = (float)WINDOW_WIDTH / WINDOW_HEIGHT;
+	GameDevice()->m_mProj = XMMatrixPerspectiveFovLH(XMConvertToRadians(50.0f), fAspect, 0.1f, 500.0f);
 }
 
 EditorCamera::~EditorCamera()

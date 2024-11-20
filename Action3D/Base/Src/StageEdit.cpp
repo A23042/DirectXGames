@@ -85,6 +85,19 @@ StageEdit::StageEdit()
 
 StageEdit::~StageEdit()
 {
+	// Ç¶ÇÁÅ[Ç≈ÇÈ
+	/*SAFE_DELETE(gizmoObj);
+	SAFE_DELETE(gizmoC);
+	SAFE_DELETE(posGizmoX);
+	SAFE_DELETE(posGizmoY);
+	SAFE_DELETE(posGizmoZ);
+	SAFE_DELETE(rotGizmoX);
+	SAFE_DELETE(rotGizmoY);
+	SAFE_DELETE(rotGizmoZ);
+	SAFE_DELETE(scaleGizmoX);
+	SAFE_DELETE(scaleGizmoY);
+	SAFE_DELETE(scaleGizmoZ);
+	SAFE_DELETE(fallCheck);*/
 }
 
 void StageEdit::Update()

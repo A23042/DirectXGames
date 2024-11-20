@@ -22,6 +22,8 @@ Camera::Camera()
 		eyePt.emplace_back(v);
 		lookatPt.emplace_back(v);
 	}
+	//float fAspect = (float)WINDOW_WIDTH / WINDOW_HEIGHT;
+	//GameDevice()->m_mProj = XMMatrixPerspectiveFovLH(XMConvertToRadians(38.0f), fAspect, 0.1f, 500.0f);
 }
 
 Camera::~Camera()

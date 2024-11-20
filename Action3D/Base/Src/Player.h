@@ -19,6 +19,13 @@ public:
 	/// </summary>
 	void SetStartPos(bool isFall = false);
 
+	/// <summary>
+	/// 移動処理
+	/// </summary>
+	/// <param name="moveSpeed">移動量</param>
+	/// <param name="rotSpeed">回転量</param>
+	void Move(VECTOR3 moveSpeed = VECTOR3(), VECTOR3 rotSpeed = VECTOR3());
+
 	// Player番号取得
 	int GetPlNum() { return playerNum; }
 	int GetState() { return state; }
@@ -42,6 +49,8 @@ private:
 
 	VECTOR3 sumVelocity;
 	VECTOR3 StartPos;
+	VECTOR3 tempMoveSpeed = VECTOR3();
+	VECTOR3 tempRotSpeed = VECTOR3();
 
 	int restShot = 0; // 残り回数
 	int playerNum;	// プレイヤー番号
@@ -50,5 +59,4 @@ private:
 
 	//XINPUT_STATE m_state;
 	//XINPUT_KEYSTROKE m_keystroke;
-
 };
