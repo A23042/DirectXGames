@@ -267,6 +267,7 @@ void CMain::MessageLoop()
 
 		DispFps();
 		m_pGMain->Update();
+		m_pGMain->Draw();
 		float timer = MainControl::RefreshTimer();
 		//if (timer > 0.0f) {
 			do {										// ループ時間待機（最低一度は通る）
@@ -289,7 +290,6 @@ void CMain::MessageLoop()
 			}
 			QueryPerformanceCounter(&StartTime);		// ループ開始時間
 		//}
-		m_pGMain->Draw();
 
 		//imgui 描画
 		ImGui::Render();
