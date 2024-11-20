@@ -9,6 +9,7 @@
 #include "CsvReader.h"
 
 using namespace std;
+using namespace ObjectManager;
 
 class StageEdit : public Object3D {
 public:

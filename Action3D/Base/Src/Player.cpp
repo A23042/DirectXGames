@@ -18,7 +18,7 @@ namespace
 
 Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
 {
-	//SetTag("STAGEOBJ");
+	SetTag("PLAYER");
 	editObj.name = "Player";
 
 	mesh = new CFbxMesh();
@@ -34,6 +34,8 @@ Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
 
 	pObj.isPlayer = true;
 	pObj.pNum = playerNum;
+	
+	restShot = 3;
 }
 
 Player::~Player()
@@ -259,8 +261,8 @@ void Player::UpdateWait()
 		}
 	}
 
-	// XZの速度が0.2以下になったらXZ速度を0にする
-	if (fabs(pObj.velocity.x) + fabs(pObj.velocity.z) <= 0.01f)
+	// XZの速度が0.02以下になったらXZ速度を0にする
+	if (fabs(pObj.velocity.x) + fabs(pObj.velocity.z) <= 0.02f)
 	{
 		pObj.velocity.x = 0;
 		pObj.velocity.z = 0;
@@ -361,8 +363,10 @@ void Player::SetStartPos(bool isFall)
 			VECTOR3 temp = pObj.center;
 			pObj.center = StartPos;
 			pObj.velocity = VECTOR3();
+			transform.rotation = VECTOR3();
 			myBall->pObj.center = temp;
 			myBall->SetPosition(myBall->pObj.center);
+			pObj.score = 0;
 			state = sNormal;
 		}
 	}

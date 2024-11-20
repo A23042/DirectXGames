@@ -6,19 +6,20 @@ FallCheck::FallCheck(bool playScene) : isPlayScene(playScene)
 {
 	SetTag("STAGEOBJ");
 	editObj.name = "FallCheck";
-	mesh = new CFbxMesh();
-	mesh->Load("Data/Gizmo/FallCheck.mesh");
-
-	meshCol = new MeshCollider();
-	meshCol->MakeFromMesh(mesh);
 	pObj.center = transform.position;
-
-	//transform.scale = VECTOR3(0.5f, 0.5f, 0.5f);
 
 	if (isPlayScene)
 	{
 		pObj.center = transform.position;
 		ObjectManager::SetVisible(this,false);
+	}
+	else
+	{
+		mesh = new CFbxMesh();
+		mesh->Load("Data/Gizmo/FallCheck.mesh");
+
+		meshCol = new MeshCollider();
+		meshCol->MakeFromMesh(mesh);
 	}
 }
 

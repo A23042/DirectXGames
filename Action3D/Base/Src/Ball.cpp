@@ -12,7 +12,7 @@ namespace { // ‚±‚ÌcppˆÈŠO‚Å‚ÍŽg‚¦‚È‚¢
 
 Ball::Ball(bool isPhysic,int pNum)
 {
-	SetTag("BALL");
+	SetTag("PLAYER");
 	editObj.name = "Ball";
 	mesh = new CFbxMesh();
 	mesh->Load("Data/Object/ball01.mesh");

@@ -204,7 +204,7 @@ void StageEdit::NoneUpdate()
 			float minDistance = 0.0f;
 
 			// Gizmo以外のオブジェクトと衝突判定
-			list<Object3D*> objs = ObjectManager::FindGameObjectsWithOutTag<Object3D>("Gizmo");
+			list<Object3D*> objs = FindGameObjectsWithOutTag<Object3D>("Gizmo");
 			for (Object3D* obj : objs)
 			{
 				VECTOR3 hit;
@@ -256,9 +256,13 @@ void StageEdit::HasUpdate()
 	// オブジェクト削除
 	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_DELETE))
 	{
-		getObj->DestroyMe();
-		DeselectObj();
-		return;
+		// 落下判定オブジェクトは消さない
+		if(getObj != fallCheck)
+		{
+			getObj->DestroyMe();
+			DeselectObj();
+			return;
+		}
 	}
 	// マウス左クリック
 	if(judgeArea)
@@ -275,7 +279,7 @@ void StageEdit::HasUpdate()
 
 			// オブジェクト探索
 			// 先に表示中のGizmoだけ衝突判定をとる
-			list<GizmoXYZ*> gizmos = ObjectManager::FindGameObjectsVisible<GizmoXYZ>();
+			list<GizmoXYZ*> gizmos = FindGameObjectsVisible<GizmoXYZ>();
 			for (GizmoXYZ* gizmo : gizmos)
 			{
 				VECTOR3 hit;
@@ -322,7 +326,7 @@ void StageEdit::HasUpdate()
 				// 当たったオブジェクトのなかでの最短距離
 				float minDistance = 0.0f;
 				// Gizmo以外のオブジェクトを調べる
-				list<Object3D*> objs = ObjectManager::FindGameObjectsWithOutTag<Object3D>("Gizmo");
+				list<Object3D*> objs = FindGameObjectsWithOutTag<Object3D>("Gizmo");
 				for (Object3D* obj : objs)
 				{
 					VECTOR3 hit;
@@ -483,15 +487,15 @@ void StageEdit::PosGizmoUpdate()
 		// 選択されているGizmoのみ表示
 		if (getGizmo != posGizmoX)
 		{
-			ObjectManager::SetVisible(posGizmoX,false);
+			SetVisible(posGizmoX,false);
 		}
 		if (getGizmo != posGizmoY)
 		{
-			ObjectManager::SetVisible(posGizmoY, false);
+			SetVisible(posGizmoY, false);
 		}
 		if (getGizmo != posGizmoZ)
 		{
-			ObjectManager::SetVisible(posGizmoZ, false);
+			SetVisible(posGizmoZ, false);
 		}
 		// オブジェクトの位置まで伸ばす
 		float exDistance = (nearWorldPos - getObj->Position()).Length();	// オブジェクトまでの距離
@@ -536,9 +540,9 @@ void StageEdit::PosGizmoUpdate()
 	if (pDI->CheckMouse(KD_UTRG, 0))
 	{
 		getGizmo = nullptr;
-		ObjectManager::SetVisible(posGizmoX, true);
-		ObjectManager::SetVisible(posGizmoY, true);
-		ObjectManager::SetVisible(posGizmoZ, true);
+		SetVisible(posGizmoX, true);
+		SetVisible(posGizmoY, true);
+		SetVisible(posGizmoZ, true);
 	}
 }
 
@@ -551,15 +555,15 @@ void StageEdit::RotGizmoUpdate()
 		// 選択されているGizmoのみ表示
 		if (getGizmo != rotGizmoX)
 		{
-			ObjectManager::SetVisible(rotGizmoX, false);
+			SetVisible(rotGizmoX, false);
 		}
 		if (getGizmo != rotGizmoY)
 		{
-			ObjectManager::SetVisible(rotGizmoY, false);
+			SetVisible(rotGizmoY, false);
 		}
 		if (getGizmo != rotGizmoZ)
 		{
-			ObjectManager::SetVisible(rotGizmoZ, false);
+			SetVisible(rotGizmoZ, false);
 		}
 		// オブジェクトの位置まで伸ばす
 		float exDistance = (nearWorldPos - getObj->Position()).Length();
@@ -596,9 +600,9 @@ void StageEdit::RotGizmoUpdate()
 	if (pDI->CheckMouse(KD_UTRG, 0))
 	{
 		getGizmo = nullptr;
-		ObjectManager::SetVisible(rotGizmoX, true);
-		ObjectManager::SetVisible(rotGizmoY, true);
-		ObjectManager::SetVisible(rotGizmoZ, true);
+		SetVisible(rotGizmoX, true);
+		SetVisible(rotGizmoY, true);
+		SetVisible(rotGizmoZ, true);
 	}
 }
 
@@ -611,15 +615,15 @@ void StageEdit::ScaleGizmoUpdate()
 		// 選択されているGizmoのみ表示
 		if (getGizmo != scaleGizmoX)
 		{
-			ObjectManager::SetVisible(scaleGizmoX, false);
+			SetVisible(scaleGizmoX, false);
 		}
 		if (getGizmo != scaleGizmoY)
 		{
-			ObjectManager::SetVisible(scaleGizmoY, false);
+			SetVisible(scaleGizmoY, false);
 		}
 		if (getGizmo != scaleGizmoZ)
 		{
-			ObjectManager::SetVisible(scaleGizmoZ, false);
+			SetVisible(scaleGizmoZ, false);
 		}
 		// オブジェクトの位置まで伸ばす
 		float exDistance = (nearWorldPos - getObj->Position()).Length();
@@ -662,9 +666,9 @@ void StageEdit::ScaleGizmoUpdate()
 	if (pDI->CheckMouse(KD_UTRG, 0))
 	{
 		getGizmo = nullptr;
-		ObjectManager::SetVisible(scaleGizmoX, true);
-		ObjectManager::SetVisible(scaleGizmoY, true);
-		ObjectManager::SetVisible(scaleGizmoZ, true);
+		SetVisible(scaleGizmoX, true);
+		SetVisible(scaleGizmoY, true);
+		SetVisible(scaleGizmoZ, true);
 	}
 }
 
@@ -673,56 +677,56 @@ void StageEdit::SetGizmo(int gState)
 	switch (gState)
 	{
 	case sPosGizmo:
-		ObjectManager::SetVisible(gizmoC, true);
-		ObjectManager::SetVisible(posGizmoX, true);
-		ObjectManager::SetVisible(posGizmoY, true);
-		ObjectManager::SetVisible(posGizmoZ, true);
-		ObjectManager::SetVisible(rotGizmoC, false);
-		ObjectManager::SetVisible(rotGizmoX, false);
-		ObjectManager::SetVisible(rotGizmoY, false);
-		ObjectManager::SetVisible(rotGizmoZ, false);
-		ObjectManager::SetVisible(scaleGizmoX, false);
-		ObjectManager::SetVisible(scaleGizmoY, false);
-		ObjectManager::SetVisible(scaleGizmoZ, false);
+		SetVisible(gizmoC, true);
+		SetVisible(posGizmoX, true);
+		SetVisible(posGizmoY, true);
+		SetVisible(posGizmoZ, true);
+		SetVisible(rotGizmoC, false);
+		SetVisible(rotGizmoX, false);
+		SetVisible(rotGizmoY, false);
+		SetVisible(rotGizmoZ, false);
+		SetVisible(scaleGizmoX, false);
+		SetVisible(scaleGizmoY, false);
+		SetVisible(scaleGizmoZ, false);
 		break;
 	case sRotGizmo:
-		ObjectManager::SetVisible(gizmoC, true);
-		ObjectManager::SetVisible(posGizmoX, false);
-		ObjectManager::SetVisible(posGizmoY, false);
-		ObjectManager::SetVisible(posGizmoZ, false);
-		ObjectManager::SetVisible(rotGizmoC, true);
-		ObjectManager::SetVisible(rotGizmoX, true);
-		ObjectManager::SetVisible(rotGizmoY, true);
-		ObjectManager::SetVisible(rotGizmoZ, true);
-		ObjectManager::SetVisible(scaleGizmoX, false);
-		ObjectManager::SetVisible(scaleGizmoY, false);
-		ObjectManager::SetVisible(scaleGizmoZ, false);
+		SetVisible(gizmoC, true);
+		SetVisible(posGizmoX, false);
+		SetVisible(posGizmoY, false);
+		SetVisible(posGizmoZ, false);
+		SetVisible(rotGizmoC, true);
+		SetVisible(rotGizmoX, true);
+		SetVisible(rotGizmoY, true);
+		SetVisible(rotGizmoZ, true);
+		SetVisible(scaleGizmoX, false);
+		SetVisible(scaleGizmoY, false);
+		SetVisible(scaleGizmoZ, false);
 		break;
 	case sScaleGizmo:
-		ObjectManager::SetVisible(gizmoC, true);
-		ObjectManager::SetVisible(posGizmoX, false);
-		ObjectManager::SetVisible(posGizmoY, false);
-		ObjectManager::SetVisible(posGizmoZ, false);
-		ObjectManager::SetVisible(rotGizmoC, false);
-		ObjectManager::SetVisible(rotGizmoX, false);
-		ObjectManager::SetVisible(rotGizmoY, false);
-		ObjectManager::SetVisible(rotGizmoZ, false);
-		ObjectManager::SetVisible(scaleGizmoX, true);
-		ObjectManager::SetVisible(scaleGizmoY, true);
-		ObjectManager::SetVisible(scaleGizmoZ, true);
+		SetVisible(gizmoC, true);
+		SetVisible(posGizmoX, false);
+		SetVisible(posGizmoY, false);
+		SetVisible(posGizmoZ, false);
+		SetVisible(rotGizmoC, false);
+		SetVisible(rotGizmoX, false);
+		SetVisible(rotGizmoY, false);
+		SetVisible(rotGizmoZ, false);
+		SetVisible(scaleGizmoX, true);
+		SetVisible(scaleGizmoY, true);
+		SetVisible(scaleGizmoZ, true);
 		break;
 	default:
-		ObjectManager::SetVisible(gizmoC, false);
-		ObjectManager::SetVisible(posGizmoX, false);
-		ObjectManager::SetVisible(posGizmoY, false);
-		ObjectManager::SetVisible(posGizmoZ, false);
-		ObjectManager::SetVisible(rotGizmoC, false);
-		ObjectManager::SetVisible(rotGizmoX, false);
-		ObjectManager::SetVisible(rotGizmoY, false);
-		ObjectManager::SetVisible(rotGizmoZ, false);
-		ObjectManager::SetVisible(scaleGizmoX, false);
-		ObjectManager::SetVisible(scaleGizmoY, false);
-		ObjectManager::SetVisible(scaleGizmoZ, false);
+		SetVisible(gizmoC, false);
+		SetVisible(posGizmoX, false);
+		SetVisible(posGizmoY, false);
+		SetVisible(posGizmoZ, false);
+		SetVisible(rotGizmoC, false);
+		SetVisible(rotGizmoX, false);
+		SetVisible(rotGizmoY, false);
+		SetVisible(rotGizmoZ, false);
+		SetVisible(scaleGizmoX, false);
+		SetVisible(scaleGizmoY, false);
+		SetVisible(scaleGizmoZ, false);
 		break;
 	}
 }
@@ -840,86 +844,87 @@ void StageEdit::Save(int n)
 	ofstream ofs(name); // 引数にファイル名
 	// データを書く
 	// セーブするためにオブジェクト探索
-	list<Player*> players = ObjectManager::FindGameObjects<Player>();
-	for (Player* player : players)
-	{
-		// Player
-		if(player->editObj.name == "Player")
-		{
-			ofs << "1" << "," << "PLAYER" << ",";
-			ofs << player->Position().x << "," << player->Position().y << "," << player->Position().z << ",";
-			ofs << player->pObj.e << "," << player->pObj.f << "," << player->pObj.mass << ",";
-			ofs << player->pObj.pNum;
-		}
-		// 改行
-		ofs << endl;
-	}
-	list<Ball*> balls = ObjectManager::FindGameObjects<Ball>();
-	for (Ball* ball : balls)
-	{
-		if (ball->editObj.name == "Ball")
-		{
-			ofs << "1" << "," << "BALL" << ",";
-			ofs << ball->Position().x << "," << ball->Position().y << "," << ball->Position().z << ",";
-			ofs << ball->pObj.e << "," << ball->pObj.f << "," << ball->pObj.mass;
-		}
-		// 改行
-		ofs << endl;
-	}
-	list<Object3D*> objs = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ");
-	for (Object3D* ob : objs)
-	{
-		// Box
-		if (ob->editObj.name == "Box")
-		{
-			ofs << "1" << "," << "BOX" << ",";
-			ofs << ob->Position().x << "," << ob->Position().y << "," << ob->Position().z << ",";
-			ofs << ob->Scale().x << "," << ob->Scale().y << "," << ob->Scale().z << ",";
-			ofs << ob->Rotation().x * 180.0f / XM_PI << "," << ob->Rotation().y * 180.0f / XM_PI << "," << ob->Rotation().z * 180.0f / XM_PI << ",";
-			ofs << ob->pObj.e << "," << ob->pObj.f;		
-		}
-		// MoveBox
-		else if (ob->editObj.name == "MoveBox")
-		{
-			ofs << "1" << "," << "MBox" << ",";
-			ofs << ob->Position().x << "," << ob->Position().y << "," << ob->Position().z << ",";
-			ofs << ob->Scale().x << "," << ob->Scale().y << "," << ob->Scale().z << ",";
-		}
-		else if (ob->editObj.name == "FallCheck")
-		{
-			ofs << "1" << "," << "FallCheck" << ",";
-			ofs << ob->Position().x << "," << ob->Position().y << "," << ob->Position().z << ",";
-		}
-		// 改行
-		ofs << endl;
-		}
-	list<Object3D*> areas = ObjectManager::FindGameObjectsWithTag<Object3D>("SCOREAREA");
-	for (Object3D* ob : areas)
-	{
-		if (ob->editObj.name == "scoreArea1")
-		{
-			ofs << "1" << "," << "Area1" << ",";
-			ofs << ob->Position().x << "," << ob->Position().y << "," << ob->Position().z << ",";
-			ofs << ob->Scale().x << "," << ob->Scale().y << "," << ob->Scale().z << ",";
-			ofs << ob->Rotation().x * 180.0f / XM_PI << "," << ob->Rotation().y * 180.0f / XM_PI << "," << ob->Rotation().z * 180.0f / XM_PI << ",";
-		}
-		else if (ob->editObj.name == "scoreArea2")
-		{
-			ofs << "1" << "," << "Area2" << ",";
-			ofs << ob->Position().x << "," << ob->Position().y << "," << ob->Position().z << ",";
-			ofs << ob->Scale().x << "," << ob->Scale().y << "," << ob->Scale().z << ",";
-			ofs << ob->Rotation().x * 180.0f / XM_PI << "," << ob->Rotation().y * 180.0f / XM_PI << "," << ob->Rotation().z * 180.0f / XM_PI << ",";
-		}
-		else if (ob->editObj.name == "scoreArea3")
-		{
-			ofs << "1" << "," << "Area3" << ",";
-			ofs << ob->Position().x << "," << ob->Position().y << "," << ob->Position().z << ",";
-			ofs << ob->Scale().x << "," << ob->Scale().y << "," << ob->Scale().z << ",";
-			ofs << ob->Rotation().x * 180.0f / XM_PI << "," << ob->Rotation().y * 180.0f / XM_PI << "," << ob->Rotation().z * 180.0f / XM_PI << ",";
-		}
-		ofs << endl;
-	}
 
+	list<Object3D*> objs = FindGameObjects<Object3D>();
+	for (Object3D* obj : objs)
+	{
+		if (obj->IsTag("PLAYER"))
+		{
+			// Player
+			if (obj->editObj.name == "Player")
+			{
+				ofs << "1" << "," << "PLAYER" << ",";
+				ofs << obj->Position().x << "," << obj->Position().y << "," << obj->Position().z << ",";
+				ofs << obj->pObj.e << "," << obj->pObj.f << "," << obj->pObj.mass << ",";
+				ofs << obj->pObj.pNum;
+			}
+			else if (obj->editObj.name == "Ball")
+			{
+				ofs << "1" << "," << "BALL" << ",";
+				ofs << obj->Position().x << "," << obj->Position().y << "," << obj->Position().z << ",";
+				ofs << obj->pObj.e << "," << obj->pObj.f << "," << obj->pObj.mass;
+			}
+			// 対応するものがなければ無視
+			else
+			{
+				continue;
+			}
+			// 改行
+			ofs << endl;
+		}
+		else if (obj->IsTag("STAGEOBJ"))
+		{
+			// Box
+			if (obj->editObj.name == "Box")
+			{
+				ofs << "1" << "," << "BOX" << ",";
+				ofs << obj->Position().x << "," << obj->Position().y << "," << obj->Position().z << ",";
+				ofs << obj->Scale().x << "," << obj->Scale().y << "," << obj->Scale().z << ",";
+				ofs << obj->Rotation().x * 180.0f / XM_PI << "," << obj->Rotation().y * 180.0f / XM_PI << "," << obj->Rotation().z * 180.0f / XM_PI << ",";
+				ofs << obj->pObj.e << "," << obj->pObj.f;
+			}
+			// MoveBox
+			else if (obj->editObj.name == "MoveBox")
+			{
+				ofs << "1" << "," << "MBox" << ",";
+				ofs << obj->Position().x << "," << obj->Position().y << "," << obj->Position().z << ",";
+				ofs << obj->Scale().x << "," << obj->Scale().y << "," << obj->Scale().z << ",";
+			}
+			else if (obj->editObj.name == "FallCheck")
+			{
+				ofs << "1" << "," << "FallCheck" << ",";
+				ofs << obj->Position().x << "," << obj->Position().y << "," << obj->Position().z << ",";
+			}
+			// 改行
+			ofs << endl;
+		}
+		else if (obj->IsTag("SCOREAREA"))
+		{
+			if (obj->editObj.name == "scoreArea1")
+			{
+				ofs << "1" << "," << "Area1" << ",";
+				ofs << obj->Position().x << "," << obj->Position().y << "," << obj->Position().z << ",";
+				ofs << obj->Scale().x << "," << obj->Scale().y << "," << obj->Scale().z << ",";
+				ofs << obj->Rotation().x * 180.0f / XM_PI << "," << obj->Rotation().y * 180.0f / XM_PI << "," << obj->Rotation().z * 180.0f / XM_PI << ",";
+			}
+			else if (obj->editObj.name == "scoreArea2")
+			{
+				ofs << "1" << "," << "Area2" << ",";
+				ofs << obj->Position().x << "," << obj->Position().y << "," << obj->Position().z << ",";
+				ofs << obj->Scale().x << "," << obj->Scale().y << "," << obj->Scale().z << ",";
+				ofs << obj->Rotation().x * 180.0f / XM_PI << "," << obj->Rotation().y * 180.0f / XM_PI << "," << obj->Rotation().z * 180.0f / XM_PI << ",";
+			}
+			else if (obj->editObj.name == "scoreArea3")
+			{
+				ofs << "1" << "," << "Area3" << ",";
+				ofs << obj->Position().x << "," << obj->Position().y << "," << obj->Position().z << ",";
+				ofs << obj->Scale().x << "," << obj->Scale().y << "," << obj->Scale().z << ",";
+				ofs << obj->Rotation().x * 180.0f / XM_PI << "," << obj->Rotation().y * 180.0f / XM_PI << "," << obj->Rotation().z * 180.0f / XM_PI << ",";
+			}
+			ofs << endl;
+
+		}
+	}
 	// ファイルを閉じる
 	ofs.close();
 }
@@ -930,7 +935,7 @@ void StageEdit::Load(int n)
 	DeselectObj();
 	
 	// 現在配置されているオブジェクトをリセット
-	list<Object3D*> objs = ObjectManager::FindGameObjects<Object3D>();
+	list<Object3D*> objs = FindGameObjects<Object3D>();
 	for (Object3D* obj : objs)
 	{
 		if (obj->editObj.name == "Box" ||

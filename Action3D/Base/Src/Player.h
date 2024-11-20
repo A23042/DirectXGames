@@ -43,9 +43,10 @@ private:
 	VECTOR3 sumVelocity;
 	VECTOR3 StartPos;
 
-	int playerNum;
-	int score = 0;
-	float pushTime[2] = {};
+	int restShot = 0; // 残り回数
+	int playerNum;	// プレイヤー番号
+	int score = 0;	// スコア
+	float pushTime[2] = {};	// 
 
 	//XINPUT_STATE m_state;
 	//XINPUT_KEYSTROKE m_keystroke;

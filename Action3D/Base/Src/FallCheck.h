@@ -13,6 +13,5 @@ public:
 	~FallCheck();
 	void Update() override;
 private:
-	float checkHeight;
 	bool isPlayScene;
 };
