@@ -7,6 +7,7 @@ public:
 	ResultScore();
 	~ResultScore();
 	void Update() override;
+	void Start() override;
 	void Draw() override;
 private:
 	Score* sc = nullptr;

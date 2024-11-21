@@ -10,9 +10,11 @@ public:
 	void Update() override;
 	void Draw() override;
 	void Clear() {
-		p0Score = 0;
-		p1Score = 0;
+		p0ScoreTemp = 0;
+		p1ScoreTemp = 0;
 	}
+
+	void CountScore();
 
 #if 1
 	//void AddScore(int val) {
@@ -26,6 +28,9 @@ public:
 	}
 #endif
 private:
+	int p0ScoreTemp; // P0スコア
+	int p1ScoreTemp; // P1スコア
+
 	int p0Score; // P0スコア
 	int p1Score; // P1スコア
 };

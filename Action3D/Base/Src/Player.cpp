@@ -4,6 +4,7 @@
 #include "MoveBox.h"
 #include "Ball.h"
 #include "ScoreArea.h"
+#include "Score.h"
 
 namespace 
 {	// このcpp以外では使えない
@@ -295,6 +296,8 @@ void Player::SetStartPos(bool isFall)
 	// 残りショット数がなければリザルト画面へ
 	if (otherplayer->restShot <= 0 && restShot <= 0)
 	{
+		Score* sc = ObjectManager::FindGameObject<Score>();
+		sc->CountScore();
 		SceneManager::ChangeScene("ResultScene");
 	}
 	// 落下でなければその場にBallを設置する

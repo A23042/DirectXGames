@@ -18,11 +18,11 @@ void ResultScore::Update()
 {
 #if 1
 	timer += SceneManager::DeltaTime();
-	if(sc == nullptr)
-	{
-		sc = ObjectManager::FindGameObject<Score>();
-	}
-	else
+	//if(sc == nullptr)
+	//{
+	//	sc = ObjectManager::FindGameObject<Score>();
+	//}
+	//else
 	{
 		if (timer >= scoreUpTime + scoreViewTime) {
 			if (viewP0Score < sc->GetP0Score())
@@ -41,6 +41,12 @@ void ResultScore::Update()
 		}
 	}
 #endif
+}
+
+void ResultScore::Start()
+{
+	sc = ObjectManager::FindGameObject<Score>();
+	sc->CountScore();
 }
 
 void ResultScore::Draw()
