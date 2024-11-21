@@ -14,15 +14,18 @@ public:
 		p1Score = 0;
 	}
 
-#if 0
-	void AddScore(int val) {
-		score += val;
+#if 1
+	//void AddScore(int val) {
+	//	score += val;
+	//}
+	int GetP0Score() {
+		return p0Score;
 	}
-	int GetScore() {
-		return score;
+	int GetP1Score() {
+		return p1Score;
 	}
 #endif
 private:
-	int p0Score; // スコア
-	int p1Score; // スコア
+	int p0Score; // P0スコア
+	int p1Score; // P1スコア
 };

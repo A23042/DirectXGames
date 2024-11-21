@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.h"
+#include "Score.h"
 
 class ResultScore : public GameObject {
 public:
@@ -8,6 +9,9 @@ public:
 	void Update() override;
 	void Draw() override;
 private:
-	int viewScore; // 表示するスコア
+	Score* sc = nullptr;
+	// 表示するスコア
+	int viewP0Score; 
+	int viewP1Score;
 	float timer;
 };

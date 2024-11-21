@@ -26,6 +26,8 @@ void Score::Update()
 			break;
 		}
 	}
+	ImGui::SetNextWindowPos(ImVec2(WINDOW_WIDTH - 240, 80));
+	ImGui::SetNextWindowSize(ImVec2(180, 80));
 	ImGui::Begin("Score");
 	ImGui::InputInt("P0", &p0Score);
 	ImGui::InputInt("P1", &p1Score);

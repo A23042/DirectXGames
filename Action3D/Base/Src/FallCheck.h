@@ -1,6 +1,7 @@
 #pragma once
 /// <summary>
 /// PlayerとBallの落下判定を取るための基準となるオブジェクト
+/// このオブジェクト以下は落下判定
 /// </summary>
 /// <author>S.Matsunaga</author>
 

@@ -9,11 +9,12 @@ namespace
 {	// このcpp以外では使えない
 	static const float Gravity = 9.8f * 4.0f; // 重力加速度(正の値)
 	// C++の定数定義（型が付く）
-	static const float JumpPower = 12.0f;
-	static const float RotationSpeed = 1.5f; // 回転速度(度)
-	static const float MoveSpeed = 0.3f;
-	static const float MaxPushTime = 1.0f;
-	static const int Power = 180;
+	static const float JumpPower = 12.0f;		// ジャンプ力
+	static const float RotationSpeed = 1.5f;	// 回転速度(度)
+	static const float MoveSpeed = 0.3f;		// 移動速度
+	static const float MaxPushTime = 1.0f;		// 長押し上限
+	static const float StopSpeed = 0.03f;		// 速度が遅くなったら0にするための基準
+	static const int Power = 180;				// 長押し発射の威力基準
 };
 
 Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
@@ -24,10 +25,12 @@ Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
 	mesh = new CFbxMesh();
 	if (playerNum == 0)
 	{
+		isMyTurn = true;
 		mesh->Load("Data/Object/blueBall.mesh");
 	}
 	else
 	{
+		isMyTurn = false;
 		mesh->Load("Data/Object/orengeBall.mesh");
 	}
 	meshCol = new MeshCollider();
@@ -62,16 +65,23 @@ void Player::Start()
 
 void Player::Update()
 {
-
-	otherplayer = ObjectManager::FindOtherGameObject<Player>(this);
-
-	ImGui::Begin("PUSH");
+	// すでに他プレイヤー情報を持っていたらなんども探さない
+	if (otherplayer == nullptr)
+	{
+		otherplayer = ObjectManager::FindOtherGameObject<Player>(this);
+	}
 	if (playerNum == 0)
 	{
+		ImGui::SetNextWindowPos(ImVec2(WINDOW_WIDTH / 5, WINDOW_HEIGHT - WINDOW_HEIGHT / 5));
+		ImGui::SetNextWindowSize(ImVec2(150, 60));
+		ImGui::Begin("PUSH0");
 		ImGui::InputFloat("P0", &pushTime[0]);
 	}
-	else if (playerNum == 0)
+	else if (playerNum == 1)
 	{
+		ImGui::SetNextWindowPos(ImVec2(WINDOW_WIDTH - (WINDOW_WIDTH / 5), WINDOW_HEIGHT - WINDOW_HEIGHT / 5));
+		ImGui::SetNextWindowSize(ImVec2(150, 60));
+		ImGui::Begin("PUSH1");
 		ImGui::InputFloat("P1", &pushTime[1]);
 	}
 	ImGui::End();
@@ -104,7 +114,7 @@ void Player::Update()
 			}
 		}
 
-		//animator->Update(); // 毎フレーム、Updateを呼ぶ
+		// ステータスで行う処理分け
 		switch (state) 
 		{
 		case sNormal:
@@ -117,107 +127,12 @@ void Player::Update()
 			UpdateJump();
 			break;
 		}
-		ImGui::Begin("POSITION");
-		ImGui::InputFloat("X", &transform.position.x);
-		ImGui::InputFloat("Y", &transform.position.y);
-		ImGui::InputFloat("Z", &transform.position.z);
-		ImGui::End();
-
-		//float velocity = pObj.velocity.Length();
-		float velocity = pObj.velocity.x + pObj.velocity.z;
-		ImGui::Begin("VELOCITY");
-		ImGui::InputFloat("Velocity", &velocity);
-		//ImGui::InputFloat("X", &pObj.velocity.x);
-		//ImGui::InputFloat("Y", &pObj.velocity.y);
-		//ImGui::InputFloat("Z", &pObj.velocity.z);
-		ImGui::End();
-
+		//ImGui::Begin("POSITION");
+		//ImGui::InputFloat("X", &transform.position.x);
+		//ImGui::InputFloat("Y", &transform.position.y);
+		//ImGui::InputFloat("Z", &transform.position.z);
+		//ImGui::End();
 	}
-
-	// ステージオブジェクトと衝突判定
-#if 0
-	std::list<Object3D*> objects = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ"); // ドアのオブジェクトを見つける
-	for (auto object : objects) 
-	{
-		SphereCollider coll;
-		coll.center = transform.position + VECTOR3(0, 0, 0); // 自分の球を作る
-		coll.radius = 0.5f;
-		VECTOR3 push;
-		if (object->HitSphereToMesh(coll, &push)) 
-		{
-			transform.position += push;
-			sphere.center = transform.position;
-		}
-	}
-
-#endif
-	// プレイヤー同士の衝突(いらないかも)
-#if 0
-	// プレイヤー同士の衝突判定
-	std::list<Ball*> players = ObjectManager::FindGameObjects<Ball>();
-	for (auto player : players) 
-	{
-			Sphere tSph = player->sphere;
-			VECTOR3 nVec = tSph.center - this->sphere.center;
-			float rsum = tSph.radius + this->sphere.radius;
-			// 衝突
-		if (nVec.LengthSquare() <= rsum * rsum)
-		{
-			normalize(nVec);
-			// めり込み解消
-			VECTOR3 pushVec = nVec * (this->sphere.radius + tSph.radius - (tSph.center - this->sphere.center).Length());
-			this->sphere.center -= pushVec / 2.0f;
-			tSph.center += pushVec / 2.0f;
-			player->SetPosition(tSph.center);
-			//b
-			VECTOR3 refNormal = dot(tSph.velocity, nVec) * nVec;
-			// 法線方向に反発係数をかける
-			VECTOR3 refSessen = sphere.velocity - refNormal;
-
-			//c
-			VECTOR3 CrefNormal = dot(this->sphere.velocity, nVec) * nVec;
-			// 法線方向に反発係数をかける
-			VECTOR3 CrefSessen = tSph.velocity - CrefNormal;
-
-			// ふたつの反発係数と摩擦係数の平均
-			float e2 = (this->sphere.e + tSph.e) / 2;
-			float f2 = (1.0f - this->sphere.f + 1.0f - tSph.f) / 2;
-
-			VECTOR3 b = -refNormal *e2 + refSessen * f2;
-			VECTOR3 c = -CrefNormal * e2 + CrefSessen * f2;
-			//this->sphere.velocity = b;
-			tSph.velocity = c;
-#if 0
-				normalize(nVec);
-				VECTOR3 pushVec = normalize(tSph.center - this->sphere.center) * (this->sphere.radius + tSph.radius - nVec.Length());
-				this->sphere.center -= pushVec;
-				transform.position = this->sphere.center;
-	
-				// 法線方向
-				VECTOR3 tPushVecNormal = dot(tSph.velocity, nVec) * nVec;
-				VECTOR3 tRefNormal = dot(this->sphere.velocity, nVec) * nVec - tPushVecNormal;
-				VECTOR3 tRefSessen = this->sphere.velocity - tRefNormal;
-
-				VECTOR3 thisPushVecNormal = dot(this->sphere.velocity, nVec) * nVec;
-				VECTOR3 thisRefNormal = dot(tSph.velocity, nVec) * nVec - thisPushVecNormal;
-				VECTOR3 thisRefSessen = tSph.velocity - thisRefNormal;
-
-				// ふたつの反発係数と摩擦係数の平均
-				float e2 = (this->sphere.e + tSph.e) / 2;
-				float f2 = (1.0f - this->sphere.f + 1.0f - tSph.f) / 2;
-
-				VECTOR3 b = -tRefNormal * e2 - tRefSessen * f2;
-				VECTOR3 c = -thisRefNormal * e2 - thisRefSessen * f2;
-
-				this->sphere.velocity = b;
-				tSph.velocity = c;
-
-
-			}
-#endif
-		}
-	}
-#endif
 }
 
 void Player::Draw()
@@ -240,17 +155,39 @@ void Player::UpdateWait()
 		}
 	}
 #endif
+
+	VECTOR3 sumVec = VECTOR3();
+
+	// XZの速度がStopSpeed以下になったらXZ速度を0にする
+	if (fabs(pObj.velocity.x) + fabs(pObj.velocity.z) <= StopSpeed)
+	{
+		pObj.velocity.x = 0;
+		pObj.velocity.z = 0;
+	}
+	sumVec += pObj.velocity;
+
 	// Ball
 	std::list<Ball*> balles = ObjectManager::FindGameObjects<Ball>();
 	for (Ball* ball : balles)
 	{
-		VECTOR3 refVec = VECTOR3(0, 0, 0);
-		//VECTOR3 pushVec = VECTOR3(0, 0, 0);
 		if (ball->HitSphereToSphere(this->pObj))
 		{
 			ball->SetPosition(ball->pObj.center);
 			transform.position = pObj.center;
 		}
+		// XZの速度がStopSpeed以下になったらXZ速度を0にする
+		if (fabs(ball->pObj.velocity.x) + fabs(ball->pObj.velocity.z) <= StopSpeed)
+		{
+			ball->pObj.velocity.x = 0;
+			ball->pObj.velocity.z = 0;
+		}
+		sumVec += ball->pObj.velocity;
+	}
+
+	if (fabs(sumVec.x) + fabs(sumVec.z) == 0)
+	{
+		SetStartPos();
+		return;
 	}
 
 	// スコアエリアの中にいるか
@@ -266,16 +203,6 @@ void Player::UpdateWait()
 		{
 			pObj.score = 0;
 		}
-	}
-
-	// XZの速度が0.02以下になったらXZ速度を0にする
-	if (fabs(pObj.velocity.x) + fabs(pObj.velocity.z) <= 0.02f)
-	{
-		pObj.velocity.x = 0;
-		pObj.velocity.z = 0;
-		restShot--;		// 残りショット数マイナス1
-		SetStartPos();
-		return;
 	}
 
 	auto pDI = GameDevice()->m_pDI;
@@ -363,25 +290,31 @@ void Player::PushVec(VECTOR3 pushVec, VECTOR3 RefVec)
 
 void Player::SetStartPos(bool isFall)
 {
+	restShot--;		// 残りショット数マイナス1
+
+	// 残りショット数がなければリザルト画面へ
+	if (otherplayer->restShot <= 0 && restShot <= 0)
+	{
+		SceneManager::ChangeScene("ResultScene");
+	}
+	// 落下でなければその場にBallを設置する
 	if(!isFall)
 	{
-		if (fabs(pObj.velocity.x) + fabs(pObj.velocity.z) <= 0.0f)
-		{
-			myBall = new Ball(true, playerNum);
-			VECTOR3 temp = pObj.center;
-			pObj.center = StartPos;
-			pObj.velocity = VECTOR3();
-			transform.rotation = VECTOR3();
-			myBall->pObj.center = temp;
-			myBall->SetPosition(myBall->pObj.center);
-			pObj.score = 0;
-			state = sNormal;
-		}
+		myBall = new Ball(true, playerNum);
+		VECTOR3 temp = pObj.center;
+		pObj.center = StartPos;
+		pObj.velocity = VECTOR3();
+		transform.rotation = VECTOR3();
+		myBall->pObj.center = temp;
+		myBall->SetPosition(myBall->pObj.center);
+		pObj.score = 0;
+		state = sNormal;
 	}
 	else
 	{
 		pObj.center = StartPos;
 		pObj.velocity = VECTOR3();
+		transform.rotation = VECTOR3();
 		state = sNormal;
 	}
 
@@ -410,11 +343,11 @@ void Player::UpdateNormal()
 
 	if (otherplayer->GetState() == 1)
 	{
-		isWait = false;
+		isWait = true;
 	}
 	else
 	{
-		isWait = true;
+		isWait = false;
 	}
 
 #if 0
@@ -453,6 +386,9 @@ void Player::UpdateNormal()
 	// コントローラーの接続数
 	switch (pDI->GetJoyNum())
 	{
+	// コントローラー接続数0の場合
+	// Player0はWASD
+	// Player1は十字
 	case 0:
 		if (playerNum == 0)
 		{
@@ -476,22 +412,27 @@ void Player::UpdateNormal()
 			{
 				state = sJump;
 			}
-			if(isWait && restShot > 0)
+			// 待ちではない　自分のターン　残り回数有
+			if(!isWait && isMyTurn &&restShot > 0)
 			{
 				if (pDI->CheckKey(KD_DAT, DIK_LCONTROL))
 				{
-					pushTime[playerNum] += SceneManager::DeltaTime();
+					pushTime[playerNum] += SceneManager::DeltaTime();	// 押してる時間カウント
+					// 最大を超えないように
 					if (pushTime[playerNum] > MaxPushTime)
 					{
 						pushTime[playerNum] = MaxPushTime;
 					}
 				}
+				// 離して放つ
 				if (pDI->CheckKey(KD_UTRG, DIK_LCONTROL))
 				{
 					VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * Power * pushTime[playerNum]); // 回転してない時の移動量
 					MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
 					pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
-					pushTime[playerNum] = 0;
+					pushTime[playerNum] = 0;	// タイムカウントリセット
+					isMyTurn = false;		// 自分のターン終了
+					otherplayer->SetTurn();	// 相手のターン
 					state = sWait;
 				}
 			}
@@ -519,7 +460,7 @@ void Player::UpdateNormal()
 			{
 				state = sJump;
 			}
-			if(isWait && restShot > 0)
+			if(!isWait && isMyTurn && restShot > 0)
 			{
 				if (pDI->CheckKey(KD_DAT, DIK_RCONTROL))
 				{
@@ -535,12 +476,17 @@ void Player::UpdateNormal()
 					MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
 					pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
 					pushTime[playerNum] = 0;
+					isMyTurn = false;		// 自分のターン終了
+					otherplayer->SetTurn();	// 相手のターン
 					state = sWait;
 				}
 			}
 		}
 		Move(tempMoveSpeed, tempRotSpeed);
 		break;
+	// コントローラー接続数1の場合
+	// Player0はコントローラー
+	// Player1はWASD
 	case 1:
 #if 0
 		ImGui::Begin("JoyR");
@@ -591,7 +537,7 @@ void Player::UpdateNormal()
 			{
 				tempRotSpeed.y = RX;
 			}
-			if (isWait && restShot > 0)
+			if (!isWait && isMyTurn && restShot > 0)
 			{
 				if (pDI->CheckJoy(KD_DAT, DIJ_B, playerNum))
 				{
@@ -607,6 +553,8 @@ void Player::UpdateNormal()
 					MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
 					pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
 					pushTime[playerNum] = 0;
+					isMyTurn = false;		// 自分のターン終了
+					otherplayer->SetTurn();	// 相手のターン
 					state = sWait;
 				}
 			}
@@ -640,7 +588,7 @@ void Player::UpdateNormal()
 			{
 				state = sJump;
 			}
-			if (isWait && restShot > 0)
+			if (!isWait && isMyTurn && restShot > 0)
 			{
 				if (pDI->CheckKey(KD_DAT, DIK_LCONTROL))
 				{
@@ -656,12 +604,16 @@ void Player::UpdateNormal()
 					MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
 					pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
 					pushTime[playerNum] = 0;
+					isMyTurn = false;		// 自分のターン終了
+					otherplayer->SetTurn();	// 相手のターン
 					state = sWait;
 				}
 			}
 		}
 		Move(tempMoveSpeed, tempRotSpeed);
 		break;
+	// コントローラー接続数2の場合
+	//両Playerはコントローラー
 	case 2:
 		ImGui::Begin("JoyR");
 		ImGui::InputFloat("RX", &RX);
@@ -680,7 +632,7 @@ void Player::UpdateNormal()
 		{
 			tempRotSpeed.y = RX;
 		}
-		if (isWait && restShot > 0)
+		if (!isWait && isMyTurn && restShot > 0)
 		{
 			if (pDI->CheckJoy(KD_DAT, DIJ_B, playerNum))
 			{
@@ -696,6 +648,8 @@ void Player::UpdateNormal()
 				MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
 				pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
 				pushTime[playerNum] = 0;
+				isMyTurn = false;		// 自分のターン終了
+				otherplayer->SetTurn();	// 相手のターン
 				state = sWait;
 			}
 		}

@@ -22,14 +22,17 @@ void TitleScene::Update()
 			speedX *= -1;
 		}
 	}
-	if (GameDevice()->m_pDI->
-			CheckKey(KD_TRG, DIK_P)) {
+	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_P)) {
 		SceneManager::ChangeScene("PlayScene", stageNum);
 	}
-	if (GameDevice()->m_pDI->
-		CheckKey(KD_TRG, DIK_E)) {
+	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_E)) {
 		SceneManager::ChangeScene("MapEditScene");
 	}
+
+	//if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_R)) {
+	//	SceneManager::ChangeScene("ResultScene");
+	//}
+
 
 	ImGui::Begin("STAGENUM");
 	ImGui::InputInt("Number", &stageNum);

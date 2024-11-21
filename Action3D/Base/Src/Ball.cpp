@@ -25,9 +25,13 @@ Ball::Ball(bool isPhysic,int pNum)
 	{
 		mesh->Load("Data/Object/blueBall.mesh");
 	}
-	else
+	else if(pObj.pNum == 1)
 	{
 		mesh->Load("Data/Object/orengeBall.mesh");
+	}
+	else
+	{
+		mesh->Load("Data/Object/ball01.mesh");
 	}
 	meshCol = new MeshCollider();
 	meshCol->MakeFromMesh(mesh);

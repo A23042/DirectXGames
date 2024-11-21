@@ -29,6 +29,8 @@ public:
 	// Player”Ô†æ“¾
 	int GetPlNum() { return playerNum; }
 	int GetState() { return state; }
+	
+	void SetTurn() { isMyTurn = true; }
 private:
 	enum State {
 		sNormal = 0,
@@ -40,14 +42,14 @@ private:
 	void UpdateWait();
 	void UpdateJump();
 
-	// Mapeditor‚ÅÕ“Ë”»’è‚È‚Ç‚µ‚È‚¢‚½‚ß‚ÌBool
-	bool isPhysic;
-	bool isWait = false;
+	
+	bool isPhysic;	// Mapeditor‚ÅÕ“Ë”»’è‚È‚Ç‚µ‚È‚¢
+	bool isWait = false;	// ‘Ò‚Â
+	bool isMyTurn = false;	// ©•ª‚Ìƒ^[ƒ“‚©
 
 	Object3D* myBall = nullptr;
 	Player* otherplayer = nullptr;
 
-	VECTOR3 sumVelocity;
 	VECTOR3 StartPos;
 	VECTOR3 tempMoveSpeed = VECTOR3();
 	VECTOR3 tempRotSpeed = VECTOR3();
