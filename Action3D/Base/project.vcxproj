@@ -290,6 +290,7 @@
     <ClInclude Include="Src\Camera.h" />
     <ClInclude Include="Src\CapsuleCollider.h" />
     <ClInclude Include="Src\Collision.h" />
+    <ClInclude Include="Src\CollisionManager.h" />
     <ClInclude Include="Src\CsvReader.h" />
     <ClInclude Include="Src\DInput.h" />
     <ClInclude Include="Src\Direct3D.h" />
@@ -345,6 +346,7 @@
     <ClCompile Include="Src\Box.cpp" />
     <ClCompile Include="Src\Camera.cpp" />
     <ClCompile Include="Src\Collision.cpp" />
+    <ClCompile Include="Src\CollisionManager.cpp" />
     <ClCompile Include="Src\CsvReader.cpp" />
     <ClCompile Include="Src\DInput.cpp" />
     <ClCompile Include="Src\Direct3D.cpp" />

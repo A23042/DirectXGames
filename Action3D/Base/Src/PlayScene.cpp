@@ -12,6 +12,7 @@
 #include "ScoreArea.h"
 #include "FallCheck.h"
 #include "Line.h"
+#include "CollisionManager.h"
 
 PlayScene::PlayScene(int num)
 {
@@ -132,6 +133,7 @@ PlayScene::PlayScene(int num)
 	}
 	sc->Clear();
 	Instantiate<ScoreDraw>();
+	Instantiate<CollisonManager>();
 }
 
 PlayScene::~PlayScene()
@@ -148,7 +150,6 @@ void PlayScene::Update()
 	{
 		SceneManager::ChangeScene("TitleScene");
 	}
-	
 }
 
 void PlayScene::Draw()

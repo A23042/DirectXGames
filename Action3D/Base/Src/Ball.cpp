@@ -73,6 +73,7 @@ void Ball::Update()
 		// 現在一度BallAからBallBに衝突判定をしても
 		//			BallBからBallAに衝突判定を取っているので一度しか衝突判定をしない様に改善する
 		// 
+#if 0
 		// Boxとの衝突判定
 		std::list<Box*> boxes = ObjectManager::FindGameObjectsWithTag<Box>("STAGEOBJ");
 		for (Box* box : boxes) 
@@ -85,6 +86,8 @@ void Ball::Update()
 				PushVec(-pushVec, refVec);
 			}
 		}
+#endif
+#if 0
 		// 自分以外のBallと衝突判定
 		std::list<Ball*> otherBall = ObjectManager::FindGameObjects<Ball>();
 		for (Ball* ball : otherBall)
@@ -98,7 +101,7 @@ void Ball::Update()
 				}
 			}
 		}
-
+#endif
 		// スコアエリアの中にいるか
 		std::list<ScoreArea*> areaes = ObjectManager::FindGameObjectsWithTag<ScoreArea>("SCOREAREA");
 		for (ScoreArea* area : areaes)
@@ -112,21 +115,8 @@ void Ball::Update()
 			{
 				pObj.score = 0;
 			}
-
 		}
-
-
 	}
 }
 
-void Ball::PushVec(VECTOR3 pushVec, VECTOR3 RefVec)
-{
-	pObj.center += pushVec;
-	transform.position = pObj.center;
-	if (RefVec.Length() > 0) 
-	{
-		pObj.velocity = RefVec;
-	}
-	return;
-}
 

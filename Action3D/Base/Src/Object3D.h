@@ -133,6 +133,15 @@ public:
 	/// <returns>衝突していたらtrue</returns>
 	virtual bool HitSphereToSphere(PhysicsObject& target);
 
+	/// 2024.11.23 S.Matsunaga
+	/// <summary>
+	/// 球と球の衝突判定
+	/// </summary>
+	/// <param name="target">ターゲットオブジェクトの構造体</param>
+	/// <returns>衝突していたらtrue</returns>
+	virtual bool HitSphereToSphere(PhysicsObject& checkSphere, PhysicsObject& target);
+
+
 	/// 2024.11.11 S.Matsunaga
 	/// <summary>
 	/// 球体とAABBで簡易的な衝突判定

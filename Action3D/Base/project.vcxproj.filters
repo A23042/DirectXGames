@@ -342,6 +342,9 @@
     <ClInclude Include="Src\Line.h">
       <Filter>ソース ファイル\10_MapEditScene</Filter>
     </ClInclude>
+    <ClInclude Include="Src\CollisionManager.h">
+      <Filter>ソース ファイル\05_フレームワーク</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Main.cpp">
@@ -493,6 +496,9 @@
     </ClCompile>
     <ClCompile Include="Src\Line.cpp">
       <Filter>ソース ファイル\10_MapEditScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\CollisionManager.cpp">
+      <Filter>ソース ファイル\08_PlayScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
