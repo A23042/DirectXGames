@@ -11,6 +11,7 @@
 #include "MoveBox.h"
 #include "ScoreArea.h"
 #include "FallCheck.h"
+#include "Line.h"
 
 PlayScene::PlayScene(int num)
 {
@@ -102,6 +103,16 @@ PlayScene::PlayScene(int num)
 			{
 				obj = new FallCheck(true);
 			}
+			else if (str == "Line")
+			{
+				//float x = csv->GetFloat(i, 2);
+				//float y = csv->GetFloat(i, 3);
+				//float z = csv->GetFloat(i, 4);
+				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
+				obj = new Line();
+				obj->SetScale(size);
+				//obj->pObj.center = VECTOR3(x, y, z);
+			}
 			else 
 			{
 				assert(false);
@@ -129,11 +140,6 @@ PlayScene::~PlayScene()
 
 void PlayScene::Update()
 {
-	// Dancer‚ª‘S–Å‚µ‚½‚çTitleScene
-	//std::list<Dancer*> dancers = ObjectManager::FindGameObjects<Dancer>();
-	//if (dancers.size() == 0) {
-		//SceneManager::ChangeScene("TitleScene");
-	//}
 	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_R)) 
 	{
 		SceneManager::ChangeScene("ResultScene");

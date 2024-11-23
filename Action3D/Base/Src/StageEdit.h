@@ -135,6 +135,7 @@ private:
 	Object3D* scaleGizmoY = nullptr;
 	Object3D* scaleGizmoZ = nullptr;
 	Object3D* fallCheck = nullptr;
+	Object3D* line = nullptr;
 
 	// マウススクリーン座標
 	POINT mousePos = {};

@@ -57,7 +57,8 @@ private:
 	int restShot = 0; // 残り回数
 	int playerNum;	// プレイヤー番号
 	int score = 0;	// スコア
-	float pushTime[2] = {};	// 
+	float pushTime[2] = {};	// 長押し時間
+	float myE, myF;	// 反発係数と摩擦を保存しておく
 
 	//XINPUT_STATE m_state;
 	//XINPUT_KEYSTROKE m_keystroke;

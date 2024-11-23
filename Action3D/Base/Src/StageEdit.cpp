@@ -9,6 +9,7 @@
 #include "GizmoXYZ.h"
 #include "ScoreArea.h"
 #include "FallCheck.h"
+#include "Line.h"
 #include <fstream>
 
 namespace
@@ -44,7 +45,7 @@ namespace
 	);
 
 	static const float e = 0.8f;
-	static const float f = 0.2f;
+	static const float f = 0.02f;
 	static const float mass = 1;
 };
 
@@ -74,6 +75,8 @@ StageEdit::StageEdit()
 
 	fallCheck = new FallCheck();
 	fallCheck->pObj.center = VECTOR3(0, -5, 0);
+
+	line = new Line();
 
 	nState = sNone;
 	gState = sNoneGizmo;
@@ -270,7 +273,7 @@ void StageEdit::HasUpdate()
 	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_DELETE))
 	{
 		// 落下判定オブジェクトは消さない
-		if(getObj != fallCheck)
+		if(getObj != fallCheck && getObj != line)
 		{
 			getObj->DestroyMe();
 			DeselectObj();
@@ -935,7 +938,17 @@ void StageEdit::Save(int n)
 				ofs << obj->Rotation().x * 180.0f / XM_PI << "," << obj->Rotation().y * 180.0f / XM_PI << "," << obj->Rotation().z * 180.0f / XM_PI << ",";
 			}
 			ofs << endl;
-
+		}
+		else if (obj->IsTag("LINE"))
+		{
+			if (obj->editObj.name == "Line")
+			{
+				ofs << "1" << "," << "Line" << ",";
+				ofs << obj->Position().x << "," << obj->Position().y << "," << obj->Position().z << ",";
+				ofs << obj->Scale().x << "," << obj->Scale().y << "," << obj->Scale().z << ",";
+			}
+		// 改行
+		ofs << endl;
 		}
 	}
 	// ファイルを閉じる
@@ -1048,6 +1061,16 @@ void StageEdit::Load(int n)
 				float y = csv->GetFloat(i, 3);
 				float z = csv->GetFloat(i, 4);
 				fallCheck->pObj.center = VECTOR3(x, y, z);
+				continue;
+			}
+			else if (str == "Line")
+			{
+				float x = csv->GetFloat(i, 2);
+				float y = csv->GetFloat(i, 3);
+				float z = csv->GetFloat(i, 4);
+				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
+				line->SetScale(size);
+				line->pObj.center = VECTOR3(x, y, z);
 				continue;
 			}
 			else 

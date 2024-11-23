@@ -63,7 +63,7 @@ void ResultScore::Draw()
 		GameDevice()->m_pFont->Draw(400, 400, strP1, 64, RGB(255, 255, 255));
 	}
 	if (viewP0Score >= sc->GetP0Score() && viewP1Score >= sc->GetP1Score()) {
-		GameDevice()->m_pFont->Draw(600, 0, "PUSH T KEY", 64, RGB(255, 255, 255));
+		GameDevice()->m_pFont->Draw(400, 600, "PUSH T KEY", 64, RGB(255, 255, 255));
 	}
 #endif
 }

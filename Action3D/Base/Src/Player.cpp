@@ -5,16 +5,20 @@
 #include "Ball.h"
 #include "ScoreArea.h"
 #include "Score.h"
+#include "Line.h"
 
 namespace 
 {	// このcpp以外では使えない
-	static const float Gravity = 9.8f * 4.0f; // 重力加速度(正の値)
 	// C++の定数定義（型が付く）
+
+	static const float Gravity = 9.8f * 4.0f;	// 重力加速度(正の値)
 	static const float JumpPower = 12.0f;		// ジャンプ力
-	static const float RotationSpeed = 1.5f;	// 回転速度(度)
+	static const float RotationSpeed = 1.2f;	// 回転速度(度)
 	static const float MoveSpeed = 0.3f;		// 移動速度
 	static const float MaxPushTime = 1.0f;		// 長押し上限
-	static const float StopSpeed = 0.03f;		// 速度が遅くなったら0にするための基準
+	static const float StopSpeed = 0.04f;		// 速度が遅くなったら0にするための基準
+	static const float RDeadZone = 0.1;			// Rスティックのデッドゾーン
+	static const float LDeadZone = 0.2;			// Lスティックのデッドゾーン
 	static const int Power = 180;				// 長押し発射の威力基準
 };
 
@@ -62,6 +66,8 @@ void Player::Start()
 {
 	pObj.center = transform.position;
 	StartPos = transform.position;
+	myE = pObj.e;
+	myF = pObj.f;
 }
 
 void Player::Update()
@@ -156,6 +162,8 @@ void Player::UpdateWait()
 		}
 	}
 #endif
+	pObj.e = myE;
+	pObj.f = myF;
 
 	VECTOR3 sumVec = VECTOR3();
 
@@ -247,7 +255,7 @@ void Player::UpdateWait()
 
 		if (playerNum == 0)
 		{
-			if (fabs(RX) > 0.1)
+			if (fabs(RX) > RDeadZone)
 			{
 				tempRotSpeed.y = RX;
 			}
@@ -268,7 +276,7 @@ void Player::UpdateWait()
 		Move(VECTOR3(), tempRotSpeed);
 		break;
 	case 2:
-		if (fabs(RX) > 0.2)
+		if (fabs(RX) > RDeadZone)
 		{
 			tempRotSpeed.y = RX;
 		}
@@ -303,13 +311,21 @@ void Player::SetStartPos(bool isFall)
 	// 落下でなければその場にBallを設置する
 	if(!isFall)
 	{
-		myBall = new Ball(true, playerNum);
+		// 自分の場所を保存し、StartPosに戻してからBallに位置を入れる
 		VECTOR3 temp = pObj.center;
 		pObj.center = StartPos;
+		
+		// 速度と回転のリセット
 		pObj.velocity = VECTOR3();
 		transform.rotation = VECTOR3();
+
+		// 設置したBallに情報を渡す
+		myBall = new Ball(true, playerNum);
 		myBall->pObj.center = temp;
 		myBall->SetPosition(myBall->pObj.center);
+		myBall->pObj.e = pObj.e;
+		myBall->pObj.f = pObj.f;
+
 		pObj.score = 0;
 		state = sNormal;
 	}
@@ -335,6 +351,26 @@ void Player::Move(VECTOR3 moveSpeed, VECTOR3 rotSpeed)
 // Playerの操作はコントローラーに変える
 void Player::UpdateNormal()
 {
+	pObj.e = 0.5;
+	pObj.f = 0.08;
+
+	// ショット前だけLineとの衝突判定
+	std::list<Line*> objes = ObjectManager::FindGameObjects<Line>();
+	for (Line* obj : objes)
+	{
+		// 先にAABBと簡易的な衝突判定をして衝突していればHitSphereCubeplaneを回す
+		if (obj->CheckSphereAABBCollision(this->pObj))
+		{
+			VECTOR3 refVec = VECTOR3(0, 0, 0);
+			VECTOR3 pushVec = VECTOR3(0, 0, 0);
+			pushVec = obj->HitSphereToCubeplane(this->pObj, refVec);
+			if (pushVec.Length() > 0)
+			{
+				PushVec(-pushVec, VECTOR3());
+			}
+		}
+	}
+
 	auto pDI = GameDevice()->m_pDI;
 	// DirectInput
 	// コントローラーのLスティックの入力状態を取る
@@ -531,12 +567,12 @@ void Player::UpdateNormal()
 
 		if (playerNum == 0)
 		{
-			if (fabs(LX) > 0.2 || fabs(LY) > 0.2)
+			if (fabs(LX) > LDeadZone || fabs(LY) > LDeadZone)
 			{
 				tempMoveSpeed.z = LY;
 				tempMoveSpeed.x = LX;
 			}
-			if (fabs(RX) > 0.1)
+			if (fabs(RX) > RDeadZone)
 			{
 				tempRotSpeed.y = RX;
 			}
@@ -626,12 +662,12 @@ void Player::UpdateNormal()
 		ImGui::End();
 
 
-		if (fabs(LX) > 0.2 || fabs(LY) > 0.2)
+		if (fabs(LX) > LDeadZone || fabs(LY) > LDeadZone)
 		{
 			tempMoveSpeed.z = LY;
 			tempMoveSpeed.x = LX;
 		}
-		if (fabs(RX) > 0.2)
+		if (fabs(RX) > RDeadZone)
 		{
 			tempRotSpeed.y = RX;
 		}

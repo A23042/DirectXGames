@@ -36,6 +36,7 @@ Box::Box(VECTOR3 size, VECTOR3 rot) : vPos(size / 2)
 void Box::Start()
 {
 	pObj.center = transform.position;
+	vPos = transform.scale / 2;
 	CubeSize(vPos.x, vPos.y, vPos.z);
 	isStart = true;
 }
@@ -73,18 +74,18 @@ void Box::Draw()
 	mesh->Render(transform.matrix());
 	
 	// 各辺の頂点パーツ
-		int edgePoint[12][2] = {
-			{0, 1}, {1, 2}, {2, 3}, {3, 0},//正面：右、　下、　左、　下
-			{0, 4}, {1, 5}, {2, 6}, {3, 7},//側面：右上、右下、左下、左上
-			{4, 5}, {5, 6}, {6, 7}, {7, 4} //背面：右、　下、　左、　下、
-		};
+	int edgePoint[12][2] = {
+		{0, 1}, {1, 2}, {2, 3}, {3, 0},//正面：右、　下、　左、　下
+		{0, 4}, {1, 5}, {2, 6}, {3, 7},//側面：右上、右下、左下、左上
+		{4, 5}, {5, 6}, {6, 7}, {7, 4} //背面：右、　下、　左、　下、
+	};
+
+	vPos = transform.scale / 2;
+	CubeSize(vPos.x, vPos.y, vPos.z);
 
 	// 選択されている場合自身のアウトライを表示させる
 	if(editObj.isSelect)
-	{
-		vPos = transform.scale / 2;
-		CubeSize(vPos.x, vPos.y, vPos.z);
-	
+	{	
 		for (int i = 0; i < 12; i++)
 		{
 			spr->DrawLine3D(vertex[edgePoint[i][1]], vertex[edgePoint[i][0]], RGB(0, 255, 50), 1.0f);
