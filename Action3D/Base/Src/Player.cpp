@@ -2,12 +2,9 @@
 #include "../Libs/Imgui/imgui.h"
 #include "Box.h"
 #include "MoveBox.h"
-#include "Ball.h"
-#include "ScoreArea.h"
 #include "Score.h"
-#include "Line.h"
 
-namespace 
+namespace
 {	// このcpp以外では使えない
 	// C++の定数定義（型が付く）
 
@@ -49,13 +46,15 @@ Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
 
 	pObj.isPlayer = true;
 	pObj.pNum = playerNum;
-	
+
+	myE = 0;
+	myF = 0;
 	restShot = 3;
 }
 
 Player::~Player()
 {
-	if (meshCol != nullptr) 
+	if (meshCol != nullptr)
 	{
 		delete meshCol;
 		meshCol = nullptr;
@@ -68,6 +67,12 @@ void Player::Start()
 	StartPos = transform.position;
 	myE = pObj.e;
 	myF = pObj.f;
+
+	// Update()内でFindGameObjectを極力しない
+	objes = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ");
+	balles = ObjectManager::FindGameObjects<Ball>();
+	areaes = ObjectManager::FindGameObjectsWithTag<ScoreArea>("SCOREAREA");
+	lines = ObjectManager::FindGameObjects<Line>();
 }
 
 void Player::Update()
@@ -105,8 +110,7 @@ void Player::Update()
 	if (isPhysic)
 	{
 		// 各Boxとの衝突判定
-		std::list<Object3D*> objes = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ");
-		for (Object3D* obj : objes) 
+		for (Object3D* obj : objes)
 		{
 			// 先にAABBと簡易的な衝突判定をして衝突していればHitSphereCubeplaneを回す
 			if (obj->CheckSphereAABBCollision(this->pObj))
@@ -122,7 +126,7 @@ void Player::Update()
 		}
 
 		// ステータスで行う処理分け
-		switch (state) 
+		switch (state)
 		{
 		case sNormal:
 			UpdateNormal();
@@ -176,7 +180,6 @@ void Player::UpdateWait()
 	sumVec += pObj.velocity;
 
 	// Ball
-	std::list<Ball*> balles = ObjectManager::FindGameObjects<Ball>();
 	for (Ball* ball : balles)
 	{
 		if (ball->HitSphereToSphere(this->pObj))
@@ -200,7 +203,6 @@ void Player::UpdateWait()
 	}
 
 	// スコアエリアの中にいるか
-	std::list<ScoreArea*> areaes = ObjectManager::FindGameObjectsWithTag<ScoreArea>("SCOREAREA");
 	for (ScoreArea* area : areaes)
 	{
 		if (area->CheckSphereAABBCollision(this->pObj))
@@ -287,10 +289,10 @@ void Player::UpdateWait()
 }
 
 void Player::PushVec(VECTOR3 pushVec, VECTOR3 RefVec)
-{	
+{
 	pObj.center += pushVec;
 	transform.position = pObj.center;
-	if (RefVec.Length() > 0) 
+	if (RefVec.Length() > 0)
 	{
 		pObj.velocity = RefVec;
 	}
@@ -309,12 +311,12 @@ void Player::SetStartPos(bool isFall)
 		SceneManager::ChangeScene("ResultScene");
 	}
 	// 落下でなければその場にBallを設置する
-	if(!isFall)
+	if (!isFall)
 	{
 		// 自分の場所を保存し、StartPosに戻してからBallに位置を入れる
 		VECTOR3 temp = pObj.center;
 		pObj.center = StartPos;
-		
+
 		// 速度と回転のリセット
 		pObj.velocity = VECTOR3();
 		transform.rotation = VECTOR3();
@@ -355,15 +357,14 @@ void Player::UpdateNormal()
 	pObj.f = 0.08;
 
 	// ショット前だけLineとの衝突判定
-	std::list<Line*> objes = ObjectManager::FindGameObjects<Line>();
-	for (Line* obj : objes)
+	for (Line* line : lines)
 	{
 		// 先にAABBと簡易的な衝突判定をして衝突していればHitSphereCubeplaneを回す
-		if (obj->CheckSphereAABBCollision(this->pObj))
+		if (line->CheckSphereAABBCollision(this->pObj))
 		{
 			VECTOR3 refVec = VECTOR3(0, 0, 0);
 			VECTOR3 pushVec = VECTOR3(0, 0, 0);
-			pushVec = obj->HitSphereToCubeplane(this->pObj, refVec);
+			pushVec = line->HitSphereToCubeplane(this->pObj, refVec);
 			if (pushVec.Length() > 0)
 			{
 				PushVec(-pushVec, VECTOR3());
@@ -413,21 +414,21 @@ void Player::UpdateNormal()
 	ImGui::InputFloat("RY", &Ry);
 	ImGui::End();
 #endif
-	
+
 	// 振動のやり方
 	// 有効な値の範囲は 0 ~ 65,535 です。
 	//XINPUT_VIBRATION a;
 	//a.wLeftMotorSpeed = 300;
 	//XInputSetState(0, &a);
-	
+
 	//XInputGetKeystroke(playerNum, 0, &m_keystroke);
 
 	// コントローラーの接続数
 	switch (pDI->GetJoyNum())
 	{
-	// コントローラー接続数0の場合
-	// Player0はWASD
-	// Player1は十字
+		// コントローラー接続数0の場合
+		// Player0はWASD
+		// Player1は十字
 	case 0:
 		if (playerNum == 0)
 		{
@@ -452,7 +453,7 @@ void Player::UpdateNormal()
 				state = sJump;
 			}
 			// 待ちではない　自分のターン　残り回数有
-			if(!isWait && isMyTurn &&restShot > 0)
+			if (!isWait && isMyTurn && restShot > 0)
 			{
 				if (pDI->CheckKey(KD_DAT, DIK_LCONTROL))
 				{
@@ -499,7 +500,7 @@ void Player::UpdateNormal()
 			{
 				state = sJump;
 			}
-			if(!isWait && isMyTurn && restShot > 0)
+			if (!isWait && isMyTurn && restShot > 0)
 			{
 				if (pDI->CheckKey(KD_DAT, DIK_RCONTROL))
 				{
@@ -523,9 +524,9 @@ void Player::UpdateNormal()
 		}
 		Move(tempMoveSpeed, tempRotSpeed);
 		break;
-	// コントローラー接続数1の場合
-	// Player0はコントローラー
-	// Player1はWASD
+		// コントローラー接続数1の場合
+		// Player0はコントローラー
+		// Player1はWASD
 	case 1:
 #if 0
 		ImGui::Begin("JoyR");
@@ -651,8 +652,8 @@ void Player::UpdateNormal()
 		}
 		Move(tempMoveSpeed, tempRotSpeed);
 		break;
-	// コントローラー接続数2の場合
-	//両Playerはコントローラー
+		// コントローラー接続数2の場合
+		//両Playerはコントローラー
 	case 2:
 		ImGui::Begin("JoyR");
 		ImGui::InputFloat("RX", &RX);

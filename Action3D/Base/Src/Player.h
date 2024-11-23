@@ -1,6 +1,10 @@
 #pragma once
 #include "Object3D.h"
 #include "Animator.h"
+#include "Ball.h"
+#include "ScoreArea.h"
+#include "Line.h"
+
 #include <Xinput.h>
 
 class Player : public Object3D {
@@ -29,7 +33,7 @@ public:
 	// Player”Ô†æ“¾
 	int GetPlNum() { return playerNum; }
 	int GetState() { return state; }
-	
+
 	void SetTurn() { isMyTurn = true; }
 private:
 	enum State {
@@ -42,11 +46,15 @@ private:
 	void UpdateWait();
 	void UpdateJump();
 
-	
+
 	bool isPhysic;	// Mapeditor‚ÅÕ“Ë”»’è‚È‚Ç‚µ‚È‚¢
 	bool isWait = false;	// ‘Ò‚Â
 	bool isMyTurn = false;	// ©•ª‚Ìƒ^[ƒ“‚©
 
+	std::list<Object3D*> objes;
+	std::list<Ball*> balles;
+	std::list<ScoreArea*> areaes;
+	std::list<Line*> lines;
 	Object3D* myBall = nullptr;
 	Player* otherplayer = nullptr;
 

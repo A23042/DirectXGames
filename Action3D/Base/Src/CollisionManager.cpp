@@ -1,5 +1,13 @@
 #include "CollisionManager.h"
 
+namespace { // このcpp以外では使えない
+	static const float Gravity = 9.8f * 3; // 重力加速度(正の値)
+	// C++の定数定義（型が付く）
+	static const float JumpPower = 0.3f;
+	static const float RotationSpeed = 3.0f; // 回転速度(度)
+	static const float MoveSpeed = 0.8f;
+};
+
 CollisonManager::CollisonManager()
 {
 	ObjectManager::SetVisible(this,false);
@@ -18,17 +26,16 @@ void CollisonManager::Start()
 void CollisonManager::Update()
 {
 #if 1
-
 	/*
 	// BallをFindGameObjectsして
 	// Aを保存、AからB～Nまで衝突判定を実行
 	// Aは衝突判定されたからBからC～Nまで衝突判定
 	// を繰り返す？
 	*/
-	
 
+	std::list<Ball*> targetBall;
 	// 衝突判定を取りに行くBallを一つづつ回す
-	//std::list<Ball*> balls = ObjectManager::FindGameObjects<Ball>();
+	// ひとつ前のcheckBallを保存してそれらと衝突判定を行う
 	for (Ball* checkBall : balls)
 	{
 		// Boxとの衝突判定
@@ -43,33 +50,37 @@ void CollisonManager::Update()
 			}
 		}
 
-
 		// 衝突判定が行われたBallでなければ
-		if (std::find(resolvedBalls.begin(), resolvedBalls.end(), checkBall) == resolvedBalls.end())
+		//if (std::find(resolvedBalls.begin(), resolvedBalls.end(), checkBall) == resolvedBalls.end())
+		//{
+		if (targetBall.size() > 0)
 		{
 			// 衝突判定を取られるBallを格納する
-			for (Ball* targetBall : balls)
+			for (Ball* ball : targetBall)
 			{
 				// 衝突判定を取りに行くBallと取られるBallが同じでなければ進
-				if (targetBall != checkBall)
-				{
+				//if (targetBall != checkBall)
+				//{
 					// checkBallからresolveBall以外すべてのtargetBallに衝突判定を取る
 					// std::find(探索する先頭、末尾、探すもの)あったら？
-					if (std::find(resolvedBalls.begin(), resolvedBalls.end(), targetBall) == resolvedBalls.end())
-					{
+					//if (std::find(resolvedBalls.begin(), resolvedBalls.end(), targetBall) == resolvedBalls.end())
+					//{
 						// checkBallからtargetBallに対して衝突判定
-						if (HitSphereToSphere(checkBall->pObj, targetBall->pObj))
+						if (HitSphereToSphere(checkBall->pObj, ball->pObj))
 						{
 							checkBall->SetPosition(checkBall->pObj.center);
-							targetBall->SetPosition(targetBall->pObj.center);
+							ball->SetPosition(ball->pObj.center);
 						}
-					}
-				}
+					//}
+				//}
 			}
 		}
+		//}
 		// checkBallからresoleveBall以外すべてのballと衝突判定を取り終えたら
 		// checkBallをresolveBallに格納する
 		resolvedBalls.push_back(checkBall);
+
+		targetBall.push_back(checkBall);
 	}
 	// resolveBallsをクリアする
 	resolvedBalls.clear();

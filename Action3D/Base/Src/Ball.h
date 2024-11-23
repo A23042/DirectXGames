@@ -2,6 +2,7 @@
 // S.Matsunaga
 
 #include "Object3D.h"
+#include "ScoreArea.h"
 
 class Ball : public Object3D {
 public:
@@ -11,4 +12,5 @@ public:
 	void Start() override;
 private:
 	bool isPhysic = true;
+	std::list<ScoreArea*> areaes;
 };
