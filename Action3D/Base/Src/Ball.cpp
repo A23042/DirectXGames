@@ -1,5 +1,6 @@
 #include "Ball.h"
 #include "Box.h"
+#include "OutlineBall.h"
 
 namespace { // このcpp以外では使えない
 	static const float Gravity = 9.8f * 3; // 重力加速度(正の値)
@@ -32,6 +33,7 @@ Ball::Ball(bool isPhysic,int pNum)
 	{
 		mesh->Load("Data/Object/ball01.mesh");
 	}
+	child = new OutlineBall(this);
 	meshCol = new MeshCollider();
 	meshCol->MakeFromMesh(mesh);
 
@@ -39,6 +41,7 @@ Ball::Ball(bool isPhysic,int pNum)
 
 Ball::~Ball()
 {
+	child->DestroyMe();
 	if (mesh != nullptr) 
 	{
 		delete mesh;

@@ -16,11 +16,11 @@
 //#include "GameMain.h"
 
 //定数定義
-//#define WINDOW_WIDTH   1920 //ウィンドウ幅
-//#define WINDOW_HEIGHT  1080 //ウィンドウ高さ
+#define WINDOW_WIDTH   1920 //ウィンドウ幅
+#define WINDOW_HEIGHT  1080 //ウィンドウ高さ
 
-#define WINDOW_WIDTH   1366   //ウィンドウ幅
-#define WINDOW_HEIGHT  768    //ウィンドウ高さ
+//#define WINDOW_WIDTH   1366   //ウィンドウ幅
+//#define WINDOW_HEIGHT  768    //ウィンドウ高さ
 
 #define APP_NAME _T("Project")
 

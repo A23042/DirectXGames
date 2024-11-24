@@ -3,6 +3,7 @@
 #include "Box.h"
 #include "MoveBox.h"
 #include "Score.h"
+#include "OutlineBall.h"
 
 namespace
 {	// このcpp以外では使えない
@@ -15,8 +16,9 @@ namespace
 	static const float MaxPushTime = 1.0f;		// 長押し上限
 	static const float StopSpeed = 0.04f;		// 速度が遅くなったら0にするための基準
 	static const float RDeadZone = 0.1;			// Rスティックのデッドゾーン
-	static const float LDeadZone = 0.2;			// Lスティックのデッドゾーン
+	static const float LDeadZone = 0.2f;			// Lスティックのデッドゾーン
 	static const int Power = 180;				// 長押し発射の威力基準
+	static const int RestShot = 3;				// 打てる回数
 };
 
 Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
@@ -35,6 +37,7 @@ Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
 		isMyTurn = false;
 		mesh->Load("Data/Object/orengeBall.mesh");
 	}
+	new OutlineBall(this);
 	meshCol = new MeshCollider();
 	meshCol->MakeFromMesh(mesh);
 
@@ -49,7 +52,7 @@ Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
 
 	myE = 0;
 	myF = 0;
-	restShot = 3;
+	restShot = RestShot;
 }
 
 Player::~Player()
@@ -67,10 +70,11 @@ void Player::Start()
 	StartPos = transform.position;
 	myE = pObj.e;
 	myF = pObj.f;
+	restShot = RestShot;
 
 	// Update()内でFindGameObjectを極力しない
-	objes = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ");
-	areaes = ObjectManager::FindGameObjectsWithTag<ScoreArea>("SCOREAREA");
+	//objes = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ");
+	//areaes = ObjectManager::FindGameObjectsWithTag<ScoreArea>("SCOREAREA");
 	lines = ObjectManager::FindGameObjects<Line>();
 	collManager = ObjectManager::FindGameObject<CollisonManager>();
 }
@@ -110,7 +114,7 @@ void Player::Update()
 	if (isPhysic)
 	{
 		// 各Boxとの衝突判定
-		for (Object3D* obj : objes)
+		for (Object3D* obj : collManager->GetBoxes())
 		{
 			// 先にAABBと簡易的な衝突判定をして衝突していればHitSphereCubeplaneを回す
 			if (obj->CheckSphereAABBCollision(this->pObj))
@@ -182,8 +186,7 @@ void Player::UpdateWait()
 	// Ballとの衝突判定
 	// BallのリストはCollisionManagerで管理している
 
-	std::list<Ball*> balls = collManager->GetBalls();
-	for (Ball* ball : balls)
+	for (Ball* ball : collManager->GetBalls())
 	{
 		if (ball->HitSphereToSphere(this->pObj))
 		{
@@ -206,7 +209,7 @@ void Player::UpdateWait()
 	}
 
 	// スコアエリアの中にいるか
-	for (ScoreArea* area : areaes)
+	for (ScoreArea* area : collManager->GetAreaes())
 	{
 		if (area->CheckSphereAABBCollision(this->pObj))
 		{
@@ -343,6 +346,31 @@ void Player::SetStartPos(bool isFall)
 		state = sNormal;
 	}
 
+}
+
+void Player::Reset()
+{
+	if (playerNum == 0)
+	{
+		isMyTurn = true;
+	}
+	else
+	{
+		isMyTurn = false;
+	}
+
+	// 速度と回転のリセット
+	pObj.velocity = VECTOR3();
+	transform.rotation = VECTOR3();
+	
+	StartPos = transform.position;
+	myE = pObj.e;
+	myF = pObj.f;
+	restShot = RestShot;
+
+	//areaes = ObjectManager::FindGameObjectsWithTag<ScoreArea>("SCOREAREA");
+
+	state = sNormal;
 }
 
 void Player::Move(VECTOR3 moveSpeed, VECTOR3 rotSpeed)

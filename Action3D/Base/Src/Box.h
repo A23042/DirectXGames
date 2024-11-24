@@ -117,4 +117,6 @@ protected:
 	XMMATRIX rotationMatrix;
 
 	bool isStart = false;
+private:
+	Object3D* child = nullptr;
 };

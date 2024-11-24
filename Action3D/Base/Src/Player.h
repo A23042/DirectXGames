@@ -25,6 +25,14 @@ public:
 	void SetStartPos(bool isFall = false);
 
 	/// <summary>
+	/// 状態をリセットする
+	/// マップ切り替えなどで呼び出す
+	/// </summary>
+	void Reset();
+
+	void SetTurn() { isMyTurn = true; }
+
+	/// <summary>
 	/// 移動処理
 	/// </summary>
 	/// <param name="moveSpeed">移動量</param>
@@ -35,7 +43,6 @@ public:
 	int GetPlNum() { return playerNum; }
 	int GetState() { return state; }
 
-	void SetTurn() { isMyTurn = true; }
 private:
 	enum State {
 		sNormal = 0,
@@ -53,7 +60,7 @@ private:
 	bool isMyTurn = false;	// 自分のターンか
 
 	std::list<Object3D*> objes;
-	std::list<ScoreArea*> areaes;
+	//std::list<ScoreArea*> areaes;
 	std::list<Line*> lines;
 	Ball* myBall = nullptr;
 	CollisonManager* collManager = nullptr;

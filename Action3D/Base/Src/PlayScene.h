@@ -1,5 +1,6 @@
 #pragma once
 #include "SceneBase.h"
+#include "CollisionManager.h"
 
 class PlayScene : public SceneBase
 {
@@ -8,4 +9,7 @@ public:
 	~PlayScene();
 	void Update() override;
 	void Draw() override;
+	void Load(int num);
+private:
+	CollisonManager* collManager = nullptr;
 };

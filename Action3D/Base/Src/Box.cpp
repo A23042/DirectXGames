@@ -1,6 +1,7 @@
 #include "Box.h"
 #include "Player.h"
 #include "Ball.h"
+#include "OutlineBox.h"
 // 動かないBoxオブジェクト
 
 // 初期化リスト　生成と同時に初期値が入るコンストラクタに書くよりも高速
@@ -31,6 +32,7 @@ Box::Box(VECTOR3 size, VECTOR3 rot) : vPos(size / 2)
 	pObj.center = transform.position;
 	
 	spr = new CSprite;
+	child = new OutlineBox(this);
 }
 
 void Box::Start()
@@ -72,7 +74,7 @@ void Box::Update()
 void Box::Draw()
 {
 	mesh->Render(transform.matrix());
-	
+#if 0
 	// 各辺の頂点パーツ
 	int edgePoint[12][2] = {
 		{0, 1}, {1, 2}, {2, 3}, {3, 0},//正面：右、　下、　左、　下
@@ -98,6 +100,7 @@ void Box::Draw()
 			spr->DrawLine3D(vertex[edgePoint[i][1]], vertex[edgePoint[i][0]], RGB(0, 0, 0), 1.0f);
 		}
 	}
+#endif
 }
 
 void Box::CubeSize(float x, float y, float z)
@@ -328,6 +331,7 @@ bool Box::CheckSphereAABBCollision(PhysicsObject& tObj)
 
 Box::~Box()
 {
+	child->DestroyMe();
 	if (mesh != nullptr) 
 	{
 		delete mesh;

@@ -18,6 +18,7 @@ void CollisonManager::Start()
 {
 	balls = ObjectManager::FindGameObjects<Ball>();
 	boxes = ObjectManager::FindGameObjectsWithTag<Box>("STAGEOBJ");
+	areaes = ObjectManager::FindGameObjectsWithTag<ScoreArea>("SCOREAREA");
 }
 
 void CollisonManager::Update()
@@ -147,6 +148,24 @@ void CollisonManager::AddBall(Ball* ball)
 	if (std::find(balls.begin(), balls.end(), ball) == balls.end())
 	{
 		balls.push_back(ball);
+	}
+}
+
+void CollisonManager::AddBox(Box* box)
+{
+	// リストに入っていなければ追加
+	if (std::find(boxes.begin(), boxes.end(), box) == boxes.end())
+	{
+		boxes.push_back(box);
+	}
+}
+
+void CollisonManager::AddArea(ScoreArea* area)
+{
+	// リストに入っていなければ追加
+	if (std::find(areaes.begin(), areaes.end(), area) == areaes.end())
+	{
+		areaes.push_back(area);
 	}
 }
 

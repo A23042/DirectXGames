@@ -63,6 +63,9 @@
     <Filter Include="ソース ファイル\11_SplitScreen">
       <UniqueIdentifier>{83dc2494-6c22-4c34-89ab-e16af2e0f31c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\12_OutLine">
+      <UniqueIdentifier>{3457840d-c592-4490-b6ad-adff6deafecb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Hlsl\DisplaceSkinMesh.hlsli">
@@ -345,6 +348,12 @@
     <ClInclude Include="Src\CollisionManager.h">
       <Filter>ソース ファイル\05_フレームワーク</Filter>
     </ClInclude>
+    <ClInclude Include="Src\OutlineBall.h">
+      <Filter>ソース ファイル\12_OutLine</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\OutlineBox.h">
+      <Filter>ソース ファイル\12_OutLine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Main.cpp">
@@ -499,6 +508,12 @@
     </ClCompile>
     <ClCompile Include="Src\CollisionManager.cpp">
       <Filter>ソース ファイル\08_PlayScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\OutlineBall.cpp">
+      <Filter>ソース ファイル\12_OutLine</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\OutlineBox.cpp">
+      <Filter>ソース ファイル\12_OutLine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

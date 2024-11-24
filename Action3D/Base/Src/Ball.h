@@ -11,6 +11,7 @@ public:
 	void Update() override;
 	void Start() override;
 private:
-	bool isPhysic = true;
 	std::list<ScoreArea*> areaes;
+	Object3D* child = nullptr;
+	bool isPhysic = true;
 };
