@@ -216,8 +216,8 @@ HRESULT CDirect3D::InitSampler()
 	SamDesc.MaxLOD = D3D11_FLOAT32_MAX;                // アクセス可能なミップマップの上限値
 
 	m_pDevice->CreateSamplerState(&SamDesc, &m_pSampleLinear);
-
-
+	m_pDeviceContext->PSSetSamplers(0, 1, &m_pSampleLinear);
+#if 0
 	// ----------------------------------------------------------------------
 	//テクスチャー用サンプラー作成 
 	// (Border　ラップせず境界色で塗りつぶす)
@@ -242,7 +242,7 @@ HRESULT CDirect3D::InitSampler()
 	SamDesc.MaxLOD = D3D11_FLOAT32_MAX;                // アクセス可能なミップマップの上限値
 
 	m_pDevice->CreateSamplerState(&SamDesc, &m_pSampleBorder);
-
+#endif
 
 	return S_OK;
 }

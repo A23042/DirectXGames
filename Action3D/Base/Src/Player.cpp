@@ -4,6 +4,7 @@
 #include "MoveBox.h"
 #include "Score.h"
 #include "OutlineBall.h"
+#include "PlayScene.h"
 
 namespace
 {	// Ç±ÇÃcppà»äOÇ≈ÇÕégÇ¶Ç»Ç¢
@@ -77,6 +78,7 @@ void Player::Start()
 	//areaes = ObjectManager::FindGameObjectsWithTag<ScoreArea>("SCOREAREA");
 	lines = ObjectManager::FindGameObjects<Line>();
 	collManager = ObjectManager::FindGameObject<CollisonManager>();
+	loadStage = ObjectManager::FindGameObject<LoadStage>();
 }
 
 void Player::Update()
@@ -314,7 +316,9 @@ void Player::SetStartPos(bool isFall)
 	{
 		Score* sc = ObjectManager::FindGameObject<Score>();
 		sc->CountScore();
-		SceneManager::ChangeScene("ResultScene");
+		//SceneManager::ChangeScene("ResultScene");
+		loadStage->Load(2);
+		return;
 	}
 	// óéâ∫Ç≈Ç»ÇØÇÍÇŒÇªÇÃèÍÇ…BallÇê›íuÇ∑ÇÈ
 	if (!isFall)
@@ -739,6 +743,6 @@ void Player::UpdateNormal()
 
 void Player::UpdateJump()
 {
-	pObj.velocity.y = JumpPower;
+	//pObj.velocity.y = JumpPower;
 	state = sNormal();
 }

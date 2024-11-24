@@ -306,6 +306,7 @@
     <ClInclude Include="Src\Gizmo3D.h" />
     <ClInclude Include="Src\GizmoXYZ.h" />
     <ClInclude Include="Src\Line.h" />
+    <ClInclude Include="Src\LoadStage.h" />
     <ClInclude Include="Src\Macro.h" />
     <ClInclude Include="Src\Main.h" />
     <ClInclude Include="Src\MainControl.h" />
@@ -363,6 +364,7 @@
     <ClCompile Include="Src\Gizmo3D.cpp" />
     <ClCompile Include="Src\GizmoXYZ.cpp" />
     <ClCompile Include="Src\Line.cpp" />
+    <ClCompile Include="Src\LoadStage.cpp" />
     <ClCompile Include="Src\Main.cpp" />
     <ClCompile Include="Src\MainControl.cpp" />
     <ClCompile Include="Src\MapEditScene.cpp" />

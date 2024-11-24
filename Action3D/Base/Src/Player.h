@@ -5,6 +5,7 @@
 #include "ScoreArea.h"
 #include "Line.h"
 #include "CollisionManager.h"
+#include "LoadStage.h"
 
 #include <Xinput.h>
 
@@ -65,6 +66,7 @@ private:
 	Ball* myBall = nullptr;
 	CollisonManager* collManager = nullptr;
 	Player* otherplayer = nullptr;
+	LoadStage* loadStage = nullptr;
 
 	VECTOR3 StartPos;
 	VECTOR3 tempMoveSpeed = VECTOR3();

@@ -354,6 +354,9 @@
     <ClInclude Include="Src\OutlineBox.h">
       <Filter>ソース ファイル\12_OutLine</Filter>
     </ClInclude>
+    <ClInclude Include="Src\LoadStage.h">
+      <Filter>ソース ファイル\08_PlayScene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Main.cpp">
@@ -514,6 +517,9 @@
     </ClCompile>
     <ClCompile Include="Src\OutlineBox.cpp">
       <Filter>ソース ファイル\12_OutLine</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\LoadStage.cpp">
+      <Filter>ソース ファイル\08_PlayScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

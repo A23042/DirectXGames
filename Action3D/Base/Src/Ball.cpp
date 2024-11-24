@@ -57,7 +57,7 @@ Ball::~Ball()
 void Ball::Start()
 {
 	pObj.center = transform.position;
-	areaes = ObjectManager::FindGameObjectsWithTag<ScoreArea>("SCOREAREA");
+	//areaes = ObjectManager::FindGameObjectsWithTag<ScoreArea>("SCOREAREA");
 }
 
 
@@ -105,7 +105,7 @@ void Ball::Update()
 			}
 		}
 #endif
-#if 1
+#if 0
 		// スコアエリアの中にいるか
 		for (ScoreArea* area : areaes)
 		{

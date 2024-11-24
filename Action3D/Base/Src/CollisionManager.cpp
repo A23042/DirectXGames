@@ -46,6 +46,24 @@ void CollisonManager::Update()
 				PushVec(checkBall->pObj, -pushVec, refVec);
 			}
 		}
+
+#if 1
+		// スコアエリアの中にいるか
+		for (ScoreArea* area : areaes)
+		{
+			if (area->CheckSphereAABBCollision(checkBall->pObj))
+			{
+				area->ScoreCount(checkBall->pObj);
+				break;
+			}
+			else
+			{
+				pObj.score = 0;
+			}
+		}
+#endif
+
+
 		// 衝突判定が行われたBallでなければ
 		if (targetBall.size() > 0)
 		{
