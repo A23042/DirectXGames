@@ -165,6 +165,7 @@ private:
 
 	bool judgeArea = true;	// ImGuiの判定エリア
 	bool isNew = false;	// 新規オブジェクト生成か
+	bool isTestMap = true;	// TestMapの編集中か
 
 	float test = 0;
 };

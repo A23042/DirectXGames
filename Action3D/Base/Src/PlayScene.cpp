@@ -18,12 +18,13 @@ PlayScene::PlayScene(int num)
 {
 	// テキストファイルの読み方
 	char name[64];
-	sprintf_s<64>(name, "data/StageCsv/Stage%02d.csv", num);
+	// TestMapを使用する場合は0にする
 #if 0
-	CsvReader* csv = new CsvReader("Data/map00.csv");
+	sprintf_s<64>(name, "data/StageCsv/Stage%02d.csv", num);
 #else
-	CsvReader* csv = new CsvReader(name);
+	sprintf_s<64>(name, "data/TestStageCsv/testStage%02d.csv", num);
 #endif
+	CsvReader* csv = new CsvReader(name);
 
 	assert(csv->GetLines() > 0);
 	for (int i = 0; i < csv->GetLines(); i++) 

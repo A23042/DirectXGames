@@ -524,7 +524,6 @@ void StageEdit::PosGizmoUpdate()
 			{
 				if (getGizmo->editObj.name == "posGizmoX")
 				{
-
 					objPos.x += diff.x;
 					getObj->pObj.center.x += diff.x;
 
@@ -855,7 +854,14 @@ void StageEdit::DupeObj(Object3D* ob)
 void StageEdit::Save(int n)
 {
 	char name[64];
-	sprintf_s<64>(name, "data/StageCsv/Stage%02d.csv", n);
+	if (!isTestMap)
+	{
+		sprintf_s<64>(name, "data/StageCsv/Stage%02d.csv", n);
+	}
+	else
+	{
+		sprintf_s<64>(name, "data/TestStageCsv/testStage%02d.csv", n);
+	}
 	// ファイルを開く
 	ofstream ofs(name); // 引数にファイル名
 	// データを書く
@@ -979,7 +985,14 @@ void StageEdit::Load(int n)
 	}
 	pNum = 0;
 	char name[64];
-	sprintf_s<64>(name, "data/StageCsv/Stage%02d.csv", n);
+	if (!isTestMap)
+	{
+		sprintf_s<64>(name, "data/StageCsv/Stage%02d.csv", n);
+	}
+	else
+	{
+		sprintf_s<64>(name, "data/TestStageCsv/testStage%02d.csv", n);
+	}
 	CsvReader* csv = new CsvReader(name);
 
 	for (int i = 0; i < csv->GetLines(); i++) { // １行ずつ読む
