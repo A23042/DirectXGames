@@ -70,9 +70,9 @@ void Player::Start()
 
 	// Update()“à‚ÅFindGameObject‚ğ‹É—Í‚µ‚È‚¢
 	objes = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ");
-	balles = ObjectManager::FindGameObjects<Ball>();
 	areaes = ObjectManager::FindGameObjectsWithTag<ScoreArea>("SCOREAREA");
 	lines = ObjectManager::FindGameObjects<Line>();
+	collManager = ObjectManager::FindGameObject<CollisonManager>();
 }
 
 void Player::Update()
@@ -179,8 +179,11 @@ void Player::UpdateWait()
 	}
 	sumVec += pObj.velocity;
 
-	// Ball
-	for (Ball* ball : balles)
+	// Ball‚Æ‚ÌÕ“Ë”»’è
+	// Ball‚ÌƒŠƒXƒg‚ÍCollisionManager‚ÅŠÇ—‚µ‚Ä‚¢‚é
+
+	std::list<Ball*> balls = collManager->GetBalls();
+	for (Ball* ball : balls)
 	{
 		if (ball->HitSphereToSphere(this->pObj))
 		{
@@ -323,6 +326,7 @@ void Player::SetStartPos(bool isFall)
 
 		// İ’u‚µ‚½Ball‚Éî•ñ‚ğ“n‚·
 		myBall = new Ball(true, playerNum);
+		collManager->AddBall(myBall);
 		myBall->pObj.center = temp;
 		myBall->SetPosition(myBall->pObj.center);
 		myBall->pObj.e = pObj.e;

@@ -855,7 +855,7 @@ void StageEdit::DupeObj(Object3D* ob)
 void StageEdit::Save(int n)
 {
 	char name[64];
-	sprintf_s<64>(name, "data/Stage%02d.csv", n);
+	sprintf_s<64>(name, "data/StageCsv/Stage%02d.csv", n);
 	// ファイルを開く
 	ofstream ofs(name); // 引数にファイル名
 	// データを書く
@@ -871,6 +871,7 @@ void StageEdit::Save(int n)
 			{
 				ofs << "1" << "," << "PLAYER" << ",";
 				ofs << obj->Position().x << "," << obj->Position().y << "," << obj->Position().z << ",";
+				ofs << obj->Rotation().y << ",";
 				ofs << obj->pObj.e << "," << obj->pObj.f << "," << obj->pObj.mass << ",";
 				ofs << obj->pObj.pNum;
 			}
@@ -978,7 +979,7 @@ void StageEdit::Load(int n)
 	}
 	pNum = 0;
 	char name[64];
-	sprintf_s<64>(name, "data/Stage%02d.csv", n);
+	sprintf_s<64>(name, "data/StageCsv/Stage%02d.csv", n);
 	CsvReader* csv = new CsvReader(name);
 
 	for (int i = 0; i < csv->GetLines(); i++) { // １行ずつ読む
@@ -995,11 +996,13 @@ void StageEdit::Load(int n)
 			str = csv->GetString(i, 1);
 			if (str == "PLAYER") 
 			{
-				float e = csv->GetFloat(i, 5);
-				float f = csv->GetFloat(i, 6);
-				float mass = csv->GetFloat(i, 7);
-				int num = csv->GetFloat(i, 8);
+				float rotY = csv->GetFloat(i, 5);
+				float e = csv->GetFloat(i, 6);
+				float f = csv->GetFloat(i, 7);
+				float mass = csv->GetFloat(i, 8);
+				int num = csv->GetFloat(i, 9);
 				obj = new Player(num, false);
+				obj->SetRotation(VECTOR3(0, rotY / 180.0f * XM_PI, 0));
 				obj->pObj.e = e;
 				obj->pObj.f = f;
 				obj->pObj.mass = mass;

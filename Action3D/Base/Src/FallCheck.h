@@ -6,6 +6,7 @@
 /// <author>S.Matsunaga</author>
 
 #include "Object3D.h"
+#include "CollisionManager.h"
 
 class FallCheck : public Object3D
 {
@@ -15,4 +16,5 @@ public:
 	void Update() override;
 private:
 	bool isPlayScene;
+	CollisonManager* collManager = nullptr;
 };

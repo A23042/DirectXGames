@@ -29,6 +29,11 @@ FallCheck::~FallCheck()
 
 void FallCheck::Update()
 {
+	if (collManager == nullptr)
+	{
+		collManager = ObjectManager::FindGameObject<CollisonManager>();
+	}
+
 	if (isPlayScene)
 	{
 		// Player—‚¿‚½‚ç‰ŠúˆÊ’u‚É–ß‚·
@@ -41,13 +46,13 @@ void FallCheck::Update()
 			}
 		}
 
-		// Ball‚ª—‚¿‚½‚çíœ
-		std::list<Ball*> balls = ObjectManager::FindGameObjects<Ball>();
-		for (Ball* ball : balls)
+		// Ball‚ª—‚¿‚½‚ç
+		// CollisionManaer‚ÌƒŠƒXƒg‚©‚ç”rœ
+		for (Ball* ball : collManager->GetBalls())
 		{
 			if (ball->Position().y < transform.position.y)
 			{
-				ball->DestroyMe();
+				collManager->RemoveBall(ball);
 			}
 		}
 	}

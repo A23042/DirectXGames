@@ -4,6 +4,7 @@
 #include "Ball.h"
 #include "ScoreArea.h"
 #include "Line.h"
+#include "CollisionManager.h"
 
 #include <Xinput.h>
 
@@ -52,10 +53,10 @@ private:
 	bool isMyTurn = false;	// ©•ª‚Ìƒ^[ƒ“‚©
 
 	std::list<Object3D*> objes;
-	std::list<Ball*> balles;
 	std::list<ScoreArea*> areaes;
 	std::list<Line*> lines;
-	Object3D* myBall = nullptr;
+	Ball* myBall = nullptr;
+	CollisonManager* collManager = nullptr;
 	Player* otherplayer = nullptr;
 
 	VECTOR3 StartPos;
