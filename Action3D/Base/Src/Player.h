@@ -4,7 +4,7 @@
 #include "Ball.h"
 #include "ScoreArea.h"
 #include "Line.h"
-#include "CollisionManager.h"
+//#include "CollisionManager.h"
 #include "LoadStage.h"
 
 #include <Xinput.h>
@@ -60,11 +60,11 @@ private:
 	bool isWait = false;	// ‘Ò‚Â
 	bool isMyTurn = false;	// ©•ª‚Ìƒ^[ƒ“‚©
 
-	std::list<Object3D*> objes;
 	//std::list<ScoreArea*> areaes;
-	std::list<Line*> lines;
+	//std::list<Line*> lines;
+	Object3D* child = nullptr;
 	Ball* myBall = nullptr;
-	CollisonManager* collManager = nullptr;
+	//CollisonManager* collManager = nullptr;
 	Player* otherplayer = nullptr;
 	LoadStage* loadStage = nullptr;
 

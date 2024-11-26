@@ -44,9 +44,9 @@ namespace
 		objInfoImSize1.x, objInfoImSize1.y
 	);
 
-	static const float e = 0.8f;
-	static const float f = 0.02f;
-	static const float mass = 1;
+	static const float e = 0.8f;	// 反発係数
+	static const float f = 0.02f;	// 摩擦
+	static const float mass = 1;	// 質量
 };
 
 // マウスのドラッグアンドドロップでステージオブジェクトの配置が理想

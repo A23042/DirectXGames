@@ -48,11 +48,12 @@ void FallCheck::Update()
 
 		// Ball‚ª—Ž‚¿‚½‚ç
 		// CollisionManaer‚ÌƒŠƒXƒg‚©‚ç”rœ
-		for (Ball* ball : collManager->GetBalls())
+		for (Ball* ball : ObjectManager::anyObjList<Ball>)
 		{
 			if (ball->Position().y < transform.position.y)
 			{
-				collManager->RemoveBall(ball);
+				//collManager->RemoveBall(ball);
+				ball->DestroyMe();
 			}
 		}
 	}

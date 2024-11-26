@@ -26,7 +26,7 @@ LoadStage::~LoadStage()
 
 void LoadStage::Start()
 {
-	collManager = ObjectManager::FindGameObject<CollisonManager>();
+	//collManager = ObjectManager::FindGameObject<CollisonManager>();
 }
 
 void LoadStage::Update()
@@ -35,12 +35,13 @@ void LoadStage::Update()
 
 void LoadStage::Load(int num)
 {
+	/*
 	if (collManager == nullptr)
 	{
 		collManager = ObjectManager::FindGameObject<CollisonManager>();
 	}
 	collManager->BoxBallDestroy();
-
+	*/
 	// 現在配置されているオブジェクトをリセット
 	std::list<Object3D*> objs = ObjectManager::FindGameObjects<Object3D>();
 	for (Object3D* obj : objs)
@@ -119,7 +120,7 @@ void LoadStage::Load(int num)
 				float e = csv->GetFloat(i, 11);
 				float f = csv->GetFloat(i, 12);
 				box = new Box(size, rot);	// 直方体のサイズと回転量を渡す
-				collManager->AddBox(box);
+				//collManager->AddBox(box);
 				box->pObj.e = e;
 				box->pObj.f = f;
 				obj = box;
@@ -143,7 +144,7 @@ void LoadStage::Load(int num)
 				float f = csv->GetFloat(i, 6);
 				float mass = csv->GetFloat(i, 7);
 				ball = new Ball();
-				collManager->AddBall(ball);
+				//collManager->AddBall(ball);
 				ball->pObj.e = e;
 				ball->pObj.f = f;
 				ball->pObj.mass = mass;
@@ -154,7 +155,7 @@ void LoadStage::Load(int num)
 				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
 				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
 				ScoreArea* area = new ScoreArea1(size, rot);
-				collManager->AddArea(area);
+				//collManager->AddArea(area);
 				obj = area;
 			}
 			else if (str == "Area2")
@@ -162,7 +163,7 @@ void LoadStage::Load(int num)
 				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
 				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
 				ScoreArea* area = new ScoreArea2(size, rot);
-				collManager->AddArea(area);
+				//collManager->AddArea(area);
 				obj = area;
 			}
 			else if (str == "Area3")
@@ -170,18 +171,26 @@ void LoadStage::Load(int num)
 				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
 				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
 				ScoreArea* area = new ScoreArea3(size, rot);
-				collManager->AddArea(area);
+				//collManager->AddArea(area);
 				obj = area;
 			}
 			else if (str == "FallCheck")
 			{
 				//obj = new FallCheck(true);
 				FallCheck* fallCheck = ObjectManager::FindGameObject<FallCheck>();
+				if (fallCheck == nullptr)
+				{
+					fallCheck = new FallCheck(true);
+				}
 				obj = fallCheck;
 			}
 			else if (str == "Line")
 			{
 				Line* line = ObjectManager::FindGameObject<Line>();
+				if (line == nullptr)
+				{
+					line = new Line(true);
+				}
 				obj = line;
 				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
 				obj->SetScale(size);
@@ -193,8 +202,11 @@ void LoadStage::Load(int num)
 			float x = csv->GetFloat(i, 2);
 			float y = csv->GetFloat(i, 3);
 			float z = csv->GetFloat(i, 4);
-			obj->SetPosition(x, y, z);
-			obj->pObj.center = VECTOR3(x, y, z);
+			if(obj != nullptr)
+			{
+				obj->SetPosition(x, y, z);
+				obj->pObj.center = VECTOR3(x, y, z);
+			}
 		}
 	}
 

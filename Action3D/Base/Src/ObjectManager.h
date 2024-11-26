@@ -9,6 +9,7 @@
 #include <list>
 #include <string>
 class GameObject;
+class ScoreArea;
 
 namespace ObjectManager {
 	void Start();
@@ -261,4 +262,71 @@ namespace ObjectManager {
 		}
 		return out;
 	}
+
+	/// 2024.11.25 S.Matsunaga
+	/// <summary>
+	/// 現在存在するオブジェクトをオブジェクトごとの型リストで管理する
+	/// 衝突判定で呼び出すために使用する
+	/// </summary>
+	/// <typeparam name="C">任意のオブジェクトクラス型</typeparam>
+	template<class C> std::list<C*> anyObjList;	// 任意のオブジェクトリスト
+
+	/// 2024.11.25 S.Matsunaga
+	/// <summary>
+	/// 任意のオブジェクトリストに追加する
+	/// 追加したらデストラクタでRemoveObjを呼んで配列から消してください
+	/// </summary>
+	/// <typeparam name="C">任意のオブジェクト型</typeparam>
+	/// <param name="obj">追加するオブジェクト</param>
+	template<class C> void AddObj(C* obj)
+	{
+		anyObjList<C>.push_back(obj);
+	}
+
+	/// 2024.11.25 S.Matsunaga
+	/// <summary>
+	/// 指定されたオブジェクトを配列から削除する
+	/// </summary>
+	/// <typeparam name="C">任意のオブジェクトクラス</typeparam>
+	/// <param name="obj">削除するオブジェクト</param>
+	template<class C> void RemoveObj(C* obj)
+	{
+		if (std::find(anyObjList<C>.begin(), anyObjList<C>.end(), obj) != anyObjList<C>.end())
+		{
+			anyObjList<C>.remove(obj);
+		}
+	}
+
+
+	/// 2024.11.26 S.Matsunaga
+	/// <summary>
+	/// スコアエリア用のリスト
+	/// </summary>
+	/// <typeparam name="C">エリア型</typeparam>
+	template<class C> std::list<C*> scArea;
+
+	/// <summary>
+	/// エリアの追加
+	/// 親のScoreAreaに追加して管理する
+	/// </summary>
+	/// <typeparam name="C"></typeparam>
+	/// <param name="area"></param>
+	template<class C> void AddScArea(C* area)
+	{
+		scArea<ScoreArea>.push_back(area);
+	}
+
+	/// <summary>
+	/// リストからエリアを削除
+	/// </summary>
+	/// <typeparam name="C"></typeparam>
+	/// <param name="area"></param>
+	template<class C> void RemoveArea(C* area)
+	{
+		if (std::find(scArea<ScoreArea>.begin(), scArea<ScoreArea>.end(), area) != scArea<ScoreArea>.end())
+		{
+			scArea<ScoreArea>.remove(area);
+		}
+	}
+
 };

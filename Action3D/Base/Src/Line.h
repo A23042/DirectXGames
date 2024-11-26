@@ -1,7 +1,7 @@
 #pragma once
-#include "Box.h"
+#include "BoxCollisionBase.h"
 
-class Line : public Box
+class Line : public BoxCollisionBase
 {
 public:
 	Line(bool playScene = false);

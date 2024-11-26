@@ -345,9 +345,6 @@
     <ClInclude Include="Src\Line.h">
       <Filter>ソース ファイル\10_MapEditScene</Filter>
     </ClInclude>
-    <ClInclude Include="Src\CollisionManager.h">
-      <Filter>ソース ファイル\05_フレームワーク</Filter>
-    </ClInclude>
     <ClInclude Include="Src\OutlineBall.h">
       <Filter>ソース ファイル\12_OutLine</Filter>
     </ClInclude>
@@ -356,6 +353,12 @@
     </ClInclude>
     <ClInclude Include="Src\LoadStage.h">
       <Filter>ソース ファイル\08_PlayScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\CollisionManager.h">
+      <Filter>ソース ファイル\08_PlayScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\BoxCollisionBase.h">
+      <Filter>ソース ファイル\02_ゲームライブラリ</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -520,6 +523,9 @@
     </ClCompile>
     <ClCompile Include="Src\LoadStage.cpp">
       <Filter>ソース ファイル\08_PlayScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\BoxCollisionBase.cpp">
+      <Filter>ソース ファイル\02_ゲームライブラリ</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

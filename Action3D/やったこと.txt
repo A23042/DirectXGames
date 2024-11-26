@@ -1,0 +1,5 @@
+ObjectManagerでオブジェクトを管理するlistをtemplateを使って作ってみた
+
+->CollisionManagerで管理しているlistをObjectManagerに移植
+　それぞれのオブジェクトクラスのコンストラクタでObjectManagerのlistにpushして
+　デストラクタでObjectManagerのlistから削除する

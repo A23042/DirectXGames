@@ -4,9 +4,9 @@
 /// </summary>
 /// <author>S.Matsunaga</author>
 /// 
-#include "Box.h"
+#include "BoxCollisionBase.h"
 
-class ScoreArea : public Box
+class ScoreArea : public BoxCollisionBase
 {
 public:
 	ScoreArea();
@@ -20,6 +20,7 @@ public:
 
 protected:
 	VECTOR3 vPos = {};
+	CSprite* spr;
 private:
 	int score = 0;
 	int n = 1;

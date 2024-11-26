@@ -29,6 +29,7 @@ namespace {
 	int drawCounter;	// 描画カウンター(何画面目の描画か)
 };
 
+
 void deleteDrawObject(GameObject* obj)
 {
 	for (auto it = drawObjects.begin(); it != drawObjects.end(); ) {

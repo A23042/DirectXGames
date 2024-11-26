@@ -36,7 +36,7 @@ Ball::Ball(bool isPhysic,int pNum)
 	child = new OutlineBall(this);
 	meshCol = new MeshCollider();
 	meshCol->MakeFromMesh(mesh);
-
+	ObjectManager::AddObj(this);
 }
 
 Ball::~Ball()
@@ -52,6 +52,7 @@ Ball::~Ball()
 		delete meshCol;
 		meshCol = nullptr;
 	}
+	ObjectManager::RemoveObj(this);
 }
 
 void Ball::Start()

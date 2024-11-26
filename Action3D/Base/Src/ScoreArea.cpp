@@ -8,7 +8,7 @@ ScoreArea::~ScoreArea()
 {
 }
 
-
+#if 1
 void ScoreArea::Draw()
 {
 	mesh->Render(transform.matrix());
@@ -25,13 +25,14 @@ void ScoreArea::Draw()
 	{
 		vPos = transform.scale / 2;
 		CubeSize(vPos.x, vPos.y, vPos.z);
-
+		if (spr == nullptr) spr = new CSprite;
 		for (int i = 0; i < 12; i++)
 		{
 			spr->DrawLine3D(vertex[edgePoint[i][1]], vertex[edgePoint[i][0]], RGB(0, 255, 50), 1.0f);
 		}
 	}
 }
+#endif
 
 ScoreArea1::ScoreArea1(VECTOR3 size, VECTOR3 rot)
 {
@@ -53,10 +54,22 @@ ScoreArea1::ScoreArea1(VECTOR3 size, VECTOR3 rot)
 	rotationMatrix = XMMatrixRotationRollPitchYaw(transform.rotation.x, transform.rotation.y, transform.rotation.z);
 
 	SetDrawOrder(-1);
+	ObjectManager::AddScArea(this);
 }
 
 ScoreArea1::~ScoreArea1()
 {
+	if (mesh != nullptr)
+	{
+		delete mesh;
+		mesh = nullptr;
+	}
+	if (meshCol != nullptr)
+	{
+		delete meshCol;
+		meshCol = nullptr;
+	}
+	ObjectManager::RemoveArea(this);
 }
 
 ScoreArea2::ScoreArea2(VECTOR3 size, VECTOR3 rot)
@@ -79,10 +92,22 @@ ScoreArea2::ScoreArea2(VECTOR3 size, VECTOR3 rot)
 	rotationMatrix = XMMatrixRotationRollPitchYaw(transform.rotation.x, transform.rotation.y, transform.rotation.z);
 
 	SetDrawOrder(-1);
+	ObjectManager::AddScArea(this);
 }
 
 ScoreArea2::~ScoreArea2()
 {
+	if (mesh != nullptr)
+	{
+		delete mesh;
+		mesh = nullptr;
+	}
+	if (meshCol != nullptr)
+	{
+		delete meshCol;
+		meshCol = nullptr;
+	}
+	ObjectManager::RemoveArea(this);
 }
 
 ScoreArea3::ScoreArea3(VECTOR3 size, VECTOR3 rot)
@@ -105,9 +130,21 @@ ScoreArea3::ScoreArea3(VECTOR3 size, VECTOR3 rot)
 	rotationMatrix = XMMatrixRotationRollPitchYaw(transform.rotation.x, transform.rotation.y, transform.rotation.z);
 
 	SetDrawOrder(-1);
+	ObjectManager::AddScArea(this);
 }
 
 ScoreArea3::~ScoreArea3()
 {
+	if (mesh != nullptr)
+	{
+		delete mesh;
+		mesh = nullptr;
+	}
+	if (meshCol != nullptr)
+	{
+		delete meshCol;
+		meshCol = nullptr;
+	}
+	ObjectManager::RemoveArea(this);
 }
 

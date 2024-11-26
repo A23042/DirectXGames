@@ -19,6 +19,7 @@ public:
 	void Update() override;
 	void PushVec(PhysicsObject &sphere, VECTOR3 pushVec, VECTOR3 RefVec);
 
+#if 0
 	/// <summary>
 	/// “r’†‚Å¶¬‚³‚ê‚½Ball‚ğƒŠƒXƒg‚É’Ç‰Á‚·‚é
 	/// </summary>
@@ -26,6 +27,7 @@ public:
 	void AddBall(Ball* ball);
 
 	void AddBox(Box* box);
+
 	void AddArea(ScoreArea* area);
 	/// <summary>
 	/// list‚Å¡‚ ‚éBall‚ğ‚·‚×‚Ä•Ô‚·
@@ -48,9 +50,10 @@ public:
 		boxes.clear();
 		areaes.clear();
 	}
+#endif
 private:
-	std::list<Ball*> balls;
+	//std::list<Ball*> balls;
 	std::list<Ball*> resolvedBalls;	// Õ“Ë”»’è‚ğI‚¦‚½BallObject
-	std::list<Box*> boxes; 
-	std::list<ScoreArea*> areaes;
+	//std::list<Box*> boxes; 
+	//std::list<ScoreArea*> areaes;
 };

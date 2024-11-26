@@ -11,8 +11,21 @@ Line::Line(bool playScene) : isPlayScene(playScene)
 	meshCol = new MeshCollider();
 	meshCol->MakeFromMesh(mesh);
 	SetDrawOrder(-1);
+	ObjectManager::AddObj(this);
+	ObjectManager::SetVisible(this, false);
 }
 
 Line::~Line()
 {
+	if (mesh != nullptr)
+	{
+		delete mesh;
+		mesh = nullptr;
+	}
+	if (meshCol != nullptr)
+	{
+		delete meshCol;
+		meshCol = nullptr;
+	}
+	ObjectManager::RemoveObj(this);
 }

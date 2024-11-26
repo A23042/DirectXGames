@@ -1,41 +1,14 @@
-#include "Box.h"
-#include "Player.h"
-#include "Ball.h"
-#include "OutlineBox.h"
-// 動かないBoxオブジェクト
+#include "BoxCollisionBase.h"
 
-Box::Box(VECTOR3 size, VECTOR3 rot)
+BoxCollisionBase::BoxCollisionBase()
 {
-	SetTag("STAGEOBJ");
-	editObj.name = "Box";
-	mesh = new CFbxMesh();
-	mesh->Load("Data/Object/box00.mesh");
-
-	meshCol = new MeshCollider();
-	meshCol->MakeFromMesh(mesh);
-	
-	vPos = VECTOR3(size.x / 2, size.y / 2, size.z / 2);
-	transform.scale = size;
-
-	// 回転角をラジアンに変換し、回転行列を作成
-	transform.rotation.x += rot.x / 180.0f * XM_PI;
-	transform.rotation.y += rot.y / 180.0f * XM_PI;
-	transform.rotation.z += rot.z / 180.0f * XM_PI;
-
-	rotationMatrix = XMMatrixRotationRollPitchYaw(transform.rotation.x, transform.rotation.y, transform.rotation.z);
-
-	pushVec = VECTOR3(0, 0, 0);
-	HitPoint = VECTOR3(0, 0, 0);
-	refVec = VECTOR3(0, 0, 0);
-
-	pObj.center = transform.position;
-	
-	spr = new CSprite;
-	child = new OutlineBox(this);
-	ObjectManager::AddObj(this);
 }
 
-void Box::Start()
+BoxCollisionBase::~BoxCollisionBase()
+{
+}
+
+void BoxCollisionBase::Start()
 {
 	pObj.center = transform.position;
 	vPos = transform.scale / 2;
@@ -43,67 +16,17 @@ void Box::Start()
 	isStart = true;
 }
 
-void Box::Update()
+void BoxCollisionBase::Update()
 {
 	transform.position = pObj.center;
-	//vPos = transform.scale / 2;
-	//CubeSize(vPos.x, vPos.y, vPos.z);
-
-	// 衝突判定の関数呼び出しはそれぞれのクラスで行う
-#if 0
-	// プレイヤーとの衝突判定
-	std::list<Player*> playeres =
-		ObjectManager::FindGameObjects<Player>();
-	for (Player* player : playeres) {
-		refVec = VECTOR3(0, 0, 0);
-		CubeSize(vPos.x, vPos.y, vPos.z);		// 直方体のサイズと位置
-		pushVec = HitSphereToCubeplane(player->sphere, refVec);	// 面->辺->頂点の衝突判定
-		player->PushVec(-pushVec, refVec);	// プレイヤーをめり込んだ量だけもどす
-	}
-	// Ballとの衝突判定
-	std::list<Ball*> balls = ObjectManager::FindGameObjects<Ball>();
-	for (Ball* ball : balls) {
-		refVec = VECTOR3(0, 0, 0);
-		CubeSize(vPos.x, vPos.y, vPos.z);		// 直方体のサイズと位置
-		pushVec = HitSphereToCubeplane(ball->sphere, refVec);	// 面->辺->頂点の衝突判定
-		ball->PushVec(-pushVec, refVec);	// プレイヤーをめり込んだ量だけもどす
-	}
-#endif
 }
 
-void Box::Draw()
+void BoxCollisionBase::Draw()
 {
 	mesh->Render(transform.matrix());
-#if 0
-	// 各辺の頂点パーツ
-	int edgePoint[12][2] = {
-		{0, 1}, {1, 2}, {2, 3}, {3, 0},//正面：右、　下、　左、　下
-		{0, 4}, {1, 5}, {2, 6}, {3, 7},//側面：右上、右下、左下、左上
-		{4, 5}, {5, 6}, {6, 7}, {7, 4} //背面：右、　下、　左、　下、
-	};
-
-	vPos = transform.scale / 2;
-	CubeSize(vPos.x, vPos.y, vPos.z);
-
-	// 選択されている場合自身のアウトライを表示させる
-	if(editObj.isSelect)
-	{	
-		for (int i = 0; i < 12; i++)
-		{
-			spr->DrawLine3D(vertex[edgePoint[i][1]], vertex[edgePoint[i][0]], RGB(0, 255, 50), 1.0f);
-		}
-	}
-	else
-	{
-		for (int i = 0; i < 12; i++)
-		{
-			spr->DrawLine3D(vertex[edgePoint[i][1]], vertex[edgePoint[i][0]], RGB(0, 0, 0), 1.0f);
-		}
-	}
-#endif
 }
-#if 0
-void Box::CubeSize(float x, float y, float z)
+
+void BoxCollisionBase::CubeSize(float x, float y, float z)
 {
 	// 立方体の各頂点座標
 	vertex[0] = VECTOR3(x, y, -z);
@@ -120,20 +43,20 @@ void Box::CubeSize(float x, float y, float z)
 	rotationMatrix = XMMatrixRotationRollPitchYaw(transform.rotation.x, transform.rotation.y, transform.rotation.z);
 
 	// 各頂点に回転行列を掛ける
-	for (int i = 0; i < 8; i++) 
+	for (int i = 0; i < 8; i++)
 	{
 		vertex[i] *= rotationMatrix;
 	}
 
 	// transform.positionを各頂点に加算
-	for (int i = 0; i < 8; i++) 
+	for (int i = 0; i < 8; i++)
 	{
 		vertex[i] += transform.position;
 	}
 
 	min = vertex[0];
 	max = vertex[0];
-	
+
 	// AABBの最小点、最大点を求める
 	//for (int i = 0; i < sizeof(vertex); i++)
 	for (int i = 0; i < 8; i++)
@@ -154,7 +77,7 @@ void Box::CubeSize(float x, float y, float z)
 		{4, 5}, {5, 6}, {6, 7}, {7, 4} //背面：右、　下、　左、　下、
 	};
 
-	
+
 	// 辺ベクトル作成
 	for (int i = 0; i < 12; i++) {
 		edge[i] = vertex[edgePoint[i][1]] - vertex[edgePoint[i][0]];
@@ -162,30 +85,30 @@ void Box::CubeSize(float x, float y, float z)
 
 	int planePoit[6][3] = {
 		// 法線ベクトルを求めるための辺ベクトル2つと共通の頂点 
-		//　　正面　　　　右　　　　　　左　　　　　後ろ
-			{2, 0, 1}, {1, 4, 5}, {6, 3, 2}, {5, 4, 6},
-		//　　上　　　　　下
-			{7, 0, 3}, {2, 1, 5}
+		//正面　　　　右　　　　左　　　　　後ろ
+		{2, 0, 1}, {1, 4, 5}, {6, 3, 2}, {5, 4, 6},
+		//　上　　　　下
+		{7, 0, 3}, {2, 1, 5}
 	};
 
 	// 面の法線と定数の計算
-	for (int i = 0; i < 6; i++) 
+	for (int i = 0; i < 6; i++)
 	{
 		VECTOR3 v1 = vertex[planePoit[i][0]] - vertex[planePoit[i][1]];
 		VECTOR3 v2 = vertex[planePoit[i][2]] - vertex[planePoit[i][1]];
 		plane[i] = normalize(cross(v1, v2));	// 平面の法線	
 		d[i] = dot(-plane[i], vertex[planePoit[i][1]]);// 平面の定数
 	}
-	return ;
+	return;
+
 }
 
-// 面との衝突
-VECTOR3 Box::HitSphereToCubeplane(PhysicsObject& tObj, VECTOR3 &refVec)
+VECTOR3 BoxCollisionBase::HitSphereToCubeplane(PhysicsObject& tObj, VECTOR3& refVec)
 {
 	pushVec = VECTOR3(0, 0, 0);
 
 	// 球の中心点から各頂点へのベクトル
-	for (int i = 0; i < 8; i++) 
+	for (int i = 0; i < 8; i++)
 	{
 		pt[i] = tObj.center - vertex[i];
 	}
@@ -197,7 +120,7 @@ VECTOR3 Box::HitSphereToCubeplane(PhysicsObject& tObj, VECTOR3 &refVec)
 	};
 
 	// 球の中心点から辺に垂線を下ろしたときに辺の範囲内にあるかどうか
-	for (int i = 0; i < 12; i++) 
+	for (int i = 0; i < 12; i++)
 	{
 		Tpt[i] = dot(edge[i], pt[TptPoint[i]]) / edge[i].LengthSquare();
 	}
@@ -213,10 +136,10 @@ VECTOR3 Box::HitSphereToCubeplane(PhysicsObject& tObj, VECTOR3 &refVec)
 		distance[i] = abs(dot(plane[i], tObj.center) + d[i]) / plane[i].Length();
 
 		// 衝突していたらあとの距離計算を省く
-		if (distance[i] <= tObj.radius) 
+		if (distance[i] <= tObj.radius)
 		{
 			// 無限平面に衝突していたら辺に垂線を下ろせるか
-			if (Tpt[pair[i][0]] >= 0 && Tpt[pair[i][0]] <= 1 && Tpt[pair[i][1]] >= 0 && Tpt[pair[i][1]] <= 1) 
+			if (Tpt[pair[i][0]] >= 0 && Tpt[pair[i][0]] <= 1 && Tpt[pair[i][1]] >= 0 && Tpt[pair[i][1]] <= 1)
 			{
 				HitPoint = tObj.center - plane[i] * distance[i];	// 衝突点
 				refVec = ReflectionVec(tObj, plane[i]);	// 球体を反射させる
@@ -227,15 +150,15 @@ VECTOR3 Box::HitSphereToCubeplane(PhysicsObject& tObj, VECTOR3 &refVec)
 	}
 
 	HitSphereToCubeEdge(tObj, refVec);
+
 }
 
-// 辺との衝突
-VECTOR3 Box::HitSphereToCubeEdge(PhysicsObject& tObj, VECTOR3& refVec)
+VECTOR3 BoxCollisionBase::HitSphereToCubeEdge(PhysicsObject& tObj, VECTOR3& refVec)
 {
 	int TptPoint[12] = {
-		{0}, {1}, {2}, {3},
-		{0}, {1}, {2}, {3},
-		{4}, {5}, {6}, {7}
+	{0}, {1}, {2}, {3},
+	{0}, {1}, {2}, {3},
+	{4}, {5}, {6}, {7}
 	};
 
 	int pair[12][2] = {
@@ -245,12 +168,12 @@ VECTOR3 Box::HitSphereToCubeEdge(PhysicsObject& tObj, VECTOR3& refVec)
 	};
 
 	// 辺と球との距離計算
-	for (int i = 0; i < 12; i++) 
+	for (int i = 0; i < 12; i++)
 	{
 		distanceV[i] = edge[i] * dot(edge[i], pt[TptPoint[i]]) / edge[i].LengthSquare() - pt[TptPoint[i]];
 		if (distanceV[i].Length() <= tObj.radius) {
 			//　垂線をおろせるか
-			if (0 <= Tpt[i] && Tpt[i] <= 1) 
+			if (0 <= Tpt[i] && Tpt[i] <= 1)
 			{
 				//VECTOR3 vNormal = normalize(plane[pair[i][0]] + plane[pair[i][1]]) / 2;	// 辺の法線ベクトル
 				VECTOR3 vNormal = normalize(distanceV[i]);	// 辺の法線ベクトル
@@ -262,17 +185,17 @@ VECTOR3 Box::HitSphereToCubeEdge(PhysicsObject& tObj, VECTOR3& refVec)
 			}
 		}
 	}
-	
+
 	HitSphereToCubeVertices(tObj, refVec);
 	return VECTOR3();
+
 }
 
-// 頂点との衝突
-VECTOR3 Box::HitSphereToCubeVertices(PhysicsObject& tObj, VECTOR3& refVec)
+VECTOR3 BoxCollisionBase::HitSphereToCubeVertices(PhysicsObject& tObj, VECTOR3& refVec)
 {
-	for (int i = 0; i < 8; i++) 
+	for (int i = 0; i < 8; i++)
 	{
-		if (pt[i].Length() < tObj.radius) 
+		if (pt[i].Length() < tObj.radius)
 		{
 			refVec = ReflectionVec(tObj, normalize(pt[i]));
 			pushVec = normalize(vertex[i] - tObj.center) * (tObj.radius - pt[i].Length());
@@ -281,14 +204,13 @@ VECTOR3 Box::HitSphereToCubeVertices(PhysicsObject& tObj, VECTOR3& refVec)
 	}
 
 	return VECTOR3();
+
 }
 
-// 反射させるための関数
-// 当たったときの法線ベクトルを受け取り跳ね返りベクトルを計算する
-VECTOR3 Box::ReflectionVec(PhysicsObject& tObj, VECTOR3 normal)
+VECTOR3 BoxCollisionBase::ReflectionVec(PhysicsObject& tObj, VECTOR3 normal)
 {
 	// 法線方向に反発係数をかける
-	// 法線方向に垂直なベクトルに摩擦係数を計算
+// 法線方向に垂直なベクトルに摩擦係数を計算
 	VECTOR3 refNormal = dot(tObj.velocity, normal) * normal;
 
 	VECTOR3 refSessen = tObj.velocity - refNormal;
@@ -303,16 +225,16 @@ VECTOR3 Box::ReflectionVec(PhysicsObject& tObj, VECTOR3 normal)
 	// 埋め込みを解除->反射	〇
 	// 反射->埋め込み解除		×
 	return VECTOR3(b);
+
 }
 
-// 35 -> 40
-bool Box::CheckSphereAABBCollision(PhysicsObject& tObj)
+bool BoxCollisionBase::CheckSphereAABBCollision(PhysicsObject& tObj)
 {
 	if (!isStart)
 	{
 		Start();
 	}
-	
+
 	// 球体の中心から最も近いAABBの頂点を取得する
 	float x = std::fmax(min.x, std::fmin(tObj.center.x, max.x));
 	float y = std::fmax(min.y, std::fmin(tObj.center.y, max.y));
@@ -327,22 +249,5 @@ bool Box::CheckSphereAABBCollision(PhysicsObject& tObj)
 
 	// 距離が半径よりも小さければtrue
 	return distance <= tObj.radius;
-}
-#endif
-Box::~Box()
-{
-	child->DestroyMe();
-	if (mesh != nullptr) 
-	{
-		delete mesh;
-		mesh = nullptr;
-	}
-	if (meshCol != nullptr)
-	{
-		delete meshCol;
-		meshCol = nullptr;
-	}
-	ObjectManager::RemoveObj(this);
-}
 
-
+}

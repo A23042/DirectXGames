@@ -16,27 +16,22 @@ CollisonManager::~CollisonManager()
 
 void CollisonManager::Start()
 {
-	balls = ObjectManager::FindGameObjects<Ball>();
-	boxes = ObjectManager::FindGameObjectsWithTag<Box>("STAGEOBJ");
-	areaes = ObjectManager::FindGameObjectsWithTag<ScoreArea>("SCOREAREA");
+	//balls = ObjectManager::FindGameObjects<Ball>();
+	//boxes = ObjectManager::FindGameObjectsWithTag<Box>("STAGEOBJ");
+	//areaes = ObjectManager::FindGameObjectsWithTag<ScoreArea>("SCOREAREA");
 }
 
 void CollisonManager::Update()
 {
-#if 1
-	/*
-	// BallをFindGameObjectsして
-	// Aを保存、AからB～Nまで衝突判定を実行
-	// Aは衝突判定されたからBからC～Nまで衝突判定
-	// を繰り返す？
-	*/
-	std::list<Ball*> targetBall;
 	// 衝突判定を取りに行くBallを一つづつ回す
 	// ひとつ前のcheckBallを保存してそれらと衝突判定を行う
-	for (Ball* checkBall : balls)
+
+	std::list<Ball*> targetBall;	// 衝突判定を取るBall
+	for (Ball* checkBall : ObjectManager::anyObjList<Ball>)
 	{
+#if 1
 		// Boxとの衝突判定
-		for (Box* box : boxes)
+		for (Box* box : ObjectManager::anyObjList<Box>)
 		{
 			if (box->CheckSphereAABBCollision(checkBall->pObj))
 			{
@@ -46,11 +41,12 @@ void CollisonManager::Update()
 				PushVec(checkBall->pObj, -pushVec, refVec);
 			}
 		}
-
+#endif
 #if 1
 		// スコアエリアの中にいるか
-		for (ScoreArea* area : areaes)
+		for (ScoreArea* area : ObjectManager::scArea<ScoreArea>)
 		{
+			if (area == nullptr) continue;
 			if (area->CheckSphereAABBCollision(checkBall->pObj))
 			{
 				area->ScoreCount(checkBall->pObj);
@@ -62,7 +58,6 @@ void CollisonManager::Update()
 			}
 		}
 #endif
-
 
 		// 衝突判定が行われたBallでなければ
 		if (targetBall.size() > 0)
@@ -79,15 +74,11 @@ void CollisonManager::Update()
 				}
 			}
 		}
-		// checkBallからresoleveBall以外すべてのballと衝突判定を取り終えたら
-		// checkBallをresolveBallに格納する
-		resolvedBalls.push_back(checkBall);
+		// checkBallをtargetBallに格納する
 		targetBall.push_back(checkBall);
 	}
-	// resolveBallsをクリアする
-	resolvedBalls.clear();
+	// targetBallsをクリアする
 	targetBall.clear();
-#endif
 
 	// 改善前
 #if 0
@@ -159,7 +150,7 @@ void CollisonManager::PushVec(PhysicsObject& sphere, VECTOR3 pushVec, VECTOR3 Re
 	}
 	return;
 }
-
+#if 0
 void CollisonManager::AddBall(Ball* ball)
 {
 	// リストに入っていなければ追加
@@ -192,6 +183,7 @@ void CollisonManager::RemoveBall(Ball* ball)
 	if (std::find(balls.begin(), balls.end(), ball) != balls.end())
 	{
 		balls.remove(ball);
-		ball->DestroyMe();
+		//ball->DestroyMe();
 	}
 }
+#endif

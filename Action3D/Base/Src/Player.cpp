@@ -16,10 +16,12 @@ namespace
 	static const float MoveSpeed = 0.3f;		// 移動速度
 	static const float MaxPushTime = 1.0f;		// 長押し上限
 	static const float StopSpeed = 0.04f;		// 速度が遅くなったら0にするための基準
-	static const float RDeadZone = 0.1;			// Rスティックのデッドゾーン
+	static const float RDeadZone = 0.1f;			// Rスティックのデッドゾーン
 	static const float LDeadZone = 0.2f;			// Lスティックのデッドゾーン
 	static const int Power = 180;				// 長押し発射の威力基準
 	static const int RestShot = 3;				// 打てる回数
+	static const float preE = 0.6f;				// 発射前操作時の反発係数	
+	static const float preF = 0.08f;			// 発射前操作時の摩擦力
 };
 
 Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
@@ -38,7 +40,7 @@ Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
 		isMyTurn = false;
 		mesh->Load("Data/Object/orengeBall.mesh");
 	}
-	new OutlineBall(this);
+	child = new OutlineBall(this);
 	meshCol = new MeshCollider();
 	meshCol->MakeFromMesh(mesh);
 
@@ -58,6 +60,12 @@ Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
 
 Player::~Player()
 {
+	child->DestroyMe();
+	if (mesh != nullptr)
+	{
+		delete mesh;
+		mesh = nullptr;
+	}
 	if (meshCol != nullptr)
 	{
 		delete meshCol;
@@ -76,14 +84,14 @@ void Player::Start()
 	// Update()内でFindGameObjectを極力しない
 	//objes = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ");
 	//areaes = ObjectManager::FindGameObjectsWithTag<ScoreArea>("SCOREAREA");
-	lines = ObjectManager::FindGameObjects<Line>();
-	collManager = ObjectManager::FindGameObject<CollisonManager>();
+	//lines = ObjectManager::FindGameObjects<Line>();
+	//collManager = ObjectManager::FindGameObject<CollisonManager>();
 	loadStage = ObjectManager::FindGameObject<LoadStage>();
 }
 
 void Player::Update()
 {
-	// すでに他プレイヤー情報を持っていたらなんども探さない
+	// すでに他プレイヤー情報を持っていたら探さない
 	if (otherplayer == nullptr)
 	{
 		otherplayer = ObjectManager::FindOtherGameObject<Player>(this);
@@ -116,7 +124,9 @@ void Player::Update()
 	if (isPhysic)
 	{
 		// 各Boxとの衝突判定
-		for (Object3D* obj : collManager->GetBoxes())
+		// CollisionManagerで管理しているBoxと衝突判定を取る
+		//for (Object3D* obj : collManager->GetBoxes())
+		for (Box* obj : ObjectManager::anyObjList<Box>)
 		{
 			// 先にAABBと簡易的な衝突判定をして衝突していればHitSphereCubeplaneを回す
 			if (obj->CheckSphereAABBCollision(this->pObj))
@@ -188,7 +198,8 @@ void Player::UpdateWait()
 	// Ballとの衝突判定
 	// BallのリストはCollisionManagerで管理している
 
-	for (Ball* ball : collManager->GetBalls())
+	//for (Ball* ball : collManager->GetBalls())
+	for (Ball* ball : ObjectManager::anyObjList<Ball>)
 	{
 		if (ball->HitSphereToSphere(this->pObj))
 		{
@@ -211,7 +222,7 @@ void Player::UpdateWait()
 	}
 
 	// スコアエリアの中にいるか
-	for (ScoreArea* area : collManager->GetAreaes())
+	for (ScoreArea* area : ObjectManager::scArea<ScoreArea>)
 	{
 		if (area->CheckSphereAABBCollision(this->pObj))
 		{
@@ -333,7 +344,7 @@ void Player::SetStartPos(bool isFall)
 
 		// 設置したBallに情報を渡す
 		myBall = new Ball(true, playerNum);
-		collManager->AddBall(myBall);
+		//collManager->AddBall(myBall);
 		myBall->pObj.center = temp;
 		myBall->SetPosition(myBall->pObj.center);
 		myBall->pObj.e = pObj.e;
@@ -389,11 +400,11 @@ void Player::Move(VECTOR3 moveSpeed, VECTOR3 rotSpeed)
 // Playerの操作はコントローラーに変える
 void Player::UpdateNormal()
 {
-	pObj.e = 0.5;
-	pObj.f = 0.08;
+	pObj.e = preE;
+	pObj.f = preF;
 
 	// ショット前だけLineとの衝突判定
-	for (Line* line : lines)
+	for (Line* line : ObjectManager::anyObjList<Line>)
 	{
 		// 先にAABBと簡易的な衝突判定をして衝突していればHitSphereCubeplaneを回す
 		if (line->CheckSphereAABBCollision(this->pObj))
