@@ -328,7 +328,8 @@ void Player::SetStartPos(bool isFall)
 		Score* sc = ObjectManager::FindGameObject<Score>();
 		sc->CountScore();
 		//SceneManager::ChangeScene("ResultScene");
-		loadStage->Load(2);
+		//loadStage->Load(4);
+
 		return;
 	}
 	// —‰º‚Å‚È‚¯‚ê‚Î‚»‚Ìê‚ÉBall‚ğİ’u‚·‚é

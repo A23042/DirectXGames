@@ -8,4 +8,6 @@ public:
 	~MapEditScene();
 	void Update() override;
 	void Draw() override;
+private:
+	CSprite* cs;
 };

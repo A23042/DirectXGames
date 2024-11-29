@@ -1,7 +1,6 @@
 #include <fstream>
 #include <assert.h>
 #include "PlayScene.h"
-#include "Player.h"
 #include "CsvReader.h"
 #include "Camera.h"
 #include "Score.h"
@@ -49,7 +48,8 @@ PlayScene::PlayScene(int num)
 				float f = csv->GetFloat(i, 7);
 				float mass = csv->GetFloat(i, 8);
 				int num = csv->GetFloat(i, 9);
-				obj = new Player(num);
+				player[num] = new Player(num);
+				obj = player[num];
 				obj->SetRotation(VECTOR3(0, rotY / 180.0f * XM_PI, 0));
 				obj->pObj.e = e;
 				obj->pObj.f = f;
@@ -112,7 +112,7 @@ PlayScene::PlayScene(int num)
 			else if (str == "Line")
 			{
 				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
-				obj = new Line();
+				obj = new Line(true);
 				obj->SetScale(size);
 			}
 			else 
@@ -136,6 +136,8 @@ PlayScene::PlayScene(int num)
 	SingleInstantiate<ScoreDraw>();
 	SingleInstantiate<CollisonManager>();
 	loadStage = SingleInstantiate<LoadStage>();
+	resultPanel = SingleInstantiate<SplitScreenLastDraw>();
+	ObjectManager::SetVisible(resultPanel, false);
 }
 
 PlayScene::~PlayScene()
@@ -146,7 +148,7 @@ void PlayScene::Update()
 {
 	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_R))
 	{
-		SceneManager::ChangeScene("ResultScene");
+		//SceneManager::ChangeScene("ResultScene");
 	}
 	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_T))
 	{
@@ -154,13 +156,61 @@ void PlayScene::Update()
 	}
 	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_M))
 	{
-		loadStage->Load(3);
+		int num = Random(1, 6);
+		loadStage->Load(num);
+	}
+
+	switch (playState)
+	{
+	case sPlay:
+		UpdatePlay();
+		break;
+	case sResult:
+		UpdateResult();
+		break;
+	default:
+		break;
 	}
 }
 
 void PlayScene::Draw()
 {
-	
+}
+
+void PlayScene::UpdatePlay()
+{
+	// リザルトパネル非表示
+	if (ObjectManager::IsVisible(resultPanel))
+	{
+		ObjectManager::SetVisible(resultPanel, false);
+		for (Player* pl : player)
+		{
+			ObjectManager::SetActive(pl, true);
+		}
+	}
+	if(!player[0]->GetRestShot() && !player[1]->GetRestShot())
+	{
+		playState = sResult;
+	}
+}
+
+void PlayScene::UpdateResult()
+{
+	// リザルトパネル表示
+	if (!ObjectManager::IsVisible(resultPanel))
+	{
+		ObjectManager::SetVisible(resultPanel, true);
+		for (Player* pl : player)
+		{
+			ObjectManager::SetActive(pl, false);
+		}
+	}
+	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_R))
+	{
+		int num = Random(1, 6);
+		loadStage->Load(num);
+		playState = sPlay;
+	}
 }
 
 

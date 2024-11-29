@@ -63,7 +63,8 @@ void SplitScreenLastDraw::Draw()
 
 			// ここに最後に画面全体に描画したい処理を書く
 			// 例えば、枠線スプライトや全体ステータスの描画など
-
+			CSprite* sp = new CSprite;
+			sp->DrawRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, RGB(0, 0, 0), 0.4f);
 
 			// -----------------------------------------------------------------
 			GameDevice()->m_mProj = saveProj;	  // プロジェクションマトリックスを元に戻す

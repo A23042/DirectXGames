@@ -57,6 +57,7 @@ namespace ObjectManager {
 	/// クラス名で自分以外のオブジェクトを探す
 	/// </summary>
 	/// <typeparam name="C">クラス</typeparam>
+	/// <param name="me">自分</param>
 	/// <returns>オブジェクトの実態（存在しなければnullptr）</returns>
 	template<class C> C* FindOtherGameObject(GameObject* me)
 	{

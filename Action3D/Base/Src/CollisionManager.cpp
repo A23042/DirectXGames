@@ -25,7 +25,6 @@ void CollisonManager::Update()
 {
 	// 衝突判定を取りに行くBallを一つづつ回す
 	// ひとつ前のcheckBallを保存してそれらと衝突判定を行う
-
 	std::list<Ball*> targetBall;	// 衝突判定を取るBall
 	for (Ball* checkBall : ObjectManager::anyObjList<Ball>)
 	{
@@ -43,19 +42,40 @@ void CollisonManager::Update()
 		}
 #endif
 #if 1
+		// 複数のAreaに接触していたら距離が一番近いものの点にする
+		ScoreArea* tempArea = nullptr;
+		float minDistance = 0.0f;
+		bool firstFlag = true;
+		bool isTouch = false;
 		// スコアエリアの中にいるか
 		for (ScoreArea* area : ObjectManager::scArea<ScoreArea>)
 		{
 			if (area == nullptr) continue;
-			if (area->CheckSphereAABBCollision(checkBall->pObj))
+			float distance = 0.0f;
+			if (area->CheckSphereAABBCollision(checkBall->pObj), distance)
 			{
-				area->ScoreCount(checkBall->pObj);
-				break;
+				isTouch = true;
+				if (firstFlag)
+				{
+					tempArea = area;
+					minDistance = distance;
+					firstFlag = false;
+				}
+				else if(distance < minDistance)
+				{
+					tempArea = area;
+					minDistance = distance;
+				}
 			}
-			else
-			{
-				pObj.score = 0;
-			}
+		}
+		if (!isTouch)
+		{
+			pObj.score = 0;
+		}
+		else
+		{
+			tempArea->ScoreCount(checkBall->pObj);
+			break;
 		}
 #endif
 

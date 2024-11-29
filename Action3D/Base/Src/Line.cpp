@@ -12,7 +12,10 @@ Line::Line(bool playScene) : isPlayScene(playScene)
 	meshCol->MakeFromMesh(mesh);
 	SetDrawOrder(-1);
 	ObjectManager::AddObj(this);
-	ObjectManager::SetVisible(this, false);
+	if (isPlayScene)
+	{
+		ObjectManager::SetVisible(this, false);
+	}
 }
 
 Line::~Line()

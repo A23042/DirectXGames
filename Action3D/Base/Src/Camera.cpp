@@ -2,7 +2,7 @@
 #include "Player.h"
 #include "Ball.h"
 //                                      後方視点　　　　　　真上視点
-static const VECTOR3 CameraPos[] = { VECTOR3(0, 6, -16), VECTOR3(0, 10, -0.5) };
+static const VECTOR3 CameraPos[] = { VECTOR3(0, 8, -18), VECTOR3(0, 10, -0.5) };
 static const VECTOR3 LookPos[] =   { VECTOR3(0, 0,  3), VECTOR3(0,  1,  1  ) };
 static const float CHANGE_TIME_LIMIT = 0.5f; // 秒
 

@@ -42,7 +42,10 @@ public:
 
 	// Player番号取得
 	int GetPlNum() { return playerNum; }
+	// Playerステータス取得
 	int GetState() { return state; }
+	// ショット回数があるか
+	bool GetRestShot() { return restShot > 0; }
 
 private:
 	enum State {

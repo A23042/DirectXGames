@@ -181,11 +181,17 @@ void StageEdit::Update()
 	ImGui::InputInt("Stage", &stageNum);
 	if (ImGui::Button("SAVE"))
 	{
-		Save(stageNum);
+		if(MessageBox(GameDevice()->m_pMain->m_hWnd, "上書きセーブしますか", "セーブ", MB_OKCANCEL) == IDOK)
+		{
+			Save(stageNum);
+		}
 	}
 	if (ImGui::Button("LOAD"))
 	{
-		Load(stageNum);
+		if (MessageBox(GameDevice()->m_pMain->m_hWnd, "現在のマップを上書きロードしますか", "ロード", MB_OKCANCEL) == IDOK)
+		{
+			Load(stageNum);
+		}
 	}
 	if (ImGui::Button("PLAY"))
 	{

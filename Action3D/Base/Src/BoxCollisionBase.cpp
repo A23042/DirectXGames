@@ -251,3 +251,31 @@ bool BoxCollisionBase::CheckSphereAABBCollision(PhysicsObject& tObj)
 	return distance <= tObj.radius;
 
 }
+
+bool BoxCollisionBase::CheckSphereAABBCollision(PhysicsObject& tObj, float distance)
+{
+	if (!isStart)
+	{
+		Start();
+	}
+
+	// ‹…‘Ì‚Ì’†S‚©‚çÅ‚à‹ß‚¢AABB‚Ì’¸“_‚ðŽæ“¾‚·‚é
+	float x = std::fmax(min.x, std::fmin(tObj.center.x, max.x));
+	float y = std::fmax(min.y, std::fmin(tObj.center.y, max.y));
+	float z = std::fmax(min.z, std::fmin(tObj.center.z, max.z));
+
+	// AABB‚Æ‹…‘Ì‚Ì‚à‚Á‚Æ‚à‹ß‚¢“_‚Æ‚Ì‹——£ŒvŽZ
+	VECTOR3 closest = VECTOR3(x, y, z);
+	float verDistance = sqrt(
+		(closest.x - tObj.center.x) * (closest.x - tObj.center.x) +
+		(closest.y - tObj.center.y) * (closest.y - tObj.center.y) +
+		(closest.z - tObj.center.z) * (closest.z - tObj.center.z));
+
+	// ‹——£‚ª”¼Œa‚æ‚è‚à¬‚³‚¯‚ê‚Îtrue
+	if (verDistance <= tObj.radius)
+	{
+		distance = verDistance;
+		return true;
+	}
+	return false;
+}
