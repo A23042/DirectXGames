@@ -52,7 +52,7 @@ void CollisonManager::Update()
 		{
 			if (area == nullptr) continue;
 			float distance = 0.0f;
-			if (area->CheckSphereAABBCollision(checkBall->pObj), distance)
+			if (area->CheckSphereAABBCollision(checkBall->pObj, distance))
 			{
 				isTouch = true;
 				if (firstFlag)
@@ -75,7 +75,7 @@ void CollisonManager::Update()
 		else
 		{
 			tempArea->ScoreCount(checkBall->pObj);
-			break;
+			//break;
 		}
 #endif
 

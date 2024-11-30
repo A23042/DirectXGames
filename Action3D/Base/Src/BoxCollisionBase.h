@@ -89,7 +89,7 @@ public:
 	/// <param name="pOgj">Õ“Ë”»’è‚ğæ‚é‹…‘Ì‚Ì\‘¢‘Ì</param>
 	/// <returns>Õ“Ë‚µ‚Ä‚¢‚½‚çtrue</returns>
 	virtual bool CheckSphereAABBCollision(PhysicsObject& tObj);
-	virtual bool CheckSphereAABBCollision(PhysicsObject& tObj, float distance);
+	virtual bool CheckSphereAABBCollision(PhysicsObject& tObj, float& distance);
 
 protected:
 	VECTOR3 vertex[8] = {};		// ’¸“_

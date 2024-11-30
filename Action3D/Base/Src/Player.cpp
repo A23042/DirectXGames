@@ -323,14 +323,14 @@ void Player::SetStartPos(bool isFall)
 	restShot--;		// 残りショット数マイナス1
 
 	// 残りショット数がなければリザルト画面へ
-	if (otherplayer->restShot <= 0 && restShot <= 0)
+	//if (otherplayer->restShot <= 0 && restShot <= 0)
 	{
-		Score* sc = ObjectManager::FindGameObject<Score>();
-		sc->CountScore();
+		//Score* sc = ObjectManager::FindGameObject<Score>();
+		//sc->CountScore();
 		//SceneManager::ChangeScene("ResultScene");
 		//loadStage->Load(4);
 
-		return;
+		//return;
 	}
 	// 落下でなければその場にBallを設置する
 	if (!isFall)

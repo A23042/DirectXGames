@@ -772,6 +772,8 @@ void StageEdit::SelectObj(Object3D* ob)
 		if (getObj != nullptr)DeselectObj();
 	}
 	getObj = ob;
+	// 選択されたオブジェクトの色を変える
+	getObj->GetMesh()->m_vDiffuse = VECTOR4(1.0f, 0.2f, 1.0f, 1.0f);
 
 	// 選択されてるオブジェクトのGizmo表示
 	// 初めてGizmoが出る場合posGizmoを出す
@@ -800,6 +802,8 @@ void StageEdit::DeselectObj()
 {
 	if(getObj != nullptr)
 	{
+		// 色をもとに戻す
+		getObj->GetMesh()->m_vDiffuse = VECTOR4(1.0f, 1.0f, 1.0f, 1.0f);
 		getObj->editObj.isSelect = false;
 		getObj = nullptr;
 		nState = sNone;

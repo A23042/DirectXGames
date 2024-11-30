@@ -28,6 +28,7 @@ private:
 	LoadStage* loadStage = nullptr;
 	SplitScreenLastDraw* resultPanel = nullptr;
 	Player* player[2] = {};
+	Score* sc = nullptr;
 
 	bool isPlay = true;
 

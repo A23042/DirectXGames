@@ -11,6 +11,7 @@
 #include "ScoreArea.h"
 #include "FallCheck.h"
 #include "Line.h"
+#include "SkyBox.h"
 
 PlayScene::PlayScene(int num)
 {
@@ -126,7 +127,7 @@ PlayScene::PlayScene(int num)
 		}
 	}
 	SingleInstantiate<Camera>();
-	Score* sc = ObjectManager::FindGameObject<Score>();
+	sc = ObjectManager::FindGameObject<Score>();
 	if (sc == nullptr) 
 	{
 		sc = SingleInstantiate<Score>();
@@ -135,6 +136,7 @@ PlayScene::PlayScene(int num)
 	sc->Clear();
 	SingleInstantiate<ScoreDraw>();
 	SingleInstantiate<CollisonManager>();
+	SingleInstantiate<SkyBox>();
 	loadStage = SingleInstantiate<LoadStage>();
 	resultPanel = SingleInstantiate<SplitScreenLastDraw>();
 	ObjectManager::SetVisible(resultPanel, false);
@@ -146,7 +148,7 @@ PlayScene::~PlayScene()
 
 void PlayScene::Update()
 {
-	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_R))
+	//if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_R))
 	{
 		//SceneManager::ChangeScene("ResultScene");
 	}
@@ -199,6 +201,7 @@ void PlayScene::UpdateResult()
 	// リザルトパネル表示
 	if (!ObjectManager::IsVisible(resultPanel))
 	{
+		sc->CountScore();
 		ObjectManager::SetVisible(resultPanel, true);
 		for (Player* pl : player)
 		{

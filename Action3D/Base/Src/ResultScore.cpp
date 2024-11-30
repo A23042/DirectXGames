@@ -14,6 +14,12 @@ ResultScore::~ResultScore()
 {
 }
 
+void ResultScore::Start()
+{
+	sc = ObjectManager::FindGameObject<Score>();
+	//sc->CountScore();
+}
+
 void ResultScore::Update()
 {
 #if 1
@@ -41,12 +47,6 @@ void ResultScore::Update()
 		}
 	}
 #endif
-}
-
-void ResultScore::Start()
-{
-	sc = ObjectManager::FindGameObject<Score>();
-	sc->CountScore();
 }
 
 void ResultScore::Draw()

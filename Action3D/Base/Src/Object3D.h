@@ -152,6 +152,8 @@ public:
 	/// <returns>è’ìÀÇµÇƒÇ¢ÇΩÇÁtrue</returns>
 	virtual bool CheckSphereAABBCollision(PhysicsObject& pOgj);
 
+	CFbxMesh* GetMesh() { return mesh; }
+
 protected:
 	CFbxMesh* mesh;
 	MeshCollider* meshCol;

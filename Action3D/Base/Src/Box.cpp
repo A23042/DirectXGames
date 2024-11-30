@@ -10,6 +10,7 @@ Box::Box(VECTOR3 size, VECTOR3 rot)
 	editObj.name = "Box";
 	mesh = new CFbxMesh();
 	mesh->Load("Data/Object/box00.mesh");
+	//mesh->m_vDiffuse.w = 0.5f;
 
 	meshCol = new MeshCollider();
 	meshCol->MakeFromMesh(mesh);
@@ -331,7 +332,10 @@ bool Box::CheckSphereAABBCollision(PhysicsObject& tObj)
 #endif
 Box::~Box()
 {
-	child->DestroyMe();
+	if(child != nullptr)
+	{
+		child->DestroyMe();
+	}
 	if (mesh != nullptr) 
 	{
 		delete mesh;

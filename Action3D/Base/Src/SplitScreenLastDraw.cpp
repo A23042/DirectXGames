@@ -2,6 +2,8 @@
 #include "PlayScene.h"
 #include "Camera.h"
 
+const float scoreViewTime = 1.5f;
+const float scoreUpTime = 0.5f;
 
 SplitScreenLastDraw::SplitScreenLastDraw()
 {
@@ -27,8 +29,40 @@ SplitScreenLastDraw::~SplitScreenLastDraw()
 
 }
 
+void SplitScreenLastDraw::Start()
+{
+	score = ObjectManager::FindGameObject<Score>();
+	//score->CountScore();
+}
+
 void SplitScreenLastDraw::Update()
 {
+#if 1
+	timer += SceneManager::DeltaTime();
+	//if(sc == nullptr)
+	//{
+	//	sc = ObjectManager::FindGameObject<Score>();
+	//}
+	//else
+	{
+		if (timer >= scoreUpTime + scoreViewTime) {
+			if (viewP0Score < score->GetP0Score())
+			{
+				viewP0Score += 1;
+			}
+			if (viewP1Score < score->GetP1Score())
+			{
+				viewP1Score += 1;
+			}
+		}
+		if (viewP0Score >= score->GetP0Score() && viewP1Score >= score->GetP1Score()) {
+			if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_T)) {
+				SceneManager::ChangeScene("TitleScene");
+			}
+		}
+	}
+#endif
+
 }
 
 
@@ -64,7 +98,25 @@ void SplitScreenLastDraw::Draw()
 			// ここに最後に画面全体に描画したい処理を書く
 			// 例えば、枠線スプライトや全体ステータスの描画など
 			CSprite* sp = new CSprite;
-			sp->DrawRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, RGB(0, 0, 0), 0.4f);
+			sp->DrawRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, RGB(0, 0, 0), 0.2f);
+
+			float x = WINDOW_WIDTH / 3;
+#if 1
+			GameDevice()->m_pFont->Draw(x, 0, "RESULT", 64, RGB(255, 255, 255));
+			if (timer >= scoreViewTime) {
+				char strP0[64]; // 文字列を用意
+				sprintf_s<64>(strP0, "Player0Score: %6d", viewP0Score);
+				GameDevice()->m_pFont->Draw(x, 200, strP0, 64, RGB(255, 255, 255));
+
+				char strP1[64]; // 文字列を用意
+				sprintf_s<64>(strP1, "Player1Score: %6d", viewP1Score);
+				GameDevice()->m_pFont->Draw(x, 400, strP1, 64, RGB(255, 255, 255));
+			}
+			if (viewP0Score >= score->GetP0Score() && viewP1Score >= score->GetP1Score()) {
+				GameDevice()->m_pFont->Draw(x, 600, "PUSH R KEY", 64, RGB(255, 255, 255));
+			}
+#endif
+
 
 			// -----------------------------------------------------------------
 			GameDevice()->m_mProj = saveProj;	  // プロジェクションマトリックスを元に戻す

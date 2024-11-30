@@ -252,7 +252,7 @@ bool BoxCollisionBase::CheckSphereAABBCollision(PhysicsObject& tObj)
 
 }
 
-bool BoxCollisionBase::CheckSphereAABBCollision(PhysicsObject& tObj, float distance)
+bool BoxCollisionBase::CheckSphereAABBCollision(PhysicsObject& tObj, float& distance)
 {
 	if (!isStart)
 	{

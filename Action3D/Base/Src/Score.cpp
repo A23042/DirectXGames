@@ -10,9 +10,10 @@ Score::~Score()
 
 void Score::Update()
 {
+	// ImGui表示用スコア
 	Clear();
-	std::list<Object3D*> objs = ObjectManager::FindGameObjects<Object3D>();
-	for (Object3D* obj : objs)
+	std::list<Object3D*> balls = ObjectManager::FindGameObjectsWithTag<Object3D>("PLAYER");
+	for (Object3D* obj : balls)
 	{
 		switch (obj->pObj.pNum)
 		{
@@ -40,6 +41,9 @@ void Score::Draw()
 
 void Score::CountScore()
 {
+	p0Score = 0;
+	p1Score = 0;
+
 	std::list<Object3D*> objs = ObjectManager::FindGameObjectsWithTag<Object3D>("PLAYER");
 	for (Object3D* obj : objs)
 	{
