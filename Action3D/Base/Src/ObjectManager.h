@@ -281,7 +281,10 @@ namespace ObjectManager {
 	/// <param name="obj">追加するオブジェクト</param>
 	template<class C> void AddObj(C* obj)
 	{
-		anyObjList<C>.push_back(obj);
+		if (std::find(anyObjList<C>.begin(), anyObjList<C>.end(), obj) == anyObjList<C>.end())
+		{
+			anyObjList<C>.push_back(obj);
+		}
 	}
 
 	/// 2024.11.25 S.Matsunaga

@@ -9,7 +9,6 @@
 #include "CsvReader.h"
 
 using namespace std;
-using namespace ObjectManager;
 
 class StageEdit : public Object3D {
 public:
@@ -60,7 +59,9 @@ public:
 	/// <summary>
 	/// オブジェクトの選択が解除されたときに呼ばれる
 	/// </summary>
-	void DeselectObj();
+	void DeselectObj(Object3D* obj = nullptr);
+
+	void DeleteObj();
 
 	/// <summary>
 	/// オブジェクト複製
@@ -68,7 +69,7 @@ public:
 	/// 複製元オブジェクトの位置、回転、サイズを入れる
 	/// </summary>
 	/// <param name="ob">複製元オブジェクト</param>
-	void DupeObj(Object3D* ob);
+	void DupeObj();
 
 	/// <summary>
 	/// ステージセーブ
@@ -116,7 +117,13 @@ private:
 	MATRIX4X4 identity;
 
 	// 選択状態のオブジェクト
-	Object3D* getObj = nullptr;	
+	//Object3D* getObj = nullptr;	
+	std::list<Object3D*> selectObj;
+	std::list<VECTOR3> pos;
+	std::list<VECTOR3> rot;
+	std::list<VECTOR3> scale;
+
+
 	// 選択状態のGizmo
 	Object3D* getGizmo = nullptr;
 
