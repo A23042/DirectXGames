@@ -1107,6 +1107,7 @@ void StageEdit::DupeObj()
 		if(tempObj != nullptr)
 		{
 			tempObj->pObj.center = obj->pObj.center;
+			tempObj->SetPosition(tempObj->pObj.center);
 			tempObj->SetRotation(obj->Rotation());
 			tempObj->SetScale(obj->Scale());
 
@@ -1401,7 +1402,7 @@ bool StageEdit::GetWorldPos()
 {
 	// マウス座標取得
 	mousePos = GameDevice()->m_pDI->GetMousePos();
-/*
+
 	if (pDI->CheckMouse(KD_DAT, 0))
 	{
 		// オブジェクトのスケールと回転を変えるときウィンドウをループするようにしたい
@@ -1424,7 +1425,7 @@ bool StageEdit::GetWorldPos()
 			SetCursorPos(mousePos.x, WINDOW_HEIGHT);
 		}
 	}
-*/
+
 
 	// 近視点(0)と遠視点(1)
 	nearWorldPos = XMVector3Unproject(VECTOR3(mousePos.x, mousePos.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
