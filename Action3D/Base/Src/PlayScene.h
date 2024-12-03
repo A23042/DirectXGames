@@ -3,6 +3,7 @@
 #include "LoadStage.h"
 #include "SplitScreenLastDraw.h"
 #include "Player.h"
+#include "DataHolder.h"
 
 class PlayScene : public SceneBase
 {
@@ -14,10 +15,6 @@ public:
 	
 	void UpdatePlay();
 	void UpdateResult();
-
-	void SetPlay(bool isPlay) { this->isPlay = isPlay; }
-
-	bool IsPlay() { return isPlay; }
 private:
 	enum PlayState
 	{
@@ -29,7 +26,5 @@ private:
 	SplitScreenLastDraw* resultPanel = nullptr;
 	Player* player[2] = {};
 	Score* sc = nullptr;
-
-	bool isPlay = true;
-
+	DataHolder* data = nullptr;
 };

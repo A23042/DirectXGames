@@ -1,7 +1,11 @@
 #pragma once
 #include "Object3D.h"
 #include "Direct3D.h"
-#include "Score.h"
+
+class Score;
+class SplitScreen;
+class Camera;
+class DataHolder;
 
 /// ‰æ–Ê•ªŠ„ƒNƒ‰ƒX
 /// </summary>
@@ -17,12 +21,17 @@ public:
 
 private:
 	D3D11_VIEWPORT vpSingle;
-	Score* score;
-	
+	Score* score = nullptr;
+	SplitScreen* ss = nullptr;
+	Camera* cm = nullptr;
+	DataHolder* data = nullptr;
+	CSprite* sp;
+
 	int p0Score = 0;
 	int p1Score = 0;
 
 	float timer = 0.0f;
+	float upTimer = 0.0f;
 
 	int viewP0Score = 0;
 	int viewP1Score = 0;

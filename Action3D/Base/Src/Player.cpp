@@ -14,7 +14,7 @@ namespace
 	static const float JumpPower = 12.0f;		// ジャンプ力
 	static const float RotationSpeed = 1.2f;	// 回転速度(度)
 	static const float MoveSpeed = 0.3f;		// 移動速度
-	static const float MaxPushTime = 1.0f;		// 長押し上限
+	static const float MaxPushTime = 0.8f;		// 長押し上限
 	static const float StopSpeed = 0.04f;		// 速度が遅くなったら0にするための基準
 	static const float RDeadZone = 0.1f;			// Rスティックのデッドゾーン
 	static const float LDeadZone = 0.2f;			// Lスティックのデッドゾーン

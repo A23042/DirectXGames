@@ -126,7 +126,7 @@ PlayScene::PlayScene(int num)
 			obj->SetPosition(x, y, z);
 		}
 	}
-	SingleInstantiate<Camera>();
+	Instantiate<Camera>();
 	sc = ObjectManager::FindGameObject<Score>();
 	if (sc == nullptr) 
 	{
@@ -134,12 +134,14 @@ PlayScene::PlayScene(int num)
 		sc->DontDestroyMe(); // シーンが切り替わっても消えない
 	}
 	sc->Clear();
-	SingleInstantiate<ScoreDraw>();
-	SingleInstantiate<CollisonManager>();
-	SingleInstantiate<SkyBox>();
-	loadStage = SingleInstantiate<LoadStage>();
+	Instantiate<ScoreDraw>();
+	Instantiate<CollisonManager>();
+	Instantiate<SkyBox>();
+	loadStage = Instantiate<LoadStage>();
 	resultPanel = SingleInstantiate<SplitScreenLastDraw>();
-	ObjectManager::SetVisible(resultPanel, false);
+	data = SingleInstantiate<DataHolder>();
+	data->DontDestroyMe();
+	data->SetPlay(true);
 }
 
 PlayScene::~PlayScene()
@@ -181,37 +183,20 @@ void PlayScene::Draw()
 
 void PlayScene::UpdatePlay()
 {
-	// リザルトパネル非表示
-	if (ObjectManager::IsVisible(resultPanel))
-	{
-		ObjectManager::SetVisible(resultPanel, false);
-		for (Player* pl : player)
-		{
-			ObjectManager::SetActive(pl, true);
-		}
-	}
 	if(!player[0]->GetRestShot() && !player[1]->GetRestShot())
 	{
+		data->SetPlay(false);
 		playState = sResult;
 	}
 }
 
 void PlayScene::UpdateResult()
 {
-	// リザルトパネル表示
-	if (!ObjectManager::IsVisible(resultPanel))
-	{
-		sc->CountScore();
-		ObjectManager::SetVisible(resultPanel, true);
-		for (Player* pl : player)
-		{
-			ObjectManager::SetActive(pl, false);
-		}
-	}
 	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_R))
 	{
 		int num = Random(1, 6);
 		loadStage->Load(num);
+		data->SetPlay(true);
 		playState = sPlay;
 	}
 }

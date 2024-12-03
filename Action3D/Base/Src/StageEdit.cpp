@@ -24,9 +24,14 @@ namespace
 	ImVec2 stageImPos = ImVec2(170, 30);
 	ImVec2 stageImSize = ImVec2(200, 130);
 	
-	ImVec2 objInfoImPos = ImVec2(30, 170);
+	// inspector
+	ImVec2 objInfoImPos = ImVec2(WINDOW_WIDTH - 320, 170);
 	ImVec2 objInfoImSize0 = ImVec2(290, 310);
 	ImVec2 objInfoImSize1 = ImVec2(290, 400);
+
+	// hierarchy
+	ImVec2 objHierarchyImPos = ImVec2(30, 170);
+	ImVec2 objHierarchyImSize = ImVec2(290, 310);
 
 	// 判定を飛ばすエリア指定左上の座標と右下の座標
 	VECTOR4 judgeSkipArea0 = VECTOR4(
@@ -41,10 +46,16 @@ namespace
 		objInfoImPos.x, objInfoImPos.y,
 		objInfoImSize0.x, objInfoImSize0.y
 	);
-	VECTOR4 judgeSkipArea3 = VECTOR4(
+	/*VECTOR4 judgeSkipArea3 = VECTOR4(
 		objInfoImPos.x, objInfoImPos.y,
 		objInfoImSize1.x, objInfoImSize1.y
+	);*/
+
+	VECTOR4 judgeSkipArea4 = VECTOR4(
+		objHierarchyImPos.x, objHierarchyImPos.y,
+		objHierarchyImSize.x, objHierarchyImSize.y
 	);
+
 
 	static const float e = 0.8f;	// 反発係数
 	static const float f = 0.02f;	// 摩擦
@@ -129,6 +140,7 @@ void StageEdit::Update()
 	default:
 		break;
 	}
+
 	// オブジェクト作成ボタンImGui
 	ImGui::SetNextWindowPos(createObjImPos);
 	ImGui::SetNextWindowSize(createObjImSize);
@@ -180,6 +192,22 @@ void StageEdit::Update()
 	}
 	ImGui::End();
 
+	int i = 0;
+	ImGui::SetNextWindowPos(objHierarchyImPos);
+	ImGui::SetNextWindowSize(objHierarchyImSize);
+
+	ImGui::Begin("HIERARCHY");
+	for (Object3D* obj : hierarchyObj)
+	{
+		i++;
+		//string name = obj->editObj.name;
+		string name = "[" + to_string(i) + "] : " + obj->editObj.name;
+		if (ImGui::Button(name.c_str()))
+		{
+			SelectObj(obj);
+		}
+	}
+	ImGui::End();
 
 	// Stage読み書き用
 	ImGui::SetNextWindowPos(stageImPos);
@@ -402,6 +430,11 @@ void StageEdit::HasUpdate()
 				if (temp != nullptr)
 				{
 					SelectObj(temp);
+					
+				}
+				else
+				{
+					DeselectObj();
 				}
 			}
 		}
@@ -513,6 +546,9 @@ void StageEdit::HasUpdate()
 			for(Object3D* obj : selectObj)
 			{
 				VECTOR3 tmpPos = obj->Position();
+				VECTOR3 tmpRot = obj->Rotation() * 180 / XM_PI;
+				VECTOR3 tmpScale = obj->Scale();
+
 				i++;
 				name = "[" + to_string(i) + "] :" + obj->editObj.name;
 				if (ImGui::BeginTabItem(name.c_str()))
@@ -521,7 +557,6 @@ void StageEdit::HasUpdate()
 					ImGui::SliderFloat("f", &obj->pObj.f, 0.0f, 0.1f, "%.2f");
 					ImGui::InputFloat("mass", &obj->pObj.mass, 0.5f, 1.0f);
 					// 場所
-					VECTOR3 pos = obj->Position();
 					ImGui::InputFloat("PositionX", &tmpPos.x, 0.1f, 0.5f, "%.2f");
 					ImGui::InputFloat("PositionY", &tmpPos.y, 0.1f, 0.5f, "%.2f");
 					ImGui::InputFloat("PositionZ", &tmpPos.z, 0.1f, 0.5f, "%.2f");
@@ -531,14 +566,19 @@ void StageEdit::HasUpdate()
 
 					// 回転
 					VECTOR3 rot = obj->Rotation();
-					ImGui::InputFloat("RotateX", &rot.x, 0.1f, 0.5f, "%.2f");
-					ImGui::InputFloat("RotateY", &rot.y, 0.1f, 0.5f, "%.2f");
-					ImGui::InputFloat("RotateZ", &rot.z, 0.1f, 0.5f, "%.2f");
+					ImGui::InputFloat("RotateX", &tmpRot.x, 5.0f, 0.5f, "%.2f");
+					ImGui::InputFloat("RotateY", &tmpRot.y, 5.0f, 0.5f, "%.2f");
+					ImGui::InputFloat("RotateZ", &tmpRot.z, 5.0f, 0.5f, "%.2f");
+					
+					obj->SetRotation(tmpRot / 180 * XM_PI);
+
 					// スケール
 					VECTOR3 scale = obj->Scale();
-					ImGui::InputFloat("ScaleX", &scale.x, 0.1f, 0.5f, "%.2f");
-					ImGui::InputFloat("scaleY", &scale.y, 0.1f, 0.5f, "%.2f");
-					ImGui::InputFloat("ScaleZ", &scale.z, 0.1f, 0.5f, "%.2f");
+					ImGui::InputFloat("ScaleX", &tmpScale.x, 0.1f, 0.5f, "%.2f");
+					ImGui::InputFloat("scaleY", &tmpScale.y, 0.1f, 0.5f, "%.2f");
+					ImGui::InputFloat("ScaleZ", &tmpScale.z, 0.1f, 0.5f, "%.2f");
+
+					obj->SetScale(tmpScale);
 
 					ImGui::EndTabItem();
 				}
@@ -970,7 +1010,7 @@ void StageEdit::SelectObj(Object3D* ob)
 		ob->pObj.f = f;
 		ob->pObj.mass = mass;
 		selectObj.push_back(ob);
-
+		hierarchyObj.push_back(ob);
 		//getObj->pObj.e = e;
 		//getObj->pObj.f = f;
 		//getObj->pObj.mass = mass;
@@ -1054,6 +1094,7 @@ void StageEdit::DeleteObj()
 	{
 		if(obj->editObj.name != "FallCheck")
 		{
+			hierarchyObj.remove(obj);
 			obj->DestroyMe();
 		}
 	}
@@ -1107,7 +1148,6 @@ void StageEdit::DupeObj()
 		if(tempObj != nullptr)
 		{
 			tempObj->pObj.center = obj->pObj.center;
-			tempObj->SetPosition(tempObj->pObj.center);
 			tempObj->SetRotation(obj->Rotation());
 			tempObj->SetScale(obj->Scale());
 
@@ -1115,6 +1155,7 @@ void StageEdit::DupeObj()
 			tempObj->pObj.f = obj->pObj.f;
 			tempObj->pObj.mass = obj->pObj.mass;
 			tempList.push_back(tempObj);
+			hierarchyObj.push_back(tempObj);
 		}
 	}
 	DeselectObj();
@@ -1275,6 +1316,7 @@ void StageEdit::Load(int n)
 			obj->editObj.name == "Line"
 			)
 		{
+			hierarchyObj.remove(obj);
 			obj->DestroyMe();
 		}
 	}
@@ -1392,6 +1434,7 @@ void StageEdit::Load(int n)
 			float y = csv->GetFloat(i, 3);
 			float z = csv->GetFloat(i, 4);
 			obj->SetPosition(x, y, z);
+			hierarchyObj.push_back(obj);
 		}
 	}
 	delete csv;
@@ -1402,7 +1445,7 @@ bool StageEdit::GetWorldPos()
 {
 	// マウス座標取得
 	mousePos = GameDevice()->m_pDI->GetMousePos();
-
+/*
 	if (pDI->CheckMouse(KD_DAT, 0))
 	{
 		// オブジェクトのスケールと回転を変えるときウィンドウをループするようにしたい
@@ -1425,7 +1468,7 @@ bool StageEdit::GetWorldPos()
 			SetCursorPos(mousePos.x, WINDOW_HEIGHT);
 		}
 	}
-
+*/
 
 	// 近視点(0)と遠視点(1)
 	nearWorldPos = XMVector3Unproject(VECTOR3(mousePos.x, mousePos.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);

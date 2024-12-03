@@ -119,10 +119,8 @@ private:
 	// 選択状態のオブジェクト
 	//Object3D* getObj = nullptr;	
 	std::list<Object3D*> selectObj;
-	std::list<VECTOR3> pos;
-	std::list<VECTOR3> rot;
-	std::list<VECTOR3> scale;
 
+	std::list<Object3D*> hierarchyObj;
 
 	// 選択状態のGizmo
 	Object3D* getGizmo = nullptr;
