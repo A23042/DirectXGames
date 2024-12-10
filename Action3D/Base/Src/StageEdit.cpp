@@ -31,7 +31,7 @@ namespace
 
 	// hierarchy
 	ImVec2 objHierarchyImPos = ImVec2(30, 170);
-	ImVec2 objHierarchyImSize = ImVec2(290, 310);
+	ImVec2 objHierarchyImSize = ImVec2(250, 350);
 
 	// 判定を飛ばすエリア指定左上の座標と右下の座標
 	VECTOR4 judgeSkipArea0 = VECTOR4(
@@ -57,9 +57,9 @@ namespace
 	);
 
 
-	static const float e = 0.8f;	// 反発係数
-	static const float f = 0.02f;	// 摩擦
-	static const float mass = 1;	// 質量
+	static const float defaultE = 0.8f;	// 反発係数
+	static const float defaultF = 0.02f;	// 摩擦
+	static const float defaultMass = 1;	// 質量
 };
 
 // マウスのドラッグアンドドロップでステージオブジェクトの配置が理想
@@ -67,10 +67,7 @@ namespace
 // オブジェクトを配置、削除したらcsvの行を詰めたい
 StageEdit::StageEdit()
 {
-	// 左下Gizmo初期化
-	gizmoObj = new Gizmo3D();
-	gizmoObj->SetScale(VECTOR3(0.15f, 0.15f, 0.15f));
-	gizmoObj->SetRotation(VECTOR3(0, 180.0f / 180 * XM_PI, 0));
+	new Gizmo3D();
 
 	// 親Gizmoと移動、回転サイズGizmoの初期化
 	gizmoC = new GizmoXYZ();
@@ -94,26 +91,13 @@ StageEdit::StageEdit()
 	nState = sNone;
 	gState = sNoneGizmo;
 
-	tempE = e;
-	tempF = f;
-	tempMass = mass;
+	tempE = defaultE;
+	tempF = defaultF;
+	tempMass = defaultMass;
 }
 
 StageEdit::~StageEdit()
 {
-	// えらーでる
-	/*SAFE_DELETE(gizmoObj);
-	SAFE_DELETE(gizmoC);
-	SAFE_DELETE(posGizmoX);
-	SAFE_DELETE(posGizmoY);
-	SAFE_DELETE(posGizmoZ);
-	SAFE_DELETE(rotGizmoX);
-	SAFE_DELETE(rotGizmoY);
-	SAFE_DELETE(rotGizmoZ);
-	SAFE_DELETE(scaleGizmoX);
-	SAFE_DELETE(scaleGizmoY);
-	SAFE_DELETE(scaleGizmoZ);
-	SAFE_DELETE(fallCheck);*/
 }
 
 void StageEdit::Update()
@@ -124,11 +108,6 @@ void StageEdit::Update()
 	identity = XMMatrixIdentity();
 	judgeArea = GetWorldPos();
 
-	// 3DGizmo表示位置
-	// Windowの左下
-	VECTOR3 windowWorldPos = XMVector3Unproject(VECTOR3(100, WINDOW_HEIGHT - 100, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
-	gizmoObj->SetPosition(windowWorldPos);
-	
 	switch (nState)
 	{
 	case sNone:
@@ -142,99 +121,11 @@ void StageEdit::Update()
 	}
 
 	// オブジェクト作成ボタンImGui
-	ImGui::SetNextWindowPos(createObjImPos);
-	ImGui::SetNextWindowSize(createObjImSize);
-	ImGui::Begin("NEWOBJ");
-	if (ImGui::Button("Box"))
-	{
-		isNew = true;
-		SelectObj(new Box());
-	}
-	if (ImGui::Button("MoveBox"))
-	{
-		isNew = true;
-		SelectObj(new MoveBox());
-	}
-	if (ImGui::Button("Area1"))
-	{
-		isNew = true;
-		SelectObj(new ScoreArea1);
-	}
-	if (ImGui::Button("Area2"))
-	{
-		isNew = true;
-		SelectObj(new ScoreArea2);
-	}
-	if (ImGui::Button("Area3"))
-	{
-		isNew = true;
-		SelectObj(new ScoreArea3);
-	}
-	if (ImGui::Button("Line"))
-	{
-		isNew = true;
-		SelectObj(new Line());
-	}
-	if (ImGui::Button("Ball"))
-	{
-		isNew = true;
-		SelectObj(new Ball(false));
-	}
-	// Playerは２つまで
-	if(pNum <= 1)
-	{
-		if (ImGui::Button("Player"))
-		{
-			isNew = true;
-			SelectObj(new Player(pNum,false));
-			pNum++;
-		}
-	}
-	ImGui::End();
-
-	int i = 0;
-	ImGui::SetNextWindowPos(objHierarchyImPos);
-	ImGui::SetNextWindowSize(objHierarchyImSize);
-
-	ImGui::Begin("HIERARCHY");
-	for (Object3D* obj : hierarchyObj)
-	{
-		i++;
-		//string name = obj->editObj.name;
-		string name = "[" + to_string(i) + "] : " + obj->editObj.name;
-		if (ImGui::Button(name.c_str()))
-		{
-			SelectObj(obj);
-		}
-	}
-	ImGui::End();
-
-	// Stage読み書き用
-	ImGui::SetNextWindowPos(stageImPos);
-	ImGui::SetNextWindowSize(stageImSize);
-	ImGui::Begin("MENU");
-	ImGui::InputInt("Stage", &stageNum);
-	if (ImGui::Button("SAVE"))
-	{
-		if(MessageBox(GameDevice()->m_pMain->m_hWnd, "上書きセーブしますか", "セーブ", MB_OKCANCEL) == IDOK)
-		{
-			Save(stageNum);
-		}
-	}
-	if (ImGui::Button("LOAD"))
-	{
-		if (MessageBox(GameDevice()->m_pMain->m_hWnd, "現在のマップを上書きロードしますか", "ロード", MB_OKCANCEL) == IDOK)
-		{
-			Load(stageNum);
-		}
-	}
-	if (ImGui::Button("PLAY"))
-	{
-		//Save(stageNum);
-		SceneManager::ChangeScene("PlayScene",stageNum);
-	}
-	ImGui::End();
-
+	CreateObjImGui();
+	// ヒエラルキーImGui
+	HierarchyImGui();
+	// ステージ読み書き用ImGui
+	StageImGui();
 }
 
 #if 1
@@ -253,38 +144,10 @@ void StageEdit::NoneUpdate()
 		if (GameDevice()->m_pDI->CheckMouse(KD_TRG, 0))
 		{
 			Object3D* temp = nullptr;
-			// 探索された最初のオブジェクトか
-			bool firstFlag = true;
-			// naerWorldPosから当たった場所までの距離
-			float distance = 0.0f;
-			// 当たったオブジェクトのなかでの最短距離
-			float minDistance = 0.0f;
-
 			// Gizmo以外のオブジェクトと衝突判定
 			list<Object3D*> objs = FindGameObjectsWithOutTag<Object3D>("Gizmo");
-			for (Object3D* obj : objs)
-			{
-				VECTOR3 hit;
-				if (obj->HitLineToMesh(nearWorldPos, farWorldPos, &hit))
-				{
-					// 当たった場所への距離を求めて一番近いオブジェクトを格納する
-					distance = (hit - nearWorldPos).Length();
-					if (firstFlag)
-					{
-						minDistance = distance;
-						firstFlag = false;
-						temp = obj;
-					}
-					else
-					{
-						if (minDistance > distance)
-						{
-							minDistance = distance;
-							temp = obj;
-						}
-					}
-				}
-			}
+			VECTOR3 hit;
+			temp = GetClosestHitObject(objs, hit);
 			if (temp != nullptr)
 			{
 				SelectObj(temp);
@@ -292,14 +155,6 @@ void StageEdit::NoneUpdate()
 			}
 		}
 	}
-	/*if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_1))
-	{
-		SelectObj(new Box());
-	}
-	else if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_2))
-	{
-		SelectObj(new Player(false));
-	}*/
 }
 
 void StageEdit::HasUpdate()
@@ -335,102 +190,42 @@ void StageEdit::HasUpdate()
 		if (GameDevice()->m_pDI->CheckMouse(KD_TRG, 0))
 		{
 			bool isHit = false;
-			// 探索された最初のオブジェクトか
-			bool firstFlag = true;
-			// naerWorldPosから当たった場所までの距離
-			float distance = 0.0f;
-			// 当たったオブジェクトのなかでの最短距離
-			float minDistance = 0.0f;
-
 			// オブジェクト探索
 			// 先に表示中のGizmoだけ衝突判定をとる
-			list<GizmoXYZ*> gizmos = FindGameObjectsVisible<GizmoXYZ>();
-			for (GizmoXYZ* gizmo : gizmos)
+			list<Object3D*> gizmos = FindGameObjectsVisibleWithTag<Object3D>("Gizmo");
+			Object3D* temp = nullptr;
+			VECTOR3 hit = VECTOR3();
+			temp = GetClosestHitObject(gizmos, hit);
+			if (temp != nullptr)
 			{
-				VECTOR3 hit;
-				if (gizmo->HitLineToMesh(nearWorldPos, farWorldPos, &hit))
+				VECTOR3 objCenter = VECTOR3();
+				int i = 0;
+				for (Object3D* obj : selectObj)
 				{
-					VECTOR3 objCenter = VECTOR3();
-					int i = 0;
-					for (Object3D* obj : selectObj)
-					{
-						i++;
-						objCenter += obj->Position();
-					}
-					objCenter /= i;
-
-					// 当たった場所への距離を求めて一番近いオブジェクトを格納する
-					distance = (hit - nearWorldPos).Length();
-					float exDistance = (nearWorldPos - objCenter).Length();
-					extendedNearWorldPos = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
-					prevMousePos = extendedNearWorldPos;
-					// 違うオブジェクトがクリックされたら選択オブジェクト変更
-					if (firstFlag)
-					{
-						minDistance = distance;
-						firstFlag = false;
-						//float exDistance = (nearWorldPos - getObj->Position()).Length();
-						//extendedNearWorldPos = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
-						//prevMousePos = extendedNearWorldPos;
-						getGizmo = gizmo;
-					}
-					else
-					{
-						if (minDistance > distance)
-						{
-							minDistance = distance;
-							//float exDistance = (nearWorldPos - getObj->Position()).Length();
-							//extendedNearWorldPos = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
-							//prevMousePos = extendedNearWorldPos;
-							getGizmo = gizmo;
-						}
-					}
-					isHit = true;
+					i++;
+					objCenter += obj->Position();
 				}
+				objCenter /= i;
+				float distance = (hit - nearWorldPos).Length();
+				float exDistance = (nearWorldPos - objCenter).Length();
+				extendedNearWorldPos = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
+				prevMousePos = extendedNearWorldPos;
+				getGizmo = temp;
+				isHit = true;
 			}
+
 			// Gizmoに当たってなければ衝突判定をとる
 			if (!isHit)
 			{
-				// 一番近いオブジェクトの格納
-				Object3D* temp = nullptr;
-				// 探索された最初のオブジェクトか
-				bool firstFlag = true;
-				// naerWorldPosから当たった場所までの距離
-				float distance = 0.0f;
-				// 当たったオブジェクトのなかでの最短距離
-				float minDistance = 0.0f;
 				// Gizmo以外のオブジェクトを調べる
 				list<Object3D*> objs = FindGameObjectsWithOutTag<Object3D>("Gizmo");
-				for (Object3D* obj : objs)
-				{
-					VECTOR3 hit;
-					// カーソルのワールド座標の近視点から遠視点までのRayを飛ばす
-					if (obj->HitLineToMesh(nearWorldPos, farWorldPos, &hit))
-					{
-						// 当たった場所への距離を求めて一番近いオブジェクトを格納する
-						distance = (hit - nearWorldPos).Length();
-						// 違うオブジェクトがクリックされたら選択オブジェクト変更
-						if (firstFlag)
-						{
-							temp = obj;
-							minDistance = distance;
-							firstFlag = false;
-						}
-						// 二回目以降距離が近ければ
-						else if (minDistance > distance)
-						{
-							if (obj != temp)
-							{
-								temp = obj;
-								minDistance = distance;
-							}
-						}
-					}
-				}
+				Object3D* temp = nullptr;
+				VECTOR3 hit;
+				temp = GetClosestHitObject(objs, hit);
+
 				if (temp != nullptr)
 				{
 					SelectObj(temp);
-					
 				}
 				else
 				{
@@ -592,14 +387,11 @@ void StageEdit::HasUpdate()
 
 	// ImGuiで入力された値をオブジェクトに適用
 	
-	//getObj->pObj.e = tempE;
-	//getObj->pObj.f = tempF;
-	//getObj->pObj.mass = tempMass;
 	// 場所はObjectが持っている構造体のCenterに適用させる
 	// それぞれのオブジェクトのUpdateでCenterをtransform.positinonに適用させてるから
-	//getObj->pObj.center = objPos;	// 場所
+
 	// 回転角度をラジアンから度数に変換
-	//VECTOR3 Rot = getObj->Rotation();
+
 	//getObj->SetRotation(objRot / 180.0f * XM_PI);	// 回転
 	// スケールの最小値は0.1
 	if(objScale.x <= 0.1f)
@@ -665,6 +457,7 @@ void StageEdit::PosGizmoUpdate()
 	gizmoC->SetRotation(VECTOR3());
 	VECTOR3 objCenter = VECTOR3();
 	int i = 0;
+	// 選択されているオブジェクトの中心点を取る
 	for (Object3D* obj : selectObj)
 	{
 		i++;
@@ -703,7 +496,6 @@ void StageEdit::PosGizmoUpdate()
 					{
 						obj->pObj.center.x += diff.x;
 					}
-
 				}
 				else if (getGizmo->editObj.name == "posGizmoY")
 				{
@@ -785,6 +577,15 @@ void StageEdit::RotGizmoUpdate()
 		{
 			if (pDI->CheckMouse(KD_DAT, 0))
 			{
+				if (CursorLoop())
+				{
+					GetWorldPos();
+					exDistance = (nearWorldPos - objCenter).Length();
+					nearWorldPosEx = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
+					prevMousePos = nearWorldPosEx;
+					return;
+				}
+
 				if (getGizmo->editObj.name == "rotGizmoX")
 				{
 					objRot.x = (objRot.x) + (diff.y * 200 / 180.0f * XM_PI);
@@ -866,6 +667,14 @@ void StageEdit::ScaleGizmoUpdate()
 		{
 			if (pDI->CheckMouse(KD_DAT, 0))
 			{
+				if (CursorLoop())
+				{
+					GetWorldPos();
+					exDistance = (nearWorldPos - objCenter).Length();
+					nearWorldPosEx = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
+					prevMousePos = nearWorldPosEx;
+					return;
+				}
 				if (getGizmo->editObj.name == "scaleGizmoX")
 				{
 					objScale.x += diff.x * 2;
@@ -978,42 +787,35 @@ void StageEdit::SetGizmo(int gState)
 	}
 }
 
-void StageEdit::SelectObj(Object3D* ob)
+void StageEdit::SelectObj(Object3D* obj)
 {
 	//LCtrl押されてたら
 	if (pDI->CheckKey(KD_DAT, DIK_LCONTROL))
 	{
 		// listの中にすでにあれば選択解除
-		if (find(selectObj.begin(), selectObj.end(), ob) != selectObj.end())
+		if (find(selectObj.begin(), selectObj.end(), obj) != selectObj.end())
 		{
-			DeselectObj(ob);
-			selectObj.remove(ob);
+			DeselectObj(obj);
+			selectObj.remove(obj);
 		}
 		// なければ追加
 		else
 		{
-			selectObj.push_back(ob);
+			selectObj.push_back(obj);
 		}
 	}
 	else
 	{
-		//selectObj.clear();
 		DeselectObj();
-		selectObj.push_back(ob);
+		selectObj.push_back(obj);
 	}
 	if (isNew)
 	{
-		selectObj.clear();
-		//if (getObj != nullptr)DeselectObj();
-		//getObj = ob;
-		ob->pObj.e = e;
-		ob->pObj.f = f;
-		ob->pObj.mass = mass;
-		selectObj.push_back(ob);
-		hierarchyObj.push_back(ob);
-		//getObj->pObj.e = e;
-		//getObj->pObj.f = f;
-		//getObj->pObj.mass = mass;
+		obj->pObj.e = defaultE;
+		obj->pObj.f = defaultF;
+		obj->pObj.mass = defaultMass;
+		selectObj.push_back(obj);
+		hierarchyObj.push_back(obj);
 		isNew = false;
 	}
 	// 選択されたオブジェクトの色を変える
@@ -1030,28 +832,19 @@ void StageEdit::SelectObj(Object3D* ob)
 		gState = sPosGizmo;
 	}
 
-	// それぞれの値をImGui用の変数に保管
-	//objPos = getObj->pObj.center;
-	//objRot = getObj->Rotation() * 180.0f / XM_PI;
-	//objScale = getObj->Scale();
+	objPos = obj->pObj.center;
+	objRot = obj->Rotation() * 180.0f / XM_PI;
+	objScale = obj->Scale();
 
-	objPos = ob->pObj.center;
-	objRot = ob->Rotation() * 180.0f / XM_PI;
-	objScale = ob->Scale();
-
-	//tempE = getObj->pObj.e;
-	//tempF = getObj->pObj.f;
-	//tempMass = getObj->pObj.mass;
-
-	tempE = ob->pObj.e;
-	tempF = ob->pObj.f;
-	tempMass = ob->pObj.mass;
+	tempE = obj->pObj.e;
+	tempF = obj->pObj.f;
+	tempMass = obj->pObj.mass;
 
 	// ステータスによって表示するGizmoを変える
 	SetGizmo(gState);
 
 	//getObj->editObj.isSelect = true;
-	ob->editObj.isSelect = true;
+	obj->editObj.isSelect = true;
 	nState = sHas;
 }
 
@@ -1062,11 +855,6 @@ void StageEdit::DeselectObj(Object3D* obj)
 	{
 		if (selectObj.size() != 0)
 		{
-			// 色をもとに戻す
-			//getObj->GetMesh()->m_vDiffuse = VECTOR4(1.0f, 1.0f, 1.0f, 1.0f);
-			//getObj->editObj.isSelect = false;
-			//getObj = nullptr;
-
 			// 色をもとに戻す
 			for (Object3D* obj : selectObj)
 			{
@@ -1099,7 +887,6 @@ void StageEdit::DeleteObj()
 		}
 	}
 	selectObj.clear();
-
 }
 
 void StageEdit::DupeObj()
@@ -1304,22 +1091,8 @@ void StageEdit::Load(int n)
 	
 	// 現在配置されているオブジェクトをリセット
 	list<Object3D*> objs = FindGameObjects<Object3D>();
-	for (Object3D* obj : objs)
-	{
-		if (obj->editObj.name == "Box" ||
-			obj->editObj.name == "MoveBox"||
-			obj->editObj.name == "Player"||
-			obj->editObj.name == "Ball" ||
-			obj->editObj.name == "scoreArea1" ||
-			obj->editObj.name == "scoreArea2" ||
-			obj->editObj.name == "scoreArea3" ||
-			obj->editObj.name == "Line"
-			)
-		{
-			hierarchyObj.remove(obj);
-			obj->DestroyMe();
-		}
-	}
+	CheckResetObj(objs);
+
 	pNum = 0;
 	char name[64];
 	if (!isTestMap)
@@ -1352,7 +1125,7 @@ void StageEdit::Load(int n)
 				float mass = csv->GetFloat(i, 8);
 				int num = csv->GetFloat(i, 9);
 				obj = new Player(num, false);
-				obj->SetRotation(VECTOR3(0, rotY / 180.0f * XM_PI, 0));
+				obj->SetRotation(VECTOR3(0, rotY, 0));
 				obj->pObj.e = e;
 				obj->pObj.f = f;
 				obj->pObj.mass = mass;
@@ -1360,8 +1133,8 @@ void StageEdit::Load(int n)
 			}
 			else if (str == "BOX") 
 			{
-				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
-				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
+				VECTOR3 size = csv->GetVector3(i, 5);
+				VECTOR3 rot = csv->GetVector3(i, 8);
 				float e = csv->GetFloat(i, 11);
 				float f = csv->GetFloat(i, 12);
 				obj = new Box(size, rot);	// 直方体のサイズと回転量を渡す
@@ -1370,10 +1143,10 @@ void StageEdit::Load(int n)
 			}
 			else if (str == "MBox") 
 			{
-				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
-				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
-				VECTOR3 move = VECTOR3(csv->GetFloat(i, 11), csv->GetFloat(i, 12), csv->GetFloat(i, 13));
-				VECTOR3 moveSpeed = VECTOR3(csv->GetFloat(i, 14), csv->GetFloat(i, 15), csv->GetFloat(i, 16));
+				VECTOR3 size = csv->GetVector3(i, 5);
+				VECTOR3 rot = csv->GetVector3(i, 8);
+				VECTOR3 move = csv->GetVector3(i, 11);
+				VECTOR3 moveSpeed = csv->GetVector3(i, 14);
 				float e = csv->GetFloat(i, 17);
 				float f = csv->GetFloat(i, 18);
 				obj = new MoveBox(size, rot, move, moveSpeed);	// 直方体のサイズと回転量、移動量を渡す
@@ -1392,36 +1165,29 @@ void StageEdit::Load(int n)
 			}
 			else if (str == "Area1")
 			{
-				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
-				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
+				VECTOR3 size = csv->GetVector3(i, 5);
+				VECTOR3 rot = csv->GetVector3(i, 8);
 				obj = new ScoreArea1(size, rot);
 			}
 			else if (str == "Area2")
 			{
-				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
-				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
+				VECTOR3 size = csv->GetVector3(i, 5);
+				VECTOR3 rot = csv->GetVector3(i, 8);
 				obj = new ScoreArea2(size, rot);
 			}
 			else if (str == "Area3")
 			{
-				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
-				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
-				obj = new ScoreArea3(size, rot);
+				obj = new ScoreArea3(csv->GetVector3(i, 5), csv->GetVector3(i, 8));
 			}
 			else if (str == "FallCheck")
 			{
-				float x = csv->GetFloat(i, 2);
-				float y = csv->GetFloat(i, 3);
-				float z = csv->GetFloat(i, 4);
-				fallCheck->pObj.center = VECTOR3(x, y, z);
+				VECTOR3 pos = csv->GetVector3(i, 2);
+				fallCheck->pObj.center = pos;
 				continue;
 			}
 			else if (str == "Line")
 			{
-				float x = csv->GetFloat(i, 2);
-				float y = csv->GetFloat(i, 3);
-				float z = csv->GetFloat(i, 4);
-				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
+				VECTOR3 size = csv->GetVector3(i, 5);
 				obj = new Line();
 				obj->SetScale(size);
 			}
@@ -1430,14 +1196,40 @@ void StageEdit::Load(int n)
 				continue;
 				//assert(false);
 			}
-			float x = csv->GetFloat(i, 2);
-			float y = csv->GetFloat(i, 3);
-			float z = csv->GetFloat(i, 4);
-			obj->SetPosition(x, y, z);
+			VECTOR3 pos = csv->GetVector3(i, 2);
+			obj->SetPosition(pos);
 			hierarchyObj.push_back(obj);
 		}
 	}
 	delete csv;
+}
+
+bool StageEdit::CursorLoop()
+{
+	POINT clientPos = { 0,0 };
+	ClientToScreen(GameDevice()->m_pMain->m_hWnd, &clientPos);
+
+	if (clientPos.x + mousePos.x > clientPos.x + WINDOW_WIDTH)
+	{
+		SetCursorPos(clientPos.x, clientPos.y + mousePos.y);
+		return true;
+	}
+	else if (clientPos.x + mousePos.x < clientPos.x)
+	{
+		SetCursorPos(clientPos.x + WINDOW_WIDTH, mousePos.y);
+		return true;
+	}
+	if (clientPos.y + mousePos.y > clientPos.y + WINDOW_HEIGHT)
+	{
+		SetCursorPos(clientPos.x + mousePos.x, clientPos.y);
+		return true;
+	}
+	else if (clientPos.y + mousePos.y < clientPos.y)
+	{
+		SetCursorPos(clientPos.x + mousePos.x, clientPos.y + WINDOW_HEIGHT);
+		return true;
+	}
+	return false;
 }
 
 // マウスカーソルのワールド座標の取得
@@ -1445,30 +1237,6 @@ bool StageEdit::GetWorldPos()
 {
 	// マウス座標取得
 	mousePos = GameDevice()->m_pDI->GetMousePos();
-/*
-	if (pDI->CheckMouse(KD_DAT, 0))
-	{
-		// オブジェクトのスケールと回転を変えるときウィンドウをループするようにしたい
-
-		if (mousePos.x > WINDOW_WIDTH)
-		{
-			//ClientToScreen(GameDevice()->m_pMain->m_hWnd, &mousePos);
-			SetCursorPos(0, mousePos.y);
-		}
-		else if (mousePos.x < 0)
-		{
-			SetCursorPos(WINDOW_WIDTH, mousePos.y);
-		}
-		if (mousePos.y > WINDOW_HEIGHT)
-		{
-			SetCursorPos(mousePos.x, 0);
-		}
-		else if (mousePos.y < 0)
-		{
-			SetCursorPos(mousePos.x, WINDOW_HEIGHT);
-		}
-	}
-*/
 
 	// 近視点(0)と遠視点(1)
 	nearWorldPos = XMVector3Unproject(VECTOR3(mousePos.x, mousePos.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
@@ -1477,34 +1245,180 @@ bool StageEdit::GetWorldPos()
 	// 方向ベクトルを正規化して長さを延ばす
 	direction = XMVector3Normalize(farWorldPos - nearWorldPos);
 
-	// ImGui範囲内の時はfalseを返す
+	return CheckInAreaCursor();
+}
+
+void StageEdit::CheckResetObj(list<Object3D*> objs)
+{
+	for (Object3D* obj : objs)
+	{
+		// 判定を取るオブジェクト
+		if (obj->editObj.name == "Box" ||
+			obj->editObj.name == "MoveBox" ||
+			obj->editObj.name == "Player" ||
+			obj->editObj.name == "Ball" ||
+			obj->editObj.name == "scoreArea1" ||
+			obj->editObj.name == "scoreArea2" ||
+			obj->editObj.name == "scoreArea3" ||
+			obj->editObj.name == "Line"
+			)
+		{
+			// ヒエラルキーから削除
+			hierarchyObj.remove(obj);
+			obj->DestroyMe();
+		}
+	}
+}
+
+void StageEdit::CreateObjImGui()
+{
+	ImGui::SetNextWindowPos(createObjImPos);
+	ImGui::SetNextWindowSize(createObjImSize);
+	ImGui::Begin("NEWOBJ");
+	if (ImGui::Button("Box"))
+	{
+		isNew = true;
+		SelectObj(new Box());
+	}
+	if (ImGui::Button("MoveBox"))
+	{
+		isNew = true;
+		SelectObj(new MoveBox());
+	}
+	if (ImGui::Button("Area1"))
+	{
+		isNew = true;
+		SelectObj(new ScoreArea1);
+	}
+	if (ImGui::Button("Area2"))
+	{
+		isNew = true;
+		SelectObj(new ScoreArea2);
+	}
+	if (ImGui::Button("Area3"))
+	{
+		isNew = true;
+		SelectObj(new ScoreArea3);
+	}
+	if (ImGui::Button("Line"))
+	{
+		isNew = true;
+		SelectObj(new Line());
+	}
+	if (ImGui::Button("Ball"))
+	{
+		isNew = true;
+		SelectObj(new Ball(false));
+	}
+	// Playerは２つまで
+	if (pNum <= 1)
+	{
+		if (ImGui::Button("Player"))
+		{
+			isNew = true;
+			SelectObj(new Player(pNum, false));
+			pNum++;
+		}
+	}
+	ImGui::End();
+}
+
+void StageEdit::HierarchyImGui()
+{
+	int i = 0;	// オブジェクト番号
+	ImGui::SetNextWindowPos(objHierarchyImPos);
+	ImGui::SetNextWindowSize(objHierarchyImSize);
+
+	ImGui::Begin("HIERARCHY");
+	for (Object3D* obj : hierarchyObj)
+	{
+		i++;
+		// ボタンにオブジェクトの番号 + 名前を入れる
+		string name = "[" + to_string(i) + "] : " + obj->editObj.name;
+		if (ImGui::Button(name.c_str()))
+		{
+			SelectObj(obj);
+		}
+	}
+	ImGui::End();
+}
+
+void StageEdit::StageImGui()
+{
+	// Stage読み書き用
+	ImGui::SetNextWindowPos(stageImPos);
+	ImGui::SetNextWindowSize(stageImSize);
+	ImGui::Begin("MENU");
+	ImGui::InputInt("Stage", &stageNum);
+	if (ImGui::Button("SAVE"))
+	{
+		if (MessageBox(GameDevice()->m_pMain->m_hWnd, "上書きセーブしますか", "セーブ", MB_OKCANCEL) == IDOK)
+		{
+			Save(stageNum);
+		}
+	}
+	if (ImGui::Button("LOAD"))
+	{
+		if (MessageBox(GameDevice()->m_pMain->m_hWnd, "現在のマップを上書きロードしますか", "ロード", MB_OKCANCEL) == IDOK)
+		{
+			Load(stageNum);
+		}
+	}
+	if (ImGui::Button("PLAY"))
+	{
+		SceneManager::ChangeScene("PlayScene", stageNum);
+	}
+	ImGui::End();
+}
+
+Object3D* StageEdit::GetClosestHitObject(list<Object3D*>objs, VECTOR3 &closestHit)
+{
+	Object3D* temp = nullptr;
+	// 探索された最初のオブジェクトか
+	bool firstFlag = true;
+	// naerWorldPosから当たった場所までの距離
+	float distance = 0.0f;
+	// 当たったオブジェクトのなかでの最短距離
+	float minDistance = 0.0f;
+
+	for (Object3D* obj : objs)
+	{
+		VECTOR3 hit;
+		if (obj->HitLineToMesh(nearWorldPos, farWorldPos, &hit))
+		{
+			// 当たった場所への距離を求めて一番近いオブジェクトを格納する
+			distance = (hit - nearWorldPos).Length();
+			if (firstFlag)
+			{
+				minDistance = distance;
+				firstFlag = false;
+				temp = obj;
+			}
+			else
+			{
+				if (minDistance > distance)
+				{
+					minDistance = distance;
+					closestHit = hit;
+					temp = obj;
+				}
+			}
+		}
+	}
+	if (temp != nullptr)
+	{
+		return temp;
+	}
+	return nullptr;
+}
+
+bool StageEdit::CheckInAreaCursor()
+{
 	if (mousePos.x > judgeSkipArea0.x && mousePos.x < judgeSkipArea0.x + judgeSkipArea0.z &&
 		mousePos.y > judgeSkipArea0.y && mousePos.y < judgeSkipArea0.y + judgeSkipArea0.w ||
 		mousePos.x > judgeSkipArea1.x && mousePos.x < judgeSkipArea1.x + judgeSkipArea1.z &&
-		mousePos.y > judgeSkipArea1.y && mousePos.y < judgeSkipArea1.y + judgeSkipArea1.w)
-	return false;
-
-	if (mousePos.x > judgeSkipArea2.x && mousePos.x < judgeSkipArea2.x + judgeSkipArea2.z &&
+		mousePos.y > judgeSkipArea1.y && mousePos.y < judgeSkipArea1.y + judgeSkipArea1.w ||
+		mousePos.x > judgeSkipArea2.x && mousePos.x < judgeSkipArea2.x + judgeSkipArea2.z &&
 		mousePos.y > judgeSkipArea2.y && mousePos.y < judgeSkipArea2.y + judgeSkipArea2.w)
 	return false;
-
-
-#if 0
-	if(getObj != nullptr)
-	{
-		if (getObj->editObj.name != "MoveBox")
-		{
-			if (mousePos.x > judgeSkipArea2.x && mousePos.x < judgeSkipArea2.x + judgeSkipArea2.z &&
-				mousePos.y > judgeSkipArea2.y && mousePos.y < judgeSkipArea2.y + judgeSkipArea2.w)
-				return false;
-		}
-		else
-		{
-			if (mousePos.x > judgeSkipArea3.x && mousePos.x < judgeSkipArea3.x + judgeSkipArea3.z &&
-				mousePos.y > judgeSkipArea3.y && mousePos.y < judgeSkipArea3.y + judgeSkipArea3.w)
-				return false;
-		}
-	}
-#endif
-	return true;
 }

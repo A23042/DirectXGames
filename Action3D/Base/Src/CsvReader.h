@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "MyMath.h"
 
 /// <summary>
 /// CSVを読むクラス
@@ -48,6 +49,15 @@ public:
 	/// <param name="column">桁</param>
 	/// <returns>小数値</returns>
 	float GetFloat(unsigned int line, unsigned int column);
+
+	/// 2024.12.10 S.Matsunaga
+	/// <summary>
+	/// 指定位置から3個連続した値をVECTOR3で取得する
+	/// </summary>
+	/// <param name="line">行</param>
+	/// <param name="column">最初の桁</param>
+	/// <returns>VECTOR3</returns>
+	VECTOR3 GetVector3(unsigned int line, unsigned int column);
 private:
 	struct LINEREC {
 		std::vector<std::string> record;

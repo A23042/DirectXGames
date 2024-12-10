@@ -100,3 +100,13 @@ float CsvReader::GetFloat(unsigned int line, unsigned int column)
 	std::string str = GetString(line, column);
 	return std::stof(str);
 }
+
+VECTOR3 CsvReader::GetVector3(unsigned int line, unsigned int column)
+{
+	std::string str[3] = {};
+	for (int i = 0; i < 3; i++)
+	{
+		str[i] = GetString(line, column + i);
+	}
+	return VECTOR3(std::stof(str[0]), std::stof(str[1]), std::stof(str[2]));
+}

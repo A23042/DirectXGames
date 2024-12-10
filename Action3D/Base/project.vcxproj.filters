@@ -366,6 +366,9 @@
     <ClInclude Include="Src\DataHolder.h">
       <Filter>ソース ファイル\08_PlayScene</Filter>
     </ClInclude>
+    <ClInclude Include="Src\MenuPanel.h">
+      <Filter>ソース ファイル\07_TitleScene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Main.cpp">
@@ -538,6 +541,9 @@
     </ClCompile>
     <ClCompile Include="Src\DataHolder.cpp">
       <Filter>ソース ファイル\08_PlayScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\MenuPanel.cpp">
+      <Filter>ソース ファイル\07_TitleScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

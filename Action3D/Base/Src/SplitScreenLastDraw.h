@@ -1,6 +1,7 @@
 #pragma once
 #include "Object3D.h"
 #include "Direct3D.h"
+#include "Player.h"
 
 class Score;
 class SplitScreen;
@@ -35,4 +36,18 @@ private:
 
 	int viewP0Score = 0;
 	int viewP1Score = 0;
+
+	std::list<Player*> pls;
+
+	CSprite* baseSpr = nullptr;
+	CSprite* gageSpr = nullptr;
+
+	CSpriteImage* base = nullptr;
+	CSpriteImage* gage = nullptr;
+	float posX = 0.0f;
+	float posY = 0.0f;
+	float rate[2] = {};
+	float width = 0.0f;
+	float height = 0.0f;
+
 };

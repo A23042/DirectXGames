@@ -18,28 +18,28 @@ public:
 	void Draw() override;
 
 	/// <summary>
-	/// オブジェクト未選択状態
+	/// オブジェクト未選択状態のUpdate
 	/// </summary>
 	void NoneUpdate();
 
 	/// <summary>
-	/// オブジェクト選択状態
+	/// オブジェクト選択状態のUpdate
 	/// </summary>
 	void HasUpdate();
 
 	/// <summary>
-	/// 移動用Gizmo表示状態
+	/// 移動用Gizmo表示状態のUpdate
 	/// HasUpdate()の中で呼ぶ
 	/// </summary>
 	void PosGizmoUpdate();
 
 	/// <summary>
-	/// 回転用Gizmo表示状態
+	/// 回転用Gizmo表示状態のUpdate
 	/// </summary>
 	void RotGizmoUpdate();
 	
 	/// <summary>
-	/// スケール用Gizmo表示状態
+	/// スケール用Gizmo表示状態のUpdate
 	/// </summary>
 	void ScaleGizmoUpdate();
 
@@ -57,10 +57,16 @@ public:
 	void SelectObj(Object3D* ob);
 
 	/// <summary>
-	/// オブジェクトの選択が解除されたときに呼ばれる
+	/// オブジェクトの選択解除
+	/// objがnullの場合選択されているオブジェクトすべて解除
+	/// objのデフォルトはnullptr
 	/// </summary>
+	/// <param name="obj">選択解除するオブジェクト</param>
 	void DeselectObj(Object3D* obj = nullptr);
 
+	/// <summary>
+	/// 選択されているオブジェクトの削除
+	/// </summary>
 	void DeleteObj();
 
 	/// <summary>
@@ -84,11 +90,44 @@ public:
 	void Load(int n);
 
 	/// <summary>
+	/// リセットするオブジェクトの判定を取る
+	/// 見つかったら削除
+	/// </summary>
+	/// <param name="obj">調べるObjectのリスト</param>
+	/// <returns></returns>
+	void CheckResetObj(list<Object3D*> objs);
+
+	/// <summary>
+	/// オブジェクトを生成ImGui
+	/// </summary>
+	void CreateObjImGui();
+
+	void HierarchyImGui();
+
+	void StageImGui();
+
+	/// <summary>
+	/// HitLineToMeshで一番距離の近いオブジェクトを探す
+	/// </summary>
+	/// <param name="objs">探索するオブジェクトリスト</param>
+	/// <returns>一番距離の近いオブジェクト</returns>
+	Object3D* GetClosestHitObject(list<Object3D*> objs, VECTOR3 &hit);
+
+	/// <summary>
+	/// オブジェクトのスケールと回転を変更している最中
+	/// カーソルが現在のWindowからでたら反対側から出す
+	/// </summary>
+	/// <returns>Windowから出たか</returns>
+	bool CursorLoop();
+
+	/// <summary>
 	/// マウスカーソルをワールド座標変換
 	/// ImGui上にカーソルがあるかどうかの判定も取る
 	/// </summary>
 	/// <returns>ImGuiの上にカーソルがあればfalse</returns>
 	bool GetWorldPos();
+	
+	bool CheckInAreaCursor();
 
 private:
 	// sステータス
@@ -125,8 +164,7 @@ private:
 	// 選択状態のGizmo
 	Object3D* getGizmo = nullptr;
 
-	// 左下の3DGizmo
-	Object3D* gizmoObj = nullptr;	
+	// TODO:配列にする
 	// 3DGizmoXYZ
 	Object3D* gizmoC = nullptr;
 	Object3D* posGizmoX = nullptr;
@@ -161,16 +199,17 @@ private:
 	VECTOR3 objRot;
 	VECTOR3 objScale;
 	VECTOR3 moveVolumu = {};	// MoveBoxの移動量
+
 	float moveSpeed = 0;	// MoveBoxの移動速度
 	float tempE;
 	float tempF;
 	float tempMass;
+
 	int pNum = 0;
 	int stageNum = 0;
 
 	bool judgeArea = true;	// ImGuiの判定エリア
 	bool isNew = false;	// 新規オブジェクト生成か
 	bool isTestMap = false;	// TestMapの編集中か
-
-	float test = 0;
+	bool isCursorLoop = false;
 };

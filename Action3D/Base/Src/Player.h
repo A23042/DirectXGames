@@ -47,6 +47,7 @@ public:
 	// ƒVƒ‡ƒbƒg‰ñ”‚ª‚ ‚é‚©
 	bool GetRestShot() { return restShot > 0; }
 
+	float GetRate(int i) { return rate[i]; }
 private:
 	enum State {
 		sNormal = 0,
@@ -83,4 +84,6 @@ private:
 
 	//XINPUT_STATE m_state;
 	//XINPUT_KEYSTROKE m_keystroke;
+
+	float rate[2] = {};
 };

@@ -25,6 +25,21 @@ SplitScreenLastDraw::SplitScreenLastDraw()
 	GameDevice()->m_pD3D->m_pDeviceContext->RSSetViewports(1, &vpSingle);
 
 	sp = new CSprite;
+
+	baseSpr = new CSprite();
+	gageSpr = new CSprite();
+
+	base = new CSpriteImage();
+	gage = new CSpriteImage();
+
+	base->Load("Data/Image/base.png");
+	gage->Load("Data/Image/gage.png");
+
+	posX = WINDOW_WIDTH - (WINDOW_WIDTH - base->m_dwImageWidth  / 2);
+	posY = WINDOW_HEIGHT - 100;
+	width = gage->m_dwImageWidth ;
+	height = base->m_dwImageHeight ;
+
 }
 
 SplitScreenLastDraw::~SplitScreenLastDraw()
@@ -116,9 +131,28 @@ void SplitScreenLastDraw::Draw()
 			// ここに最後に画面全体に描画したい処理を書く
 			// 例えば、枠線スプライトや全体ステータスの描画など
 
+			// ゲージ表示
+			pls = ObjectManager::FindGameObjects<Player>();
+			for (Player* pl : pls)
+			{
+				switch (pl->GetPlNum())
+				{
+				case 0:
+					baseSpr->Draw(base, posX, posY, 0, 0, width, height);
+					gageSpr->Draw(gage, posX, posY, 0, 0, width * pl->GetRate(0), height);
+					break;
+				case 1:
+					baseSpr->Draw(base, WINDOW_WIDTH / 2 + posX, posY, 0, 0, width, height);
+					gageSpr->Draw(gage, WINDOW_WIDTH / 2 + posX, posY, 0, 0, width * pl->GetRate(1), height);
+					break;
+				}
+			}
+			
+
+
+			// スコア表示
 			if(!data->IsPlay())
 			{
-				// スコア表示
 				sp->DrawRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, RGB(0, 0, 0), 0.2f);
 
 				float x = WINDOW_WIDTH / 3;

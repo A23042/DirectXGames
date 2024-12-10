@@ -1,10 +1,12 @@
 #include "TitleScene.h"
 #include "GameMain.h"
+#include "MenuPanel.h"
 
 TitleScene::TitleScene()
 {
 	positionX = 0;
 	speedX = 1;
+	new MenePanel();
 }
 
 TitleScene::~TitleScene()

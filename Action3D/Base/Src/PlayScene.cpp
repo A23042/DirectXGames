@@ -51,7 +51,7 @@ PlayScene::PlayScene(int num)
 				int num = csv->GetFloat(i, 9);
 				player[num] = new Player(num);
 				obj = player[num];
-				obj->SetRotation(VECTOR3(0, rotY / 180.0f * XM_PI, 0));
+				obj->SetRotation(VECTOR3(0, rotY, 0));
 				obj->pObj.e = e;
 				obj->pObj.f = f;
 				obj->pObj.mass = mass;
@@ -136,9 +136,10 @@ PlayScene::PlayScene(int num)
 	sc->Clear();
 	Instantiate<ScoreDraw>();
 	Instantiate<CollisonManager>();
-	Instantiate<SkyBox>();
+	//Instantiate<SkyBox>();
 	loadStage = Instantiate<LoadStage>();
 	resultPanel = SingleInstantiate<SplitScreenLastDraw>();
+	resultPanel->DontDestroyMe();
 	data = SingleInstantiate<DataHolder>();
 	data->DontDestroyMe();
 	data->SetPlay(true);

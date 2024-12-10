@@ -14,12 +14,12 @@ namespace
 	static const float JumpPower = 12.0f;		// ジャンプ力
 	static const float RotationSpeed = 1.2f;	// 回転速度(度)
 	static const float MoveSpeed = 0.3f;		// 移動速度
-	static const float MaxPushTime = 0.8f;		// 長押し上限
+	static const float MaxPushTime = 1.0f;		// 長押し上限
 	static const float StopSpeed = 0.04f;		// 速度が遅くなったら0にするための基準
 	static const float RDeadZone = 0.1f;			// Rスティックのデッドゾーン
 	static const float LDeadZone = 0.2f;			// Lスティックのデッドゾーン
 	static const int Power = 180;				// 長押し発射の威力基準
-	static const int RestShot = 3;				// 打てる回数
+	static const int RestShot = 1;				// 打てる回数
 	static const float preE = 0.6f;				// 発射前操作時の反発係数	
 	static const float preF = 0.08f;			// 発射前操作時の摩擦力
 };
@@ -56,6 +56,7 @@ Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
 	myE = 0;
 	myF = 0;
 	restShot = RestShot;
+	SetDrawOrder(-100);
 }
 
 Player::~Player()
@@ -160,11 +161,14 @@ void Player::Update()
 		//ImGui::InputFloat("Z", &transform.position.z);
 		//ImGui::End();
 	}
+	rate[playerNum] = pushTime[playerNum] / MaxPushTime;
 }
 
 void Player::Draw()
 {
 	Object3D::Draw(); // 継承元の関数を呼ぶ
+	// 割合 = 最大/現在の値
+	// 表示させる長さ = 画像の幅＊割合
 }
 
 void Player::UpdateWait()
@@ -509,7 +513,8 @@ void Player::UpdateNormal()
 					// 最大を超えないように
 					if (pushTime[playerNum] > MaxPushTime)
 					{
-						pushTime[playerNum] = MaxPushTime;
+						//pushTime[playerNum] = MaxPushTime;
+						pushTime[playerNum] = 0;
 					}
 				}
 				// 離して放つ
@@ -555,7 +560,8 @@ void Player::UpdateNormal()
 					pushTime[playerNum] += SceneManager::DeltaTime();
 					if (pushTime[playerNum] > MaxPushTime)
 					{
-						pushTime[playerNum] = MaxPushTime;
+						//pushTime[playerNum] = MaxPushTime;
+						pushTime[playerNum] = 0;
 					}
 				}
 				if (pDI->CheckKey(KD_UTRG, DIK_RCONTROL))
@@ -632,7 +638,8 @@ void Player::UpdateNormal()
 					pushTime[playerNum] += SceneManager::DeltaTime();
 					if (pushTime[playerNum] > MaxPushTime)
 					{
-						pushTime[playerNum] = MaxPushTime;
+						//pushTime[playerNum] = MaxPushTime;
+						pushTime[playerNum] = 0;
 					}
 				}
 				if (pDI->CheckJoy(KD_UTRG, DIJ_B, playerNum))
@@ -683,7 +690,8 @@ void Player::UpdateNormal()
 					pushTime[playerNum] += SceneManager::DeltaTime();
 					if (pushTime[playerNum] > MaxPushTime)
 					{
-						pushTime[playerNum] = MaxPushTime;
+						//pushTime[playerNum] = MaxPushTime;
+						pushTime[playerNum] = 0;
 					}
 				}
 				if (pDI->CheckKey(KD_UTRG, DIK_LCONTROL))
@@ -727,7 +735,8 @@ void Player::UpdateNormal()
 				pushTime[playerNum] += SceneManager::DeltaTime();
 				if (pushTime[playerNum] > MaxPushTime)
 				{
-					pushTime[playerNum] = MaxPushTime;
+					//pushTime[playerNum] = MaxPushTime;
+					pushTime[playerNum] = 0;
 				}
 			}
 			if (pDI->CheckJoy(KD_UTRG, DIJ_B, playerNum))

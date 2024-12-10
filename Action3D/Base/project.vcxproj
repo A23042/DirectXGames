@@ -313,6 +313,7 @@
     <ClInclude Include="Src\Main.h" />
     <ClInclude Include="Src\MainControl.h" />
     <ClInclude Include="Src\MapEditScene.h" />
+    <ClInclude Include="Src\MenuPanel.h" />
     <ClInclude Include="Src\MeshCollider.h" />
     <ClInclude Include="Src\MyImgui.h" />
     <ClInclude Include="Src\MyMath.h" />
@@ -373,6 +374,7 @@
     <ClCompile Include="Src\Main.cpp" />
     <ClCompile Include="Src\MainControl.cpp" />
     <ClCompile Include="Src\MapEditScene.cpp" />
+    <ClCompile Include="Src\MenuPanel.cpp" />
     <ClCompile Include="Src\MeshCollider.cpp" />
     <ClCompile Include="Src\MyImgui.cpp" />
     <ClCompile Include="Src\MyMath.cpp" />
