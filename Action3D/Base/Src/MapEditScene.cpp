@@ -2,11 +2,13 @@
 #include "StageEdit.h"
 #include "Gizmo3D.h"
 #include "EditorCamera.h"
+#include "EditUI.h"
 
 MapEditScene::MapEditScene()
 {
 	new StageEdit();
 	new EditorCamera();
+	new EditUI();
 	cs = new CSprite;
 }
 
@@ -32,6 +34,5 @@ void MapEditScene::Draw()
 		cs->DrawLine3D(VECTOR3(2 * i, 0, 100), VECTOR3(2 * i, 0, -100), RGB(255, 255, 255), 0.5f);
 		cs->DrawLine3D(VECTOR3(-2 * i, 0, 100), VECTOR3(-2 * i, 0, -100), RGB(255, 255, 255), 0.5f);
 	}
-
 	GameDevice()->m_pFont->Draw(400, 15, _T("EDIT SCENE"), 16, RGB(255, 0, 0));
 }
