@@ -16,7 +16,7 @@
 PlayScene::PlayScene(int num)
 {
 	// 光の方向をなくすことで影がなくなる
-	GameDevice()->m_vLightDir = VECTOR3();
+	//GameDevice()->m_vLightDir = VECTOR3();
 
 	// テキストファイルの読み方
 	char name[64];

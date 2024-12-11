@@ -106,12 +106,23 @@ public:
 
 	void StageImGui();
 
+	void Command();
+
 	/// <summary>
 	/// HitLineToMeshで一番距離の近いオブジェクトを探す
 	/// </summary>
 	/// <param name="objs">探索するオブジェクトリスト</param>
 	/// <returns>一番距離の近いオブジェクト</returns>
 	Object3D* GetClosestHitObject(list<Object3D*> objs, VECTOR3 &hit);
+
+	/// <summary>
+	/// オブジェクトの中心点を求める
+	/// </summary>
+	/// <param name="objs">求めるオブジェクトリスト</param>
+	/// <returns>中心点</returns>
+	void GetObjCenter(list<Object3D*> objs);
+
+	void GetNearWorldPosEx();
 
 	/// <summary>
 	/// オブジェクトのスケールと回転を変更している最中
@@ -186,13 +197,15 @@ private:
 	// 近視点
 	VECTOR3 nearWorldPos;
 	// 近視点からdirection方向に伸ばした点
-	VECTOR3 extendedNearWorldPos;
+	VECTOR3 nearWorldPosEx;
 	// 遠視点
 	VECTOR3 farWorldPos;		
 	// 近視点から遠視点への方向
 	VECTOR3 direction;	
 	// 1フレーム前のカーソル近視点座標
 	VECTOR3 prevMousePos;
+
+	VECTOR3 objCenter;
 
 	// ImGu格納用変数
 	VECTOR3 objPos;

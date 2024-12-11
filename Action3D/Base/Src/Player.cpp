@@ -97,6 +97,7 @@ void Player::Update()
 	{
 		otherplayer = ObjectManager::FindOtherGameObject<Player>(this);
 	}
+#if 0
 	if (playerNum == 0)
 	{
 		ImGui::SetNextWindowPos(ImVec2(WINDOW_WIDTH / 5, WINDOW_HEIGHT - WINDOW_HEIGHT / 5));
@@ -112,7 +113,7 @@ void Player::Update()
 		ImGui::InputFloat("P1", &pushTime[1]);
 	}
 	ImGui::End();
-
+#endif
 	if (isPhysic)
 	{
 		pObj.velocity.y -= Gravity * SceneManager::DeltaTime();

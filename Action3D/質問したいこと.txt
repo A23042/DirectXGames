@@ -1,2 +1,0 @@
-MasageBoxの使い方
-->SaveやLoadするときにYes,Noを出したい

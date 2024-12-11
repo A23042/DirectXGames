@@ -26,8 +26,7 @@ namespace
 	
 	// inspector
 	ImVec2 objInfoImPos = ImVec2(WINDOW_WIDTH - 320, 170);
-	ImVec2 objInfoImSize0 = ImVec2(290, 310);
-	ImVec2 objInfoImSize1 = ImVec2(290, 400);
+	ImVec2 objInfoImSize = ImVec2(290, 310);
 
 	// hierarchy
 	ImVec2 objHierarchyImPos = ImVec2(30, 170);
@@ -44,14 +43,10 @@ namespace
 	);
 	VECTOR4 judgeSkipArea2 = VECTOR4(
 		objInfoImPos.x, objInfoImPos.y,
-		objInfoImSize0.x, objInfoImSize0.y
+		objInfoImSize.x, objInfoImSize.y
 	);
-	/*VECTOR4 judgeSkipArea3 = VECTOR4(
-		objInfoImPos.x, objInfoImPos.y,
-		objInfoImSize1.x, objInfoImSize1.y
-	);*/
 
-	VECTOR4 judgeSkipArea4 = VECTOR4(
+	VECTOR4 judgeSkipArea3 = VECTOR4(
 		objHierarchyImPos.x, objHierarchyImPos.y,
 		objHierarchyImSize.x, objHierarchyImSize.y
 	);
@@ -106,8 +101,8 @@ void StageEdit::Update()
 	mView = GameDevice()->m_mView;
 	mPrj = GameDevice()->m_mProj;
 	identity = XMMatrixIdentity();
-	judgeArea = GetWorldPos();
-
+	judgeArea = CheckInAreaCursor();
+	GetWorldPos();
 	switch (nState)
 	{
 	case sNone:
@@ -139,7 +134,7 @@ void StageEdit::Draw()
 void StageEdit::NoneUpdate()
 {
 	// ImGui外でマウス左クリック
-	if (judgeArea)
+	if (CheckInAreaCursor())
 	{
 		if (GameDevice()->m_pDI->CheckMouse(KD_TRG, 0))
 		{
@@ -151,6 +146,9 @@ void StageEdit::NoneUpdate()
 			if (temp != nullptr)
 			{
 				SelectObj(temp);
+				// 衝突した場所
+				GetNearWorldPosEx();
+				prevMousePos = nearWorldPosEx;
 				return;
 			}
 		}
@@ -159,33 +157,11 @@ void StageEdit::NoneUpdate()
 
 void StageEdit::HasUpdate()
 {
-	// 選択解除
-	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_N))
-	{
-		DeselectObj();
-		return;	// 以下コード省略
-	}
-	// オブジェクト削除
-	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_DELETE))
-	{
-		// 落下判定オブジェクトは消さない
-		//if(getObj != fallCheck && getObj != line)
-		{
-			//getObj->DestroyMe();
-			DeleteObj();
-			//DeselectObj();
-			return;
-		}
-	}
-	// Ctrl + D オブジェクト複製
-	if (pDI->CheckKey(KD_DAT, DIK_LCONTROL) && pDI->CheckKey(KD_TRG, DIK_D))
-	{
-		DupeObj();
-		return;	// 以下コード省略
-	}
+	// ショートカットキーコマンド
+	Command();
 
 	// マウス左クリック
-	if(judgeArea)
+	if(CheckInAreaCursor())
 	{
 		if (GameDevice()->m_pDI->CheckMouse(KD_TRG, 0))
 		{
@@ -195,34 +171,24 @@ void StageEdit::HasUpdate()
 			list<Object3D*> gizmos = FindGameObjectsVisibleWithTag<Object3D>("Gizmo");
 			Object3D* temp = nullptr;
 			VECTOR3 hit = VECTOR3();
-			temp = GetClosestHitObject(gizmos, hit);
+			temp = GetClosestHitObject(gizmos, hit);	// カーソルに重なってる一番近いオブジェクトを取る
 			if (temp != nullptr)
 			{
-				VECTOR3 objCenter = VECTOR3();
-				int i = 0;
-				for (Object3D* obj : selectObj)
-				{
-					i++;
-					objCenter += obj->Position();
-				}
-				objCenter /= i;
-				float distance = (hit - nearWorldPos).Length();
-				float exDistance = (nearWorldPos - objCenter).Length();
-				extendedNearWorldPos = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
-				prevMousePos = extendedNearWorldPos;
+				// オブジェクトの中心点を求める
+				GetObjCenter(selectObj);
+				// 衝突した場所
+				GetNearWorldPosEx();
+				prevMousePos = nearWorldPosEx;
 				getGizmo = temp;
 				isHit = true;
 			}
-
 			// Gizmoに当たってなければ衝突判定をとる
 			if (!isHit)
 			{
 				// Gizmo以外のオブジェクトを調べる
 				list<Object3D*> objs = FindGameObjectsWithOutTag<Object3D>("Gizmo");
-				Object3D* temp = nullptr;
 				VECTOR3 hit;
 				temp = GetClosestHitObject(objs, hit);
-
 				if (temp != nullptr)
 				{
 					SelectObj(temp);
@@ -237,10 +203,11 @@ void StageEdit::HasUpdate()
 
 	// ImGuiで場所、回転、スケールを変える
 	ImGui::SetNextWindowPos(objInfoImPos);
-	ImGui::SetNextWindowSize(objInfoImSize1);
+	ImGui::SetNextWindowSize(objInfoImSize);
 
 	Object3D* obj;
 	string name;
+#if 0
 	if (selectObj.size() == 1)
 	{
 		obj = selectObj.front();
@@ -251,10 +218,12 @@ void StageEdit::HasUpdate()
 		}
 	}
 	else
+#endif
 	{
 		name = "OBJINFO";
 	}
-	if (selectObj.size() <= 1)
+#if 0
+	if (selectObj.size() < 1)
 	{
 		ImGui::Begin(name.c_str());
 		// 反発係数・摩擦・質量
@@ -293,9 +262,10 @@ void StageEdit::HasUpdate()
 		ImGui::End();
 	}
 	else
+#endif
 	{
 		ImGui::SetNextWindowPos(objInfoImPos);
-		ImGui::SetNextWindowSize(objInfoImSize1);
+		ImGui::SetNextWindowSize(objInfoImSize);
 		ImGui::Begin("Inspector");
 		ImGuiTabBarFlags tab_bar_flag = ImGuiBackendFlags_None;
 		if (ImGui::BeginTabBar("OBJECTINFO", tab_bar_flag))
@@ -337,14 +307,22 @@ void StageEdit::HasUpdate()
 
 			}
 #endif
-			int i = 0;
+			int i = 1;
 			for(Object3D* obj : selectObj)
 			{
+				for (Object3D* tmp : hierarchyObj)
+				{
+					if(tmp == obj)
+					{
+						break;
+					}
+					i++;
+				}
+
 				VECTOR3 tmpPos = obj->Position();
 				VECTOR3 tmpRot = obj->Rotation() * 180 / XM_PI;
 				VECTOR3 tmpScale = obj->Scale();
 
-				i++;
 				name = "[" + to_string(i) + "] :" + obj->editObj.name;
 				if (ImGui::BeginTabItem(name.c_str()))
 				{
@@ -455,15 +433,7 @@ void StageEdit::HasUpdate()
 void StageEdit::PosGizmoUpdate()
 {
 	gizmoC->SetRotation(VECTOR3());
-	VECTOR3 objCenter = VECTOR3();
-	int i = 0;
-	// 選択されているオブジェクトの中心点を取る
-	for (Object3D* obj : selectObj)
-	{
-		i++;
-		objCenter += obj->Position();
-	}
-	objCenter /= i;
+	GetObjCenter(selectObj);
 
 	if (getGizmo != nullptr)
 	{
@@ -481,10 +451,9 @@ void StageEdit::PosGizmoUpdate()
 			SetVisible(posGizmoZ, false);
 		}
 		// オブジェクトの位置まで伸ばす
-		float exDistance = (nearWorldPos - objCenter).Length();	// オブジェクトまでの距離
-		extendedNearWorldPos = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
+		GetNearWorldPosEx();
 		// ここでGizmoを触ってオブジェクトを動かす
-		VECTOR3 diff = extendedNearWorldPos - prevMousePos;
+		VECTOR3 diff = nearWorldPosEx - prevMousePos;
 		if (diff.Length() != 0)
 		{
 			if (pDI->CheckMouse(KD_DAT, 0))
@@ -523,7 +492,7 @@ void StageEdit::PosGizmoUpdate()
 				}
 			}
 		}
-		prevMousePos = extendedNearWorldPos;
+		prevMousePos = nearWorldPosEx;
 	}
 
 	// getObjのスクリーン座標
@@ -543,14 +512,8 @@ void StageEdit::PosGizmoUpdate()
 void StageEdit::RotGizmoUpdate()
 {
 	//gizmoC->SetRotation(getObj->Rotation());
-	VECTOR3 objCenter = VECTOR3();
-	int i = 0;
-	for (Object3D* obj : selectObj)
-	{
-		i++;
-		objCenter += obj->Position();
-	}
-	objCenter /= i;
+	GetObjCenter(selectObj);
+
 
 	// ここでGizmoを触ってオブジェクトを動かす
 	if (getGizmo != nullptr)
@@ -568,9 +531,7 @@ void StageEdit::RotGizmoUpdate()
 		{
 			SetVisible(rotGizmoZ, false);
 		}
-		// オブジェクトの位置まで伸ばす
-		float exDistance = (nearWorldPos - objCenter).Length();
-		VECTOR3 nearWorldPosEx = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
+		GetNearWorldPosEx();
 		// ここでGizmoを触ってオブジェクトを動かす
 		VECTOR3 diff = nearWorldPosEx - prevMousePos;
 		if (diff.Length() != 0)
@@ -580,8 +541,6 @@ void StageEdit::RotGizmoUpdate()
 				if (CursorLoop())
 				{
 					GetWorldPos();
-					exDistance = (nearWorldPos - objCenter).Length();
-					nearWorldPosEx = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
 					prevMousePos = nearWorldPosEx;
 					return;
 				}
@@ -612,8 +571,7 @@ void StageEdit::RotGizmoUpdate()
 				}
 			}
 		}
-		exDistance = (nearWorldPos - objCenter).Length();
-		nearWorldPosEx = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
+		GetNearWorldPosEx();
 		prevMousePos = nearWorldPosEx;
 	}
 	// getObjのスクリーン座標
@@ -633,14 +591,8 @@ void StageEdit::RotGizmoUpdate()
 void StageEdit::ScaleGizmoUpdate()
 {
 	//gizmoC->SetRotation(getObj->Rotation());
-	VECTOR3 objCenter = VECTOR3();
-	int i = 0;
-	for (Object3D* obj : selectObj)
-	{
-		i++;
-		objCenter += obj->Position();
-	}
-	objCenter /= i;
+	GetObjCenter(selectObj);
+
 
 	// ここでGizmoを触ってオブジェクトを動かす
 	if (getGizmo != nullptr)
@@ -659,8 +611,7 @@ void StageEdit::ScaleGizmoUpdate()
 			SetVisible(scaleGizmoZ, false);
 		}
 		// オブジェクトの位置まで伸ばす
-		float exDistance = (nearWorldPos - objCenter).Length();
-		VECTOR3 nearWorldPosEx = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
+		GetNearWorldPosEx();
 		// ここでGizmoを触ってオブジェクトを動かす
 		VECTOR3 diff = nearWorldPosEx - prevMousePos;
 		if (diff.Length() != 0)
@@ -670,8 +621,7 @@ void StageEdit::ScaleGizmoUpdate()
 				if (CursorLoop())
 				{
 					GetWorldPos();
-					exDistance = (nearWorldPos - objCenter).Length();
-					nearWorldPosEx = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
+					GetNearWorldPosEx();
 					prevMousePos = nearWorldPosEx;
 					return;
 				}
@@ -710,8 +660,7 @@ void StageEdit::ScaleGizmoUpdate()
 
 			}
 		}
-		exDistance = (nearWorldPos - objCenter).Length();
-		nearWorldPosEx = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
+		GetNearWorldPosEx();
 		prevMousePos = nearWorldPosEx;
 	}
 	// getObjのスクリーン座標
@@ -814,7 +763,7 @@ void StageEdit::SelectObj(Object3D* obj)
 		obj->pObj.e = defaultE;
 		obj->pObj.f = defaultF;
 		obj->pObj.mass = defaultMass;
-		selectObj.push_back(obj);
+		//selectObj.push_back(obj);
 		hierarchyObj.push_back(obj);
 		isNew = false;
 	}
@@ -935,6 +884,7 @@ void StageEdit::DupeObj()
 		if(tempObj != nullptr)
 		{
 			tempObj->pObj.center = obj->pObj.center;
+			tempObj->SetPosition(tempObj->pObj.center);
 			tempObj->SetRotation(obj->Rotation());
 			tempObj->SetScale(obj->Scale());
 
@@ -1371,6 +1321,28 @@ void StageEdit::StageImGui()
 	ImGui::End();
 }
 
+void StageEdit::Command()
+{
+	// 選択解除
+	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_N))
+	{
+		DeselectObj();
+		return;	// 以下コード省略
+	}
+	// オブジェクト削除
+	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_DELETE))
+	{
+		DeleteObj();
+		return;
+	}
+	// Ctrl + D オブジェクト複製
+	if (pDI->CheckKey(KD_DAT, DIK_LCONTROL) && pDI->CheckKey(KD_TRG, DIK_D))
+	{
+		DupeObj();
+		return;	// 以下コード省略
+	}
+}
+
 Object3D* StageEdit::GetClosestHitObject(list<Object3D*>objs, VECTOR3 &closestHit)
 {
 	Object3D* temp = nullptr;
@@ -1412,6 +1384,26 @@ Object3D* StageEdit::GetClosestHitObject(list<Object3D*>objs, VECTOR3 &closestHi
 	return nullptr;
 }
 
+void StageEdit::GetObjCenter(list<Object3D*> objs)
+{
+	int i = 0;
+	objCenter = VECTOR3();
+	for (Object3D* obj : selectObj)
+	{
+		i++;
+		objCenter += obj->Position();
+	}
+	objCenter /= i;
+	return;
+}
+
+void StageEdit::GetNearWorldPosEx()
+{
+	float exDistance = (nearWorldPos - objCenter).Length();
+	nearWorldPosEx = nearWorldPos + direction * exDistance;  // exDistanceで延ばす
+	return ;
+}
+
 bool StageEdit::CheckInAreaCursor()
 {
 	if (mousePos.x > judgeSkipArea0.x && mousePos.x < judgeSkipArea0.x + judgeSkipArea0.z &&
@@ -1419,6 +1411,8 @@ bool StageEdit::CheckInAreaCursor()
 		mousePos.x > judgeSkipArea1.x && mousePos.x < judgeSkipArea1.x + judgeSkipArea1.z &&
 		mousePos.y > judgeSkipArea1.y && mousePos.y < judgeSkipArea1.y + judgeSkipArea1.w ||
 		mousePos.x > judgeSkipArea2.x && mousePos.x < judgeSkipArea2.x + judgeSkipArea2.z &&
-		mousePos.y > judgeSkipArea2.y && mousePos.y < judgeSkipArea2.y + judgeSkipArea2.w)
+		mousePos.y > judgeSkipArea2.y && mousePos.y < judgeSkipArea2.y + judgeSkipArea2.w||
+		mousePos.x > judgeSkipArea3.x && mousePos.x < judgeSkipArea3.x + judgeSkipArea3.z &&
+		mousePos.y > judgeSkipArea3.y && mousePos.y < judgeSkipArea3.y + judgeSkipArea3.w)
 	return false;
 }

@@ -20,6 +20,7 @@ FallCheck::FallCheck(bool playScene) : isPlayScene(playScene)
 
 		meshCol = new MeshCollider();
 		meshCol->MakeFromMesh(mesh);
+		ObjectManager::SetDrawOrder(this, 100);
 	}
 }
 

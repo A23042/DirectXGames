@@ -3,18 +3,21 @@
 
 #include "Object3D.h"
 
-class MenePanel : public Object3D
+class MenuPanel : public Object3D
 {
 public:
-	MenePanel();
-	~MenePanel();
+	MenuPanel();
+	~MenuPanel();
 	void Update() override;
 	void Draw() override;
-private:
-	CSprite* BackGround = nullptr;
-	CSpriteImage* BackGroundImage = nullptr;
 
-	CSprite* Button[5] = {};
+	int GetNum() { return selectNum; }
+private:
+	CSprite* spr = nullptr;
+	CSpriteImage* BackGroundImage = nullptr;
+	CSpriteImage* TextImage[3] = {};
+
+	CSprite* Button[3] = {};
 
 	float moveTime = 0.2;
 	float time = 0;
