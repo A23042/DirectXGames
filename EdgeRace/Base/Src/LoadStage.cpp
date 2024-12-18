@@ -35,20 +35,12 @@ void LoadStage::Update()
 
 void LoadStage::Load(int num)
 {
-	/*
-	if (collManager == nullptr)
-	{
-		collManager = ObjectManager::FindGameObject<CollisonManager>();
-	}
-	collManager->BoxBallDestroy();
-	*/
 	// 現在配置されているオブジェクトをリセット
 	std::list<Object3D*> objs = ObjectManager::FindGameObjects<Object3D>();
 	for (Object3D* obj : objs)
 	{
 		if (obj->editObj.name == "Box"
 			|| obj->editObj.name == "MoveBox"
-			//			|| obj->editObj.name == "Player" 
 			|| obj->editObj.name == "Ball"
 			|| obj->editObj.name == "scoreArea1"
 			|| obj->editObj.name == "scoreArea2"
@@ -102,7 +94,7 @@ void LoadStage::Load(int num)
 						obj = pl;
 						obj->SetPosition(x, y, z);
 						obj->pObj.center = VECTOR3(x, y, z);
-						obj->SetRotation(VECTOR3(0, rotY / 180.0f * XM_PI, 0));
+						obj->SetRotation(VECTOR3(0, rotY, 0));
 						obj->pObj.e = e;
 						obj->pObj.f = f;
 						obj->pObj.mass = mass;

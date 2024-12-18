@@ -10,6 +10,7 @@ Score::~Score()
 
 void Score::Update()
 {
+#if 0
 	// ImGui表示用スコア
 	Clear();
 	std::list<Object3D*> balls = ObjectManager::FindGameObjectsWithTag<Object3D>("PLAYER");
@@ -33,6 +34,7 @@ void Score::Update()
 	ImGui::InputInt("P0", &p0ScoreTemp);
 	ImGui::InputInt("P1", &p1ScoreTemp);
 	ImGui::End();
+#endif
 }
 
 void Score::Draw()

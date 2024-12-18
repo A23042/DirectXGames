@@ -113,10 +113,6 @@ void TitleScene::Update()
 		SceneManager::ChangeScene("MapEditScene");
 	}
 
-	//if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_R)) {
-	//	SceneManager::ChangeScene("ResultScene");
-	//}
-
 	if (GameDevice()->m_pDI->CheckJoy(KD_UTRG, DIJ_B))
 	{
 		switch (panel->GetNum())

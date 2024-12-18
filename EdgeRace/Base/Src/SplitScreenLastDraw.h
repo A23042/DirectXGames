@@ -44,6 +44,7 @@ private:
 
 	CSpriteImage* base = nullptr;
 	CSpriteImage* gage = nullptr;
+	CSpriteImage* redArea = nullptr;
 	float posX = 0.0f;
 	float posY = 0.0f;
 	float rate[2] = {};

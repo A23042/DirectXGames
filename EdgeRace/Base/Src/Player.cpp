@@ -19,7 +19,7 @@ namespace
 	static const float RDeadZone = 0.1f;			// Rスティックのデッドゾーン
 	static const float LDeadZone = 0.2f;			// Lスティックのデッドゾーン
 	static const int Power = 180;				// 長押し発射の威力基準
-	static const int RestShot = 1;				// 打てる回数
+	static const int RestShot = 3;				// 打てる回数
 	static const float preE = 0.6f;				// 発射前操作時の反発係数	
 	static const float preF = 0.08f;			// 発射前操作時の摩擦力
 };
@@ -97,23 +97,6 @@ void Player::Update()
 	{
 		otherplayer = ObjectManager::FindOtherGameObject<Player>(this);
 	}
-#if 0
-	if (playerNum == 0)
-	{
-		ImGui::SetNextWindowPos(ImVec2(WINDOW_WIDTH / 5, WINDOW_HEIGHT - WINDOW_HEIGHT / 5));
-		ImGui::SetNextWindowSize(ImVec2(150, 60));
-		ImGui::Begin("PUSH0");
-		ImGui::InputFloat("P0", &pushTime[0]);
-	}
-	else if (playerNum == 1)
-	{
-		ImGui::SetNextWindowPos(ImVec2(WINDOW_WIDTH - (WINDOW_WIDTH / 5), WINDOW_HEIGHT - WINDOW_HEIGHT / 5));
-		ImGui::SetNextWindowSize(ImVec2(150, 60));
-		ImGui::Begin("PUSH1");
-		ImGui::InputFloat("P1", &pushTime[1]);
-	}
-	ImGui::End();
-#endif
 	if (isPhysic)
 	{
 		pObj.velocity.y -= Gravity * SceneManager::DeltaTime();
@@ -327,16 +310,6 @@ void Player::SetStartPos(bool isFall)
 {
 	restShot--;		// 残りショット数マイナス1
 
-	// 残りショット数がなければリザルト画面へ
-	//if (otherplayer->restShot <= 0 && restShot <= 0)
-	{
-		//Score* sc = ObjectManager::FindGameObject<Score>();
-		//sc->CountScore();
-		//SceneManager::ChangeScene("ResultScene");
-		//loadStage->Load(4);
-
-		//return;
-	}
 	// 落下でなければその場にBallを設置する
 	if (!isFall)
 	{
@@ -712,13 +685,6 @@ void Player::UpdateNormal()
 		// コントローラー接続数2の場合
 		//両Playerはコントローラー
 	case 2:
-		ImGui::Begin("JoyR");
-		ImGui::InputFloat("RX", &RX);
-		ImGui::InputFloat("RY", &RY);
-		ImGui::InputFloat("LX", &LX);
-		ImGui::InputFloat("LY", &LY);
-		ImGui::End();
-
 
 		if (fabs(LX) > LDeadZone || fabs(LY) > LDeadZone)
 		{

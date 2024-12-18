@@ -14,13 +14,6 @@ CollisonManager::~CollisonManager()
 {
 }
 
-void CollisonManager::Start()
-{
-	//balls = ObjectManager::FindGameObjects<Ball>();
-	//boxes = ObjectManager::FindGameObjectsWithTag<Box>("STAGEOBJ");
-	//areaes = ObjectManager::FindGameObjectsWithTag<ScoreArea>("SCOREAREA");
-}
-
 void CollisonManager::Update()
 {
 	// Õ“Ë”»’è‚ğæ‚è‚És‚­Ball‚ğˆê‚Â‚Ã‚Â‰ñ‚·

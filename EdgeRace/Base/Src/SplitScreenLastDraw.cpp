@@ -31,15 +31,18 @@ SplitScreenLastDraw::SplitScreenLastDraw()
 
 	base = new CSpriteImage();
 	gage = new CSpriteImage();
+	redArea = new CSpriteImage();
 
 	base->Load("Data/Image/base.png");
 	gage->Load("Data/Image/gage.png");
+	redArea->Load("Data/Image/redArea.png");
 
 	posX = WINDOW_WIDTH - (WINDOW_WIDTH - base->m_dwImageWidth  / 2);
 	posY = WINDOW_HEIGHT - 100;
 	width = gage->m_dwImageWidth ;
 	height = base->m_dwImageHeight ;
-
+	redArea->m_dwImageWidth = WINDOW_WIDTH;
+	redArea->m_dwImageHeight = WINDOW_HEIGHT;
 }
 
 SplitScreenLastDraw::~SplitScreenLastDraw()
@@ -62,11 +65,11 @@ void SplitScreenLastDraw::Start()
 
 void SplitScreenLastDraw::Update()
 {
+	score->CountScore();
 	if (!data->IsPlay())
 	{
 #if 1
 		timer += SceneManager::DeltaTime();
-		score->CountScore();
 		if (timer >= scoreUpTime + scoreViewTime) {
 			upTimer += SceneManager::DeltaTime();
 			if (upTimer >= scoreUpTime)
@@ -148,7 +151,12 @@ void SplitScreenLastDraw::Draw()
 				}
 			}
 			
+			char strP0[64]; // 文字列を用意
+			sprintf_s<64>(strP0, "P0Score: %2d", score->GetP0Score());
+			GameDevice()->m_pFont->Draw(40, 40, strP0, 48, RGB(255, 255, 255));
 
+			sprintf_s<64>(strP0, "P1Score: %2d", score->GetP1Score());
+			GameDevice()->m_pFont->Draw(WINDOW_WIDTH - 280, 40, strP0, 48, RGB(255, 255, 255));
 
 			// スコア表示
 			if(!data->IsPlay())
@@ -172,7 +180,7 @@ void SplitScreenLastDraw::Draw()
 				}
 			}
 #endif
-
+			//baseSpr->Draw(redArea, 0, 0, 0, 0, redArea->m_dwImageWidth, redArea->m_dwImageHeight, 0.6f);
 
 			// -----------------------------------------------------------------
 			GameDevice()->m_mProj = saveProj;	  // プロジェクションマトリックスを元に戻す

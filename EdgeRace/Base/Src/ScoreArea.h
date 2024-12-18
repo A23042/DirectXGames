@@ -12,7 +12,7 @@ public:
 	ScoreArea();
 	~ScoreArea();
 	//void Update() override;
-	void Draw() override;
+	//void Draw() override;
 	virtual void ScoreCount(PhysicsObject& pObj) 
 	{
 		pObj.score = 0;

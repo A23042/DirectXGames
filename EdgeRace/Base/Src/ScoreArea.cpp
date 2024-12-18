@@ -8,7 +8,7 @@ ScoreArea::~ScoreArea()
 {
 }
 
-#if 1
+#if 0
 void ScoreArea::Draw()
 {
 	mesh->Render(transform.matrix());

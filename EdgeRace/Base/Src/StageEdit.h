@@ -135,9 +135,12 @@ public:
 	/// マウスカーソルをワールド座標変換
 	/// ImGui上にカーソルがあるかどうかの判定も取る
 	/// </summary>
-	/// <returns>ImGuiの上にカーソルがあればfalse</returns>
-	bool GetWorldPos();
-	
+	void GetWorldPos();
+
+	/// <summary>
+	/// カーソルがImGui上にないか
+	/// </summary>
+	/// <returns>ImGui上だったらfalse</returns>
 	bool CheckInAreaCursor();
 
 private:

@@ -263,7 +263,7 @@ namespace ObjectManager {
 		}
 		return out;
 	}
-
+	
 	/// 2024.12.10 S.Matsunaga
 	/// <summary>
 	/// クラスの表示中オブジェクトをすべて探す

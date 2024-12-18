@@ -169,7 +169,7 @@ void StageEdit::HasUpdate()
 			// オブジェクト探索
 			// 先に表示中のGizmoだけ衝突判定をとる
 			list<Object3D*> gizmos = FindGameObjectsVisibleWithTag<Object3D>("Gizmo");
-			Object3D* temp = nullptr;
+			Object3D* temp = nullptr;	// 衝突したオブジェクトの一時格納
 			VECTOR3 hit = VECTOR3();
 			temp = GetClosestHitObject(gizmos, hit);	// カーソルに重なってる一番近いオブジェクトを取る
 			if (temp != nullptr)
@@ -195,6 +195,7 @@ void StageEdit::HasUpdate()
 				}
 				else
 				{
+					// 何も触ってなければ選択解除
 					DeselectObj();
 				}
 			}
@@ -350,7 +351,18 @@ void StageEdit::HasUpdate()
 					ImGui::InputFloat("ScaleX", &tmpScale.x, 0.1f, 0.5f, "%.2f");
 					ImGui::InputFloat("scaleY", &tmpScale.y, 0.1f, 0.5f, "%.2f");
 					ImGui::InputFloat("ScaleZ", &tmpScale.z, 0.1f, 0.5f, "%.2f");
-
+					if (tmpScale.x < 0.1f)
+					{
+						tmpScale.x = 0.1f;
+					}
+					else if (tmpScale.y < 0.1f)
+					{
+						tmpScale.y = 0.1f;
+					}
+					else if (tmpScale.z < 0.1f)
+					{
+						tmpScale.z = 0.1f;
+					}
 					obj->SetScale(tmpScale);
 
 					ImGui::EndTabItem();
@@ -1069,61 +1081,39 @@ void StageEdit::Load(int n)
 			str = csv->GetString(i, 1);
 			if (str == "PLAYER") 
 			{
-				float rotY = csv->GetFloat(i, 5);
-				float e = csv->GetFloat(i, 6);
-				float f = csv->GetFloat(i, 7);
-				float mass = csv->GetFloat(i, 8);
-				int num = csv->GetFloat(i, 9);
-				obj = new Player(num, false);
-				obj->SetRotation(VECTOR3(0, rotY, 0));
-				obj->pObj.e = e;
-				obj->pObj.f = f;
-				obj->pObj.mass = mass;
+				obj = new Player(csv->GetFloat(i, 9), false);
+				obj->SetRotation(VECTOR3(0, csv->GetFloat(i, 5), 0));
+				obj->pObj.e = csv->GetFloat(i, 6);
+				obj->pObj.f = csv->GetFloat(i, 7);
+				obj->pObj.mass = csv->GetFloat(i, 8);
 				pNum++;
 			}
 			else if (str == "BOX") 
 			{
-				VECTOR3 size = csv->GetVector3(i, 5);
-				VECTOR3 rot = csv->GetVector3(i, 8);
-				float e = csv->GetFloat(i, 11);
-				float f = csv->GetFloat(i, 12);
-				obj = new Box(size, rot);	// 直方体のサイズと回転量を渡す
-				obj->pObj.e = e;
-				obj->pObj.f = f;
+				obj = new Box(csv->GetVector3(i, 5), csv->GetVector3(i, 8));	// 直方体のサイズと回転量を渡す
+				obj->pObj.e = csv->GetFloat(i, 11);
+				obj->pObj.f = csv->GetFloat(i, 12);
 			}
 			else if (str == "MBox") 
 			{
-				VECTOR3 size = csv->GetVector3(i, 5);
-				VECTOR3 rot = csv->GetVector3(i, 8);
-				VECTOR3 move = csv->GetVector3(i, 11);
-				VECTOR3 moveSpeed = csv->GetVector3(i, 14);
-				float e = csv->GetFloat(i, 17);
-				float f = csv->GetFloat(i, 18);
-				obj = new MoveBox(size, rot, move, moveSpeed);	// 直方体のサイズと回転量、移動量を渡す
-				obj->pObj.e = e;
-				obj->pObj.f = f;
+				obj = new MoveBox(csv->GetVector3(i, 5), csv->GetVector3(i, 8), csv->GetVector3(i, 11), csv->GetVector3(i, 14));	// 直方体のサイズと回転量、移動量を渡す
+				obj->pObj.e = csv->GetFloat(i, 17);
+				obj->pObj.f = csv->GetFloat(i, 18);
 			}
 			else if (str == "BALL")
 			{
-				float e = csv->GetFloat(i, 5);
-				float f = csv->GetFloat(i, 6);
-				float mass = csv->GetFloat(i, 7);
 				obj = new Ball(false);
-				obj->pObj.e = e;
-				obj->pObj.f = f;
-				obj->pObj.mass = mass;
+				obj->pObj.e = csv->GetFloat(i, 5);
+				obj->pObj.f = csv->GetFloat(i, 6);
+				obj->pObj.mass = csv->GetFloat(i, 7);
 			}
 			else if (str == "Area1")
 			{
-				VECTOR3 size = csv->GetVector3(i, 5);
-				VECTOR3 rot = csv->GetVector3(i, 8);
-				obj = new ScoreArea1(size, rot);
+				obj = new ScoreArea1(csv->GetVector3(i, 5), csv->GetVector3(i, 8));
 			}
 			else if (str == "Area2")
 			{
-				VECTOR3 size = csv->GetVector3(i, 5);
-				VECTOR3 rot = csv->GetVector3(i, 8);
-				obj = new ScoreArea2(size, rot);
+				obj = new ScoreArea2(csv->GetVector3(i, 5), csv->GetVector3(i, 8));
 			}
 			else if (str == "Area3")
 			{
@@ -1131,23 +1121,20 @@ void StageEdit::Load(int n)
 			}
 			else if (str == "FallCheck")
 			{
-				VECTOR3 pos = csv->GetVector3(i, 2);
-				fallCheck->pObj.center = pos;
+				fallCheck->pObj.center = csv->GetVector3(i, 2);
 				continue;
 			}
 			else if (str == "Line")
 			{
-				VECTOR3 size = csv->GetVector3(i, 5);
 				obj = new Line();
-				obj->SetScale(size);
+				obj->SetScale(csv->GetVector3(i, 5));
 			}
 			else 
 			{
 				continue;
 				//assert(false);
 			}
-			VECTOR3 pos = csv->GetVector3(i, 2);
-			obj->SetPosition(pos);
+			obj->SetPosition(csv->GetVector3(i, 2));
 			hierarchyObj.push_back(obj);
 		}
 	}
@@ -1156,34 +1143,43 @@ void StageEdit::Load(int n)
 
 bool StageEdit::CursorLoop()
 {
-	POINT clientPos = { 0,0 };
-	ClientToScreen(GameDevice()->m_pMain->m_hWnd, &clientPos);
+	POINT clientPosLT = { 0,0 };	// ウィンドウの左上座標
+	ClientToScreen(GameDevice()->m_pMain->m_hWnd, &clientPosLT);
 
-	if (clientPos.x + mousePos.x > clientPos.x + WINDOW_WIDTH)
+	POINT clientPosRU = { 0,0 };	// ウィンドウの右下座標
+	clientPosRU.x = clientPosLT.x + WINDOW_WIDTH;
+	clientPosRU.y = clientPosLT.y + WINDOW_HEIGHT;
+
+	POINT currsorClientPos = { 0,0 };	// カーソルのウィンドウ上の座標
+	currsorClientPos.x = clientPosLT.x + mousePos.x;
+	currsorClientPos.y = clientPosLT.y + mousePos.y;
+
+	// カーソルがウィンドウの外にでたら
+	if (currsorClientPos.x > clientPosRU.x)
 	{
-		SetCursorPos(clientPos.x, clientPos.y + mousePos.y);
+		SetCursorPos(clientPosLT.x, currsorClientPos.y);
 		return true;
 	}
-	else if (clientPos.x + mousePos.x < clientPos.x)
+	else if (currsorClientPos.x < clientPosLT.x)
 	{
-		SetCursorPos(clientPos.x + WINDOW_WIDTH, mousePos.y);
+		SetCursorPos(clientPosRU.x, mousePos.y);
 		return true;
 	}
-	if (clientPos.y + mousePos.y > clientPos.y + WINDOW_HEIGHT)
+	if (currsorClientPos.y > clientPosRU.y)
 	{
-		SetCursorPos(clientPos.x + mousePos.x, clientPos.y);
+		SetCursorPos(currsorClientPos.x, clientPosLT.y);
 		return true;
 	}
-	else if (clientPos.y + mousePos.y < clientPos.y)
+	else if (currsorClientPos.y < clientPosLT.y)
 	{
-		SetCursorPos(clientPos.x + mousePos.x, clientPos.y + WINDOW_HEIGHT);
+		SetCursorPos(currsorClientPos.x, clientPosRU.y);
 		return true;
 	}
 	return false;
 }
 
 // マウスカーソルのワールド座標の取得
-bool StageEdit::GetWorldPos()
+void StageEdit::GetWorldPos()
 {
 	// マウス座標取得
 	mousePos = GameDevice()->m_pDI->GetMousePos();
@@ -1195,7 +1191,7 @@ bool StageEdit::GetWorldPos()
 	// 方向ベクトルを正規化して長さを延ばす
 	direction = XMVector3Normalize(farWorldPos - nearWorldPos);
 
-	return CheckInAreaCursor();
+	return;
 }
 
 void StageEdit::CheckResetObj(list<Object3D*> objs)
