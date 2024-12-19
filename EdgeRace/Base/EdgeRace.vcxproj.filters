@@ -66,6 +66,9 @@
     <Filter Include="ソース ファイル\12_OutLine">
       <UniqueIdentifier>{3457840d-c592-4490-b6ad-adff6deafecb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\13_Command">
+      <UniqueIdentifier>{efe3f59c-ae76-42a0-8e06-c050f01f203c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Hlsl\DisplaceSkinMesh.hlsli">
@@ -372,6 +375,18 @@
     <ClInclude Include="Src\EditUI.h">
       <Filter>ソース ファイル\10_MapEditScene</Filter>
     </ClInclude>
+    <ClInclude Include="Src\CommandBase.h">
+      <Filter>ソース ファイル\13_Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\CommandManager.h">
+      <Filter>ソース ファイル\13_Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\MoveCommand.h">
+      <Filter>ソース ファイル\13_Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\EmptyCommand.h">
+      <Filter>ソース ファイル\13_Command</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Main.cpp">
@@ -550,6 +565,12 @@
     </ClCompile>
     <ClCompile Include="Src\EditUI.cpp">
       <Filter>ソース ファイル\10_MapEditScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\MoveCommand.cpp">
+      <Filter>ソース ファイル\13_Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\CommandManager.cpp">
+      <Filter>ソース ファイル\13_Command</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -77,6 +77,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -91,6 +92,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -127,6 +129,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -530,6 +533,8 @@
     <ClInclude Include="Src\CapsuleCollider.h" />
     <ClInclude Include="Src\Collision.h" />
     <ClInclude Include="Src\CollisionManager.h" />
+    <ClInclude Include="Src\CommandBase.h" />
+    <ClInclude Include="Src\CommandManager.h" />
     <ClInclude Include="Src\CsvReader.h" />
     <ClInclude Include="Src\DataHolder.h" />
     <ClInclude Include="Src\DInput.h" />
@@ -537,6 +542,7 @@
     <ClInclude Include="Src\Displace.h" />
     <ClInclude Include="Src\EditorCamera.h" />
     <ClInclude Include="Src\EditUI.h" />
+    <ClInclude Include="Src\EmptyCommand.h" />
     <ClInclude Include="Src\FallCheck.h" />
     <ClInclude Include="Src\FbxMesh.h" />
     <ClInclude Include="Src\GameMain.h" />
@@ -551,6 +557,7 @@
     <ClInclude Include="Src\MapEditScene.h" />
     <ClInclude Include="Src\MenuPanel.h" />
     <ClInclude Include="Src\MeshCollider.h" />
+    <ClInclude Include="Src\MoveCommand.h" />
     <ClInclude Include="Src\MyImgui.h" />
     <ClInclude Include="Src\MyMath.h" />
     <ClInclude Include="Src\MoveBox.h" />
@@ -594,6 +601,7 @@
     <ClCompile Include="Src\Camera.cpp" />
     <ClCompile Include="Src\Collision.cpp" />
     <ClCompile Include="Src\CollisionManager.cpp" />
+    <ClCompile Include="Src\CommandManager.cpp" />
     <ClCompile Include="Src\CsvReader.cpp" />
     <ClCompile Include="Src\DataHolder.cpp" />
     <ClCompile Include="Src\DInput.cpp" />
@@ -613,6 +621,7 @@
     <ClCompile Include="Src\MapEditScene.cpp" />
     <ClCompile Include="Src\MenuPanel.cpp" />
     <ClCompile Include="Src\MeshCollider.cpp" />
+    <ClCompile Include="Src\MoveCommand.cpp" />
     <ClCompile Include="Src\MyImgui.cpp" />
     <ClCompile Include="Src\MyMath.cpp" />
     <ClCompile Include="Src\MoveBox.cpp" />

@@ -83,10 +83,6 @@ void Player::Start()
 	restShot = RestShot;
 
 	// Update()内でFindGameObjectを極力しない
-	//objes = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ");
-	//areaes = ObjectManager::FindGameObjectsWithTag<ScoreArea>("SCOREAREA");
-	//lines = ObjectManager::FindGameObjects<Line>();
-	//collManager = ObjectManager::FindGameObject<CollisonManager>();
 	loadStage = ObjectManager::FindGameObject<LoadStage>();
 }
 
@@ -157,19 +153,6 @@ void Player::Draw()
 
 void Player::UpdateWait()
 {
-#if 0
-	// 自分以外のPlayerと衝突判定
-	//if (otherplayer != this)
-	if (otherplayer != nullptr)
-	{
-		VECTOR3 refVec = VECTOR3(0, 0, 0);
-		if (otherplayer->HitSphereToSphere(this->pObj))
-		{
-			otherplayer->SetPosition(otherplayer->pObj.center);
-			transform.position = pObj.center;
-		}
-	}
-#endif
 	pObj.e = myE;
 	pObj.f = myF;
 
@@ -556,44 +539,6 @@ void Player::UpdateNormal()
 		// Player0はコントローラー
 		// Player1はWASD
 	case 1:
-#if 0
-		ImGui::Begin("JoyR");
-		ImGui::InputFloat("RX", &RX);
-		ImGui::InputFloat("RY", &RY);
-		ImGui::InputFloat("LX", &LX);
-		ImGui::InputFloat("LY", &LY);
-		ImGui::End();
-
-		if (playerNum == 0)
-		{
-
-			if (fabs(LX) > 0 || fabs(LY) > 0)
-			{
-				VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * -LY); // 回転してない時の移動量
-				MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
-				pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
-
-				VECTOR3 side = VECTOR3(MoveSpeed * LX, 0, 0); // 回転してない時の移動量
-				pObj.velocity += side * rotY; // キャラの向いてる方への移動速度
-			}
-			if (fabs(RX) > 0)
-			{
-				transform.rotation.y += RotationSpeed * RX / 180.0f * XM_PI;
-			}
-
-			if (pDI->CheckJoy(KD_TRG, 0, playerNum))
-			{
-				VECTOR3 forward = VECTOR3(0, 0, MoveSpeed * 60); // 回転してない時の移動量
-				MATRIX4X4 rotY = XMMatrixRotationY(transform.rotation.y); // Yの回転行列
-				pObj.velocity += forward * rotY; // キャラの向いてる方への移動速度
-			}
-			if (pDI->CheckJoy(KD_TRG, 1, playerNum))
-			{
-				state = sJump;
-			}
-		}
-#endif
-
 		if (playerNum == 0)
 		{
 			if (fabs(LX) > LDeadZone || fabs(LY) > LDeadZone)

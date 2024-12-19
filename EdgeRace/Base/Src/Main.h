@@ -22,7 +22,7 @@
 #define WINDOW_WIDTH   1366   //ウィンドウ幅
 #define WINDOW_HEIGHT  768    //ウィンドウ高さ
 
-#define APP_NAME _T("Project")
+#define APP_NAME _T("EdgeRace")
 
 class CGameMain;
 

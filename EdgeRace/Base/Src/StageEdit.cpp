@@ -1,5 +1,7 @@
 // 2024.10.06~ S.Matsunaga	編集中
 
+#include <fstream>
+
 #include "StageEdit.h"
 #include "Box.h"
 #include "Ball.h"
@@ -10,7 +12,8 @@
 #include "ScoreArea.h"
 #include "FallCheck.h"
 #include "Line.h"
-#include <fstream>
+#include "MoveCommand.h"
+#include "CommandManager.h"
 
 using namespace ObjectManager;
 
@@ -55,6 +58,8 @@ namespace
 	static const float defaultE = 0.8f;	// 反発係数
 	static const float defaultF = 0.02f;	// 摩擦
 	static const float defaultMass = 1;	// 質量
+
+	CommandManager commandManager;
 };
 
 // マウスのドラッグアンドドロップでステージオブジェクトの配置が理想
@@ -89,6 +94,8 @@ StageEdit::StageEdit()
 	tempE = defaultE;
 	tempF = defaultF;
 	tempMass = defaultMass;
+
+	commandManager.SetUp();
 }
 
 StageEdit::~StageEdit()
@@ -121,6 +128,11 @@ void StageEdit::Update()
 	HierarchyImGui();
 	// ステージ読み書き用ImGui
 	StageImGui();
+
+	if (pDI->CheckKey(KD_DAT, DIK_LCONTROL) && pDI->CheckKey(KD_TRG, DIK_Z))
+	{
+		commandManager.Undo();
+	}
 }
 
 #if 1
@@ -179,6 +191,7 @@ void StageEdit::HasUpdate()
 				// 衝突した場所
 				GetNearWorldPosEx();
 				prevMousePos = nearWorldPosEx;
+				oldPos = selectObj.front()->pObj.center;
 				getGizmo = temp;
 				isHit = true;
 			}
@@ -446,7 +459,6 @@ void StageEdit::PosGizmoUpdate()
 {
 	gizmoC->SetRotation(VECTOR3());
 	GetObjCenter(selectObj);
-
 	if (getGizmo != nullptr)
 	{
 		// 選択されているGizmoのみ表示
@@ -506,7 +518,6 @@ void StageEdit::PosGizmoUpdate()
 		}
 		prevMousePos = nearWorldPosEx;
 	}
-
 	// getObjのスクリーン座標
 	VECTOR3 objScreenPos = XMVector3Project(objCenter, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
 	// getObjのスクリーン座標をワールド座標に変換
@@ -514,6 +525,7 @@ void StageEdit::PosGizmoUpdate()
 	gizmoC->SetPosition(gizmoWorldPos);
 	if (pDI->CheckMouse(KD_UTRG, 0))
 	{
+		commandManager.Do(std::make_shared<MoveCommand>(selectObj.front(), oldPos));
 		getGizmo = nullptr;
 		SetVisible(posGizmoX, true);
 		SetVisible(posGizmoY, true);

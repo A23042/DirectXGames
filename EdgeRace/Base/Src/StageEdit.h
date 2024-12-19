@@ -208,7 +208,8 @@ private:
 	// 1フレーム前のカーソル近視点座標
 	VECTOR3 prevMousePos;
 
-	VECTOR3 objCenter;
+	VECTOR3 objCenter;	// 複数オブジェクトの中心点
+	VECTOR3 oldPos;
 
 	// ImGu格納用変数
 	VECTOR3 objPos;
