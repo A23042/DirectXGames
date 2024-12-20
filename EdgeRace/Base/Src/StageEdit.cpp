@@ -3,6 +3,7 @@
 #include <fstream>
 
 #include "StageEdit.h"
+#include "HierarchyManager.h"
 #include "Box.h"
 #include "Ball.h"
 #include "MoveBox.h"
@@ -12,10 +13,11 @@
 #include "ScoreArea.h"
 #include "FallCheck.h"
 #include "Line.h"
-#include "MoveCommand.h"
 #include "CommandManager.h"
-
-using namespace ObjectManager;
+#include "MoveCommand.h"
+#include "RotationCommand.h"
+#include "ScaleCommand.h"
+#include "CreateCommand.h"
 
 namespace
 {
@@ -132,7 +134,13 @@ void StageEdit::Update()
 	if (pDI->CheckKey(KD_DAT, DIK_LCONTROL) && pDI->CheckKey(KD_TRG, DIK_Z))
 	{
 		commandManager.Undo();
+		selectObj.clear();
 	}
+	if (pDI->CheckKey(KD_DAT, DIK_LCONTROL) && pDI->CheckKey(KD_TRG, DIK_Y))
+	{
+		commandManager.Redo();
+	}
+
 }
 
 #if 1
@@ -171,7 +179,7 @@ void StageEdit::HasUpdate()
 {
 	// ショートカットキーコマンド
 	Command();
-
+	GizmoUpdate();
 	// マウス左クリック
 	if(CheckInAreaCursor())
 	{
@@ -191,8 +199,27 @@ void StageEdit::HasUpdate()
 				// 衝突した場所
 				GetNearWorldPosEx();
 				prevMousePos = nearWorldPosEx;
-				oldPos = selectObj.front()->pObj.center;
 				getGizmo = temp;
+				
+				// 操作前情報を登録しておく
+				// クリックしたギズモによって各GizumoのUpdateを回す
+				if (getGizmo == posGizmoX || getGizmo == posGizmoY || getGizmo == posGizmoZ)
+				{
+					oldPos = selectObj.front()->pObj.center;
+					gState = sPosGizmo;
+				}
+				else if (getGizmo == rotGizmoX || getGizmo == rotGizmoY || getGizmo == rotGizmoZ)
+				{
+					oldRot = selectObj.front()->Rotation();
+					gState = sRotGizmo;
+				}
+				else if (getGizmo == scaleGizmoX || getGizmo == scaleGizmoY || getGizmo == scaleGizmoZ)
+				{
+					oldScale = selectObj.front()->Scale();
+					gState = sScaleGizmo;
+				}
+				// クリックを離したらNonGizumoUpdateを回すようにする
+
 				isHit = true;
 			}
 			// Gizmoに当たってなければ衝突判定をとる
@@ -220,63 +247,7 @@ void StageEdit::HasUpdate()
 	ImGui::SetNextWindowSize(objInfoImSize);
 
 	Object3D* obj;
-	string name;
-#if 0
-	if (selectObj.size() == 1)
-	{
-		obj = selectObj.front();
-		name = "OBJINFO:" + obj->editObj.name;
-		if (obj->editObj.name == "Player")
-		{
-			name = name + to_string(obj->pObj.pNum);
-		}
-	}
-	else
-#endif
-	{
-		name = "OBJINFO";
-	}
-#if 0
-	if (selectObj.size() < 1)
-	{
-		ImGui::Begin(name.c_str());
-		// 反発係数・摩擦・質量
-		ImGui::SliderFloat("e", &tempE, 0.0f, 1.0f, "%.1f");
-		ImGui::SliderFloat("f", &tempF, 0.0f, 0.1f, "%.2f");
-		ImGui::InputFloat("mass", &tempMass, 0.5f, 1.0f);
-		ImGui::SameLine();
-		ImGui::Separator();
-
-		// 場所
-		ImGui::InputFloat("PositionX", &objPos.x, 0.1f, 0.5f, "%.2f");
-		ImGui::InputFloat("PositionY", &objPos.y, 0.1f, 0.5f, "%.2f");
-		ImGui::InputFloat("PositionZ", &objPos.z, 0.1f, 0.5f, "%.2f");
-		ImGui::SameLine();
-		ImGui::Separator();
-
-		// 回転
-		ImGui::InputFloat("RotateX", &objRot.x, 0.1f, 0.5f, "%.2f");
-		ImGui::InputFloat("RotateY", &objRot.y, 0.1f, 0.5f, "%.2f");
-		ImGui::InputFloat("RotateZ", &objRot.z, 0.1f, 0.5f, "%.2f");
-		ImGui::SameLine();
-		ImGui::Separator();
-
-		// スケール
-		ImGui::InputFloat("ScaleX", &objScale.x, 0.1f, 0.5f, "%.2f");
-		ImGui::InputFloat("scaleY", &objScale.y, 0.1f, 0.5f, "%.2f");
-		ImGui::InputFloat("ScaleZ", &objScale.z, 0.1f, 0.5f, "%.2f");
-		// MoveBoxの場合移動速と移動量
-		//if (getObj->editObj.name == "MoveBox")
-		{
-			ImGui::InputFloat("MoveSpeed", &moveSpeed, 0.5f);
-			ImGui::InputFloat("MovementX", &moveVolumu.x, 0.5f);
-			ImGui::InputFloat("MovementY", &moveVolumu.y, 0.5f);
-			ImGui::InputFloat("MovementZ", &moveVolumu.z, 0.5f);
-		}
-		ImGui::End();
-	}
-	else
-#endif
+	string name = "OBJINFO";
 	{
 		ImGui::SetNextWindowPos(objInfoImPos);
 		ImGui::SetNextWindowSize(objInfoImSize);
@@ -284,47 +255,10 @@ void StageEdit::HasUpdate()
 		ImGuiTabBarFlags tab_bar_flag = ImGuiBackendFlags_None;
 		if (ImGui::BeginTabBar("OBJECTINFO", tab_bar_flag))
 		{
-#if 0
-			VECTOR3 tmpPos = {};
-
-			if (ImGui::BeginTabItem("AllObj"))
-			{
-				ImGui::SliderFloat("e", &tempE, 0.0f, 1.0f, "%.1f");
-				ImGui::SliderFloat("f", &tempF, 0.0f, 0.1f, "%.2f");
-				ImGui::InputFloat("mass", &tempMass, 0.5f, 1.0f);
-				// 場所
-				VECTOR3 pos = obj->Position();
-				ImGui::InputFloat("PositionX", &tmpPos.x, 0.1f, 0.5f, "%.2f");
-				ImGui::InputFloat("PositionY", &tmpPos.y, 0.1f, 0.5f, "%.2f");
-				ImGui::InputFloat("PositionZ", &tmpPos.z, 0.1f, 0.5f, "%.2f");
-
-				obj->pObj.center = tmpPos;
-				obj->SetPosition(tmpPos);
-
-				// 回転
-				VECTOR3 rot = obj->Rotation();
-				ImGui::InputFloat("RotateX", &rot.x, 0.1f, 0.5f, "%.2f");
-				ImGui::InputFloat("RotateY", &rot.y, 0.1f, 0.5f, "%.2f");
-				ImGui::InputFloat("RotateZ", &rot.z, 0.1f, 0.5f, "%.2f");
-				// スケール
-				VECTOR3 scale = obj->Scale();
-				ImGui::InputFloat("ScaleX", &scale.x, 0.1f, 0.5f, "%.2f");
-				ImGui::InputFloat("scaleY", &scale.y, 0.1f, 0.5f, "%.2f");
-				ImGui::InputFloat("ScaleZ", &scale.z, 0.1f, 0.5f, "%.2f");
-			
-				for (Object3D* obj : selectObj)
-				{
-					obj->pObj.center = tmpPos;
-				}
-
-				ImGui::EndTabItem();
-
-			}
-#endif
 			int i = 1;
 			for(Object3D* obj : selectObj)
 			{
-				for (Object3D* tmp : hierarchyObj)
+				for (Object3D* tmp : HierarchyManager::GetHierarchyList())
 				{
 					if(tmp == obj)
 					{
@@ -416,10 +350,31 @@ void StageEdit::HasUpdate()
 		// ここにMoveBoxで移動速度、移動量を渡す
 	}
 
+	// 操作変更
+	if (!pDI->CheckMouse(KD_DAT, 1))
+	{
+		if (pDI->CheckKey(KD_TRG, DIK_W))
+		{
+			vGizmo = vPos;
+			SetGizmo();
+		}
+		else if (pDI->CheckKey(KD_TRG, DIK_R))
+		{
+			vGizmo = vRot;
+			SetGizmo();
+		}
+		else if (pDI->CheckKey(KD_TRG, DIK_E))
+		{
+			vGizmo = vScale;
+			SetGizmo();
+		}
+	}
 
 	// ギズモの表示状態でステータス分け
 	switch (gState)
 	{
+	case sNoneGizmo:
+		break;
 	case sPosGizmo:
 		PosGizmoUpdate();
 		break;
@@ -432,33 +387,21 @@ void StageEdit::HasUpdate()
 	default:
 		break;
 	}
-
-	// 操作変更
-	if (!pDI->CheckMouse(KD_DAT, 1))
-	{
-		if (pDI->CheckKey(KD_TRG, DIK_W))
-		{
-			gState = sPosGizmo;
-			SetGizmo(gState);
-		}
-		else if (pDI->CheckKey(KD_TRG, DIK_R))
-		{	
-			gState = sScaleGizmo;
-			SetGizmo(gState);
-		}
-		else if (pDI->CheckKey(KD_TRG, DIK_E))
-		{	
-			gState = sRotGizmo;
-			SetGizmo(gState);
-		}
-	}
 }
-// 
+void StageEdit::GizmoUpdate()
+{
+	GetObjCenter(selectObj);
+	// getObjのスクリーン座標
+	VECTOR3 objScreenPos = XMVector3Project(objCenter, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+	// getObjのスクリーン座標をワールド座標に変換
+	VECTOR3 gizmoWorldPos = XMVector3Unproject(VECTOR3(objScreenPos.x, objScreenPos.y, 0.2f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+	gizmoC->SetPosition(gizmoWorldPos);
+
+}
+
 // Position移動Gizmo表示中
 void StageEdit::PosGizmoUpdate()
 {
-	gizmoC->SetRotation(VECTOR3());
-	GetObjCenter(selectObj);
 	if (getGizmo != nullptr)
 	{
 		// 選択されているGizmoのみ表示
@@ -518,27 +461,22 @@ void StageEdit::PosGizmoUpdate()
 		}
 		prevMousePos = nearWorldPosEx;
 	}
-	// getObjのスクリーン座標
-	VECTOR3 objScreenPos = XMVector3Project(objCenter, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
-	// getObjのスクリーン座標をワールド座標に変換
-	VECTOR3 gizmoWorldPos = XMVector3Unproject(VECTOR3(objScreenPos.x, objScreenPos.y, 0.2f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
-	gizmoC->SetPosition(gizmoWorldPos);
 	if (pDI->CheckMouse(KD_UTRG, 0))
 	{
-		commandManager.Do(std::make_shared<MoveCommand>(selectObj.front(), oldPos));
+		if (oldPos != selectObj.front()->Position())
+		{
+			commandManager.Do(std::make_shared<MoveCommand>(selectObj.front(), oldPos));
+		}
 		getGizmo = nullptr;
 		SetVisible(posGizmoX, true);
 		SetVisible(posGizmoY, true);
 		SetVisible(posGizmoZ, true);
+		gState = sNoneGizmo;
 	}
 }
 
 void StageEdit::RotGizmoUpdate()
 {
-	//gizmoC->SetRotation(getObj->Rotation());
-	GetObjCenter(selectObj);
-
-
 	// ここでGizmoを触ってオブジェクトを動かす
 	if (getGizmo != nullptr)
 	{
@@ -598,26 +536,22 @@ void StageEdit::RotGizmoUpdate()
 		GetNearWorldPosEx();
 		prevMousePos = nearWorldPosEx;
 	}
-	// getObjのスクリーン座標
-	VECTOR3 objScreenPos = XMVector3Project(objCenter, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
-	// getObjのスクリーン座標をワールド座標に変換
-	VECTOR3 gizmoWorldPos = XMVector3Unproject(VECTOR3(objScreenPos.x, objScreenPos.y, 0.2f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
-	gizmoC->SetPosition(gizmoWorldPos);
 	if (pDI->CheckMouse(KD_UTRG, 0))
 	{
+		if (oldRot != selectObj.front()->Rotation())
+		{
+			commandManager.Do(std::make_shared<RotationCommand>(selectObj.front(), oldRot));
+		}
 		getGizmo = nullptr;
 		SetVisible(rotGizmoX, true);
 		SetVisible(rotGizmoY, true);
 		SetVisible(rotGizmoZ, true);
+		gState = sNoneGizmo;
 	}
 }
 
 void StageEdit::ScaleGizmoUpdate()
 {
-	//gizmoC->SetRotation(getObj->Rotation());
-	GetObjCenter(selectObj);
-
-
 	// ここでGizmoを触ってオブジェクトを動かす
 	if (getGizmo != nullptr)
 	{
@@ -687,25 +621,25 @@ void StageEdit::ScaleGizmoUpdate()
 		GetNearWorldPosEx();
 		prevMousePos = nearWorldPosEx;
 	}
-	// getObjのスクリーン座標
-	VECTOR3 objScreenPos = XMVector3Project(objCenter, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
-	// getObjのスクリーン座標をワールド座標に変換
-	VECTOR3 gizmoWorldPos = XMVector3Unproject(VECTOR3(objScreenPos.x, objScreenPos.y, 0.2f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
-	gizmoC->SetPosition(gizmoWorldPos);
 	if (pDI->CheckMouse(KD_UTRG, 0))
 	{
+		if (oldScale != selectObj.front()->Scale())
+		{
+			commandManager.Do(std::make_shared<ScaleCommand>(selectObj.front(), oldScale));
+		}
 		getGizmo = nullptr;
 		SetVisible(scaleGizmoX, true);
 		SetVisible(scaleGizmoY, true);
 		SetVisible(scaleGizmoZ, true);
+		gState = sNoneGizmo;
 	}
 }
 
-void StageEdit::SetGizmo(int gState)
+void StageEdit::SetGizmo()
 {
-	switch (gState)
+	switch (vGizmo)
 	{
-	case sPosGizmo:
+	case vPos:
 		SetVisible(gizmoC, true);
 		SetVisible(posGizmoX, true);
 		SetVisible(posGizmoY, true);
@@ -718,7 +652,7 @@ void StageEdit::SetGizmo(int gState)
 		SetVisible(scaleGizmoY, false);
 		SetVisible(scaleGizmoZ, false);
 		break;
-	case sRotGizmo:
+	case vRot:
 		SetVisible(gizmoC, true);
 		SetVisible(posGizmoX, false);
 		SetVisible(posGizmoY, false);
@@ -731,7 +665,7 @@ void StageEdit::SetGizmo(int gState)
 		SetVisible(scaleGizmoY, false);
 		SetVisible(scaleGizmoZ, false);
 		break;
-	case sScaleGizmo:
+	case vScale:
 		SetVisible(gizmoC, true);
 		SetVisible(posGizmoX, false);
 		SetVisible(posGizmoY, false);
@@ -788,7 +722,7 @@ void StageEdit::SelectObj(Object3D* obj)
 		obj->pObj.f = defaultF;
 		obj->pObj.mass = defaultMass;
 		//selectObj.push_back(obj);
-		hierarchyObj.push_back(obj);
+		HierarchyManager::AddHierarchy(obj);
 		isNew = false;
 	}
 	// 選択されたオブジェクトの色を変える
@@ -800,9 +734,9 @@ void StageEdit::SelectObj(Object3D* obj)
 
 	// 選択されてるオブジェクトのGizmo表示
 	// 初めてGizmoが出る場合posGizmoを出す
-	if (gState == sNoneGizmo)
+	if (vGizmo == vNone)
 	{
-		gState = sPosGizmo;
+		vGizmo = vPos;
 	}
 
 	objPos = obj->pObj.center;
@@ -814,7 +748,7 @@ void StageEdit::SelectObj(Object3D* obj)
 	tempMass = obj->pObj.mass;
 
 	// ステータスによって表示するGizmoを変える
-	SetGizmo(gState);
+	SetGizmo();
 
 	//getObj->editObj.isSelect = true;
 	obj->editObj.isSelect = true;
@@ -846,7 +780,7 @@ void StageEdit::DeselectObj(Object3D* obj)
 	}
 
 	nState = sNone;
-	SetGizmo(sNoneGizmo);
+	SetGizmo();
 }
 
 void StageEdit::DeleteObj()
@@ -855,8 +789,7 @@ void StageEdit::DeleteObj()
 	{
 		if(obj->editObj.name != "FallCheck")
 		{
-			hierarchyObj.remove(obj);
-			obj->DestroyMe();
+			HierarchyManager::RemoveHierarchy(obj);
 		}
 	}
 	selectObj.clear();
@@ -916,7 +849,7 @@ void StageEdit::DupeObj()
 			tempObj->pObj.f = obj->pObj.f;
 			tempObj->pObj.mass = obj->pObj.mass;
 			tempList.push_back(tempObj);
-			hierarchyObj.push_back(tempObj);
+			HierarchyManager::AddHierarchy(tempObj);
 		}
 	}
 	DeselectObj();
@@ -928,7 +861,7 @@ void StageEdit::DupeObj()
 
 	}
 	// ステータスによって表示するGizmoを変える
-	SetGizmo(gState);
+	SetGizmo();
 	nState = sHas;
 
 #if 0
@@ -1147,7 +1080,7 @@ void StageEdit::Load(int n)
 				//assert(false);
 			}
 			obj->SetPosition(csv->GetVector3(i, 2));
-			hierarchyObj.push_back(obj);
+			HierarchyManager::AddHierarchy(obj);
 		}
 	}
 	delete csv;
@@ -1222,7 +1155,7 @@ void StageEdit::CheckResetObj(list<Object3D*> objs)
 			)
 		{
 			// ヒエラルキーから削除
-			hierarchyObj.remove(obj);
+			HierarchyManager::RemoveHierarchy(obj);
 			obj->DestroyMe();
 		}
 	}
@@ -1236,37 +1169,51 @@ void StageEdit::CreateObjImGui()
 	if (ImGui::Button("Box"))
 	{
 		isNew = true;
-		SelectObj(new Box());
+		Box* temp = new Box();
+		SelectObj(temp);
+		commandManager.Do(std::make_shared<CreateCommand<Box>>(temp));
 	}
 	if (ImGui::Button("MoveBox"))
 	{
 		isNew = true;
-		SelectObj(new MoveBox());
+		MoveBox* temp = new MoveBox();
+		SelectObj(temp);
+		commandManager.Do(std::make_shared<CreateCommand<MoveBox>>(temp));
 	}
 	if (ImGui::Button("Area1"))
 	{
 		isNew = true;
-		SelectObj(new ScoreArea1);
+		ScoreArea1* temp = new ScoreArea1();
+		SelectObj(temp);
+		commandManager.Do(std::make_shared<CreateCommand<ScoreArea1>>(temp));
 	}
 	if (ImGui::Button("Area2"))
 	{
 		isNew = true;
-		SelectObj(new ScoreArea2);
+		ScoreArea2* temp = new ScoreArea2();
+		SelectObj(temp);
+		commandManager.Do(std::make_shared<CreateCommand<ScoreArea2>>(temp));
 	}
 	if (ImGui::Button("Area3"))
 	{
 		isNew = true;
-		SelectObj(new ScoreArea3);
+		ScoreArea3* temp = new ScoreArea3();
+		SelectObj(temp);
+		commandManager.Do(std::make_shared<CreateCommand<ScoreArea3>>(temp));
 	}
 	if (ImGui::Button("Line"))
 	{
 		isNew = true;
-		SelectObj(new Line());
+		Line* temp = new Line();
+		SelectObj(temp);
+		commandManager.Do(std::make_shared<CreateCommand<Line>>(temp));
 	}
 	if (ImGui::Button("Ball"))
 	{
 		isNew = true;
-		SelectObj(new Ball(false));
+		Ball* temp = new Ball(false);
+		SelectObj(temp);
+		commandManager.Do(std::make_shared<CreateCommand<Ball>>(temp));
 	}
 	// Playerは２つまで
 	if (pNum <= 1)
@@ -1274,7 +1221,9 @@ void StageEdit::CreateObjImGui()
 		if (ImGui::Button("Player"))
 		{
 			isNew = true;
-			SelectObj(new Player(pNum, false));
+			Player* temp = new Player(pNum, false);
+			SelectObj(temp);
+			commandManager.Do(std::make_shared<CreateCommand<Player>>(temp));
 			pNum++;
 		}
 	}
@@ -1288,7 +1237,7 @@ void StageEdit::HierarchyImGui()
 	ImGui::SetNextWindowSize(objHierarchyImSize);
 
 	ImGui::Begin("HIERARCHY");
-	for (Object3D* obj : hierarchyObj)
+	for (Object3D* obj : HierarchyManager::GetHierarchyList())
 	{
 		i++;
 		// ボタンにオブジェクトの番号 + 名前を入れる
@@ -1414,6 +1363,34 @@ void StageEdit::GetNearWorldPosEx()
 
 bool StageEdit::CheckInAreaCursor()
 {
+	POINT clientPosLT = { 0,0 };	// ウィンドウの左上座標
+	ClientToScreen(GameDevice()->m_pMain->m_hWnd, &clientPosLT);
+
+	POINT clientPosRU = { 0,0 };	// ウィンドウの右下座標
+	clientPosRU.x = clientPosLT.x + WINDOW_WIDTH;
+	clientPosRU.y = clientPosLT.y + WINDOW_HEIGHT;
+
+	POINT currsorClientPos = { 0,0 };	// カーソルのウィンドウ上の座標
+	currsorClientPos.x = clientPosLT.x + mousePos.x;
+	currsorClientPos.y = clientPosLT.y + mousePos.y;
+
+	// カーソルがウィンドウの外にでたら
+	if (currsorClientPos.x > clientPosRU.x)
+	{
+		return false;
+	}
+	else if (currsorClientPos.x < clientPosLT.x)
+	{
+		return false;
+	}
+	if (currsorClientPos.y > clientPosRU.y)
+	{
+		return false;
+	}
+	else if (currsorClientPos.y < clientPosLT.y)
+	{
+		return false;
+	}
 	if (mousePos.x > judgeSkipArea0.x && mousePos.x < judgeSkipArea0.x + judgeSkipArea0.z &&
 		mousePos.y > judgeSkipArea0.y && mousePos.y < judgeSkipArea0.y + judgeSkipArea0.w ||
 		mousePos.x > judgeSkipArea1.x && mousePos.x < judgeSkipArea1.x + judgeSkipArea1.z &&

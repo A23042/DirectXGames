@@ -387,6 +387,18 @@
     <ClInclude Include="Src\EmptyCommand.h">
       <Filter>ソース ファイル\13_Command</Filter>
     </ClInclude>
+    <ClInclude Include="Src\RotationCommand.h">
+      <Filter>ソース ファイル\13_Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\ScaleCommand.h">
+      <Filter>ソース ファイル\13_Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\CreateCommand.h">
+      <Filter>ソース ファイル\13_Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\HierarchyManager.h">
+      <Filter>ソース ファイル\10_MapEditScene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Main.cpp">
@@ -571,6 +583,18 @@
     </ClCompile>
     <ClCompile Include="Src\CommandManager.cpp">
       <Filter>ソース ファイル\13_Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\RotationCommand.cpp">
+      <Filter>ソース ファイル\13_Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\ScaleCommand.cpp">
+      <Filter>ソース ファイル\13_Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\CreateCommand.cpp">
+      <Filter>ソース ファイル\13_Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\HierarchyManager.cpp">
+      <Filter>ソース ファイル\10_MapEditScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

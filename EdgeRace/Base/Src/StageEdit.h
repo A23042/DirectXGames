@@ -4,11 +4,11 @@
 /// </summary>
 /// <author>S.Matsunaga</author>
 
-
 #include "Object3D.h"
 #include "CsvReader.h"
 
 using namespace std;
+using namespace ObjectManager;
 
 class StageEdit : public Object3D {
 public:
@@ -26,6 +26,8 @@ public:
 	/// オブジェクト選択状態のUpdate
 	/// </summary>
 	void HasUpdate();
+
+	void GizmoUpdate();
 
 	/// <summary>
 	/// 移動用Gizmo表示状態のUpdate
@@ -47,8 +49,7 @@ public:
 	/// 操作中のGizmoを表示
 	/// それ以外のGizmoを非表示
 	/// </summary>
-	/// <param name="gState">Gizmoステータス</param>
-	void SetGizmo(int gState);
+	void SetGizmo();
 	
 	/// <summary>
 	/// オブジェクトが選択される時に呼ばれる
@@ -153,7 +154,7 @@ private:
 		sGizmo,		// ギズモ選択状態
 	}nState;
 
-	// Gizmo関連のステータス
+	// Gizmoドラッグ中のステータス
 	enum GizmoState
 	{
 		sNoneGizmo = 0,	// ギズモ未選択
@@ -161,6 +162,15 @@ private:
 		sRotGizmo,		// 回転操作
 		sScaleGizmo,	// スケール操作
 	}gState;
+
+	// 表示するGizmo
+	enum GizmoView
+	{
+		vNone = 0,	// Gizmo非表示
+		vPos,		// 移動用表示
+		vRot,		// 回転用表示
+		vScale,		// スケール表示
+	}vGizmo;
 
 	CDirectInput* pDI = GameDevice()->m_pDI;	// pDIショートカット
 
@@ -173,7 +183,7 @@ private:
 	//Object3D* getObj = nullptr;	
 	std::list<Object3D*> selectObj;
 
-	std::list<Object3D*> hierarchyObj;
+	//std::list<Object3D*> hierarchyObj;
 
 	// 選択状態のGizmo
 	Object3D* getGizmo = nullptr;
@@ -210,6 +220,8 @@ private:
 
 	VECTOR3 objCenter;	// 複数オブジェクトの中心点
 	VECTOR3 oldPos;
+	VECTOR3 oldRot;
+	VECTOR3 oldScale;
 
 	// ImGu格納用変数
 	VECTOR3 objPos;

@@ -535,6 +535,7 @@
     <ClInclude Include="Src\CollisionManager.h" />
     <ClInclude Include="Src\CommandBase.h" />
     <ClInclude Include="Src\CommandManager.h" />
+    <ClInclude Include="Src\CreateCommand.h" />
     <ClInclude Include="Src\CsvReader.h" />
     <ClInclude Include="Src\DataHolder.h" />
     <ClInclude Include="Src\DInput.h" />
@@ -549,6 +550,7 @@
     <ClInclude Include="Src\GameObject.h" />
     <ClInclude Include="Src\Gizmo3D.h" />
     <ClInclude Include="Src\GizmoXYZ.h" />
+    <ClInclude Include="Src\HierarchyManager.h" />
     <ClInclude Include="Src\Line.h" />
     <ClInclude Include="Src\LoadStage.h" />
     <ClInclude Include="Src\Macro.h" />
@@ -571,6 +573,8 @@
     <ClInclude Include="Src\ResourceManager.h" />
     <ClInclude Include="Src\ResultScene.h" />
     <ClInclude Include="Src\ResultScore.h" />
+    <ClInclude Include="Src\RotationCommand.h" />
+    <ClInclude Include="Src\ScaleCommand.h" />
     <ClInclude Include="Src\SceneBase.h" />
     <ClInclude Include="Src\SceneFactory.h" />
     <ClInclude Include="Src\SceneManager.h" />
@@ -602,6 +606,7 @@
     <ClCompile Include="Src\Collision.cpp" />
     <ClCompile Include="Src\CollisionManager.cpp" />
     <ClCompile Include="Src\CommandManager.cpp" />
+    <ClCompile Include="Src\CreateCommand.cpp" />
     <ClCompile Include="Src\CsvReader.cpp" />
     <ClCompile Include="Src\DataHolder.cpp" />
     <ClCompile Include="Src\DInput.cpp" />
@@ -614,6 +619,7 @@
     <ClCompile Include="Src\GameMain.cpp" />
     <ClCompile Include="Src\Gizmo3D.cpp" />
     <ClCompile Include="Src\GizmoXYZ.cpp" />
+    <ClCompile Include="Src\HierarchyManager.cpp" />
     <ClCompile Include="Src\Line.cpp" />
     <ClCompile Include="Src\LoadStage.cpp" />
     <ClCompile Include="Src\Main.cpp" />
@@ -634,6 +640,8 @@
     <ClCompile Include="Src\ResourceManager.cpp" />
     <ClCompile Include="Src\ResultScene.cpp" />
     <ClCompile Include="Src\ResultScore.cpp" />
+    <ClCompile Include="Src\RotationCommand.cpp" />
+    <ClCompile Include="Src\ScaleCommand.cpp" />
     <ClCompile Include="Src\SceneBase.cpp" />
     <ClCompile Include="Src\SceneFactory.cpp" />
     <ClCompile Include="Src\SceneManager.cpp" />
