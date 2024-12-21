@@ -181,9 +181,7 @@ private:
 
 	// 選択状態のオブジェクト
 	//Object3D* getObj = nullptr;	
-	std::list<Object3D*> selectObj;
-
-	//std::list<Object3D*> hierarchyObj;
+	list<Object3D*> selectObj;
 
 	// 選択状態のGizmo
 	Object3D* getGizmo = nullptr;
@@ -219,9 +217,9 @@ private:
 	VECTOR3 prevMousePos;
 
 	VECTOR3 objCenter;	// 複数オブジェクトの中心点
-	VECTOR3 oldPos;
-	VECTOR3 oldRot;
-	VECTOR3 oldScale;
+	list<VECTOR3> oldPos;
+	list<VECTOR3> oldRot;
+	list<VECTOR3> oldScale;
 
 	// ImGu格納用変数
 	VECTOR3 objPos;

@@ -7,7 +7,7 @@
 class MoveCommand : public CommandBase
 {
 public:
-	MoveCommand(Object3D* targetObj, VECTOR3 oldPos) : targetObject(targetObj), newPosition(targetObj->Position()), oldPosition(oldPos) {};
+	MoveCommand(list<Object3D*> targetObj, list<VECTOR3> oldPos);
 	/// <summary>
 	/// コマンド実行
 	/// 与えられた座標を代入する
@@ -18,7 +18,7 @@ public:
 	/// </summary>
 	void Undo() override;
 private:
-	Object3D* targetObject = nullptr;
-	VECTOR3 newPosition = VECTOR3();
-	VECTOR3 oldPosition = VECTOR3();
+	list<Object3D*> targetObject = {};
+	list<VECTOR3> newPosition;
+	list<VECTOR3> oldPosition;
 };

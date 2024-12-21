@@ -18,6 +18,7 @@
 #include "RotationCommand.h"
 #include "ScaleCommand.h"
 #include "CreateCommand.h"
+#include "DeleteCommand.h"
 
 namespace
 {
@@ -102,6 +103,7 @@ StageEdit::StageEdit()
 
 StageEdit::~StageEdit()
 {
+	HierarchyManager::ClearHierarchy();
 }
 
 void StageEdit::Update()
@@ -205,21 +207,34 @@ void StageEdit::HasUpdate()
 				// クリックしたギズモによって各GizumoのUpdateを回す
 				if (getGizmo == posGizmoX || getGizmo == posGizmoY || getGizmo == posGizmoZ)
 				{
-					oldPos = selectObj.front()->pObj.center;
+					oldPos.clear();
+					for(Object3D* obj : selectObj)
+					{
+						oldPos.push_back(obj->Position());
+					}
+					//oldPos = selectObj.front()->pObj.center;
 					gState = sPosGizmo;
 				}
 				else if (getGizmo == rotGizmoX || getGizmo == rotGizmoY || getGizmo == rotGizmoZ)
 				{
-					oldRot = selectObj.front()->Rotation();
+					oldRot.clear();
+					for(Object3D* obj : selectObj)
+					{
+						oldRot.push_back(obj->Rotation());
+					}
+					//oldRot = selectObj.front()->Rotation();
 					gState = sRotGizmo;
 				}
 				else if (getGizmo == scaleGizmoX || getGizmo == scaleGizmoY || getGizmo == scaleGizmoZ)
 				{
-					oldScale = selectObj.front()->Scale();
+					oldScale.clear();
+					for(Object3D* obj : selectObj)
+					{
+						oldScale.push_back(obj->Scale());
+					}
+					//oldScale = selectObj.front()->Scale();
 					gState = sScaleGizmo;
 				}
-				// クリックを離したらNonGizumoUpdateを回すようにする
-
 				isHit = true;
 			}
 			// Gizmoに当たってなければ衝突判定をとる
@@ -246,7 +261,7 @@ void StageEdit::HasUpdate()
 	ImGui::SetNextWindowPos(objInfoImPos);
 	ImGui::SetNextWindowSize(objInfoImSize);
 
-	Object3D* obj;
+	//Object3D* obj;
 	string name = "OBJINFO";
 	{
 		ImGui::SetNextWindowPos(objInfoImPos);
@@ -463,10 +478,8 @@ void StageEdit::PosGizmoUpdate()
 	}
 	if (pDI->CheckMouse(KD_UTRG, 0))
 	{
-		if (oldPos != selectObj.front()->Position())
-		{
-			commandManager.Do(std::make_shared<MoveCommand>(selectObj.front(), oldPos));
-		}
+		commandManager.Do(make_shared<MoveCommand>(selectObj, oldPos));
+		
 		getGizmo = nullptr;
 		SetVisible(posGizmoX, true);
 		SetVisible(posGizmoY, true);
@@ -538,11 +551,9 @@ void StageEdit::RotGizmoUpdate()
 	}
 	if (pDI->CheckMouse(KD_UTRG, 0))
 	{
-		if (oldRot != selectObj.front()->Rotation())
-		{
-			commandManager.Do(std::make_shared<RotationCommand>(selectObj.front(), oldRot));
-		}
-		getGizmo = nullptr;
+		commandManager.Do(make_shared<RotationCommand>(selectObj, oldRot));
+
+			getGizmo = nullptr;
 		SetVisible(rotGizmoX, true);
 		SetVisible(rotGizmoY, true);
 		SetVisible(rotGizmoZ, true);
@@ -623,10 +634,8 @@ void StageEdit::ScaleGizmoUpdate()
 	}
 	if (pDI->CheckMouse(KD_UTRG, 0))
 	{
-		if (oldScale != selectObj.front()->Scale())
-		{
-			commandManager.Do(std::make_shared<ScaleCommand>(selectObj.front(), oldScale));
-		}
+		commandManager.Do(make_shared<ScaleCommand>(selectObj, oldScale));
+
 		getGizmo = nullptr;
 		SetVisible(scaleGizmoX, true);
 		SetVisible(scaleGizmoY, true);
@@ -790,6 +799,7 @@ void StageEdit::DeleteObj()
 		if(obj->editObj.name != "FallCheck")
 		{
 			HierarchyManager::RemoveHierarchy(obj);
+			commandManager.Do(make_shared<DeleteCommand<Object3D>>(obj));
 		}
 	}
 	selectObj.clear();
@@ -798,7 +808,7 @@ void StageEdit::DeleteObj()
 void StageEdit::DupeObj()
 {
 	// コピーされたオブジェクトをtempに保存する
-	std::list<Object3D*> tempList = {};
+	list<Object3D*> tempList = {};
 	Object3D* tempObj = nullptr;
 	for (Object3D* obj : selectObj)
 	{
@@ -858,26 +868,11 @@ void StageEdit::DupeObj()
 	{
 		obj->editObj.isSelect = true;
 		obj->GetMesh()->m_vDiffuse = VECTOR4(1.0f, 0.2f, 1.0f, 1.0f);
-
 	}
 	// ステータスによって表示するGizmoを変える
 	SetGizmo();
 	nState = sHas;
 
-#if 0
-	if(temp != nullptr)
-	{
-		temp->pObj.center = ob->pObj.center;
-		temp->SetRotation(ob->Rotation());
-		temp->SetScale(ob->Scale());
-
-		temp->pObj.e = ob->pObj.e;
-		temp->pObj.f = ob->pObj.f;
-		temp->pObj.mass = ob->pObj.mass;
-
-		SelectObj(temp);
-	}
-#endif
 }
 
 void StageEdit::Save(int n)
@@ -1171,49 +1166,49 @@ void StageEdit::CreateObjImGui()
 		isNew = true;
 		Box* temp = new Box();
 		SelectObj(temp);
-		commandManager.Do(std::make_shared<CreateCommand<Box>>(temp));
+		commandManager.Do(make_shared<CreateCommand<Box>>(temp));
 	}
 	if (ImGui::Button("MoveBox"))
 	{
 		isNew = true;
 		MoveBox* temp = new MoveBox();
 		SelectObj(temp);
-		commandManager.Do(std::make_shared<CreateCommand<MoveBox>>(temp));
+		commandManager.Do(make_shared<CreateCommand<MoveBox>>(temp));
 	}
 	if (ImGui::Button("Area1"))
 	{
 		isNew = true;
 		ScoreArea1* temp = new ScoreArea1();
 		SelectObj(temp);
-		commandManager.Do(std::make_shared<CreateCommand<ScoreArea1>>(temp));
+		commandManager.Do(make_shared<CreateCommand<ScoreArea1>>(temp));
 	}
 	if (ImGui::Button("Area2"))
 	{
 		isNew = true;
 		ScoreArea2* temp = new ScoreArea2();
 		SelectObj(temp);
-		commandManager.Do(std::make_shared<CreateCommand<ScoreArea2>>(temp));
+		commandManager.Do(make_shared<CreateCommand<ScoreArea2>>(temp));
 	}
 	if (ImGui::Button("Area3"))
 	{
 		isNew = true;
 		ScoreArea3* temp = new ScoreArea3();
 		SelectObj(temp);
-		commandManager.Do(std::make_shared<CreateCommand<ScoreArea3>>(temp));
+		commandManager.Do(make_shared<CreateCommand<ScoreArea3>>(temp));
 	}
 	if (ImGui::Button("Line"))
 	{
 		isNew = true;
 		Line* temp = new Line();
 		SelectObj(temp);
-		commandManager.Do(std::make_shared<CreateCommand<Line>>(temp));
+		commandManager.Do(make_shared<CreateCommand<Line>>(temp));
 	}
 	if (ImGui::Button("Ball"))
 	{
 		isNew = true;
 		Ball* temp = new Ball(false);
 		SelectObj(temp);
-		commandManager.Do(std::make_shared<CreateCommand<Ball>>(temp));
+		commandManager.Do(make_shared<CreateCommand<Ball>>(temp));
 	}
 	// Playerは２つまで
 	if (pNum <= 1)
@@ -1223,7 +1218,7 @@ void StageEdit::CreateObjImGui()
 			isNew = true;
 			Player* temp = new Player(pNum, false);
 			SelectObj(temp);
-			commandManager.Do(std::make_shared<CreateCommand<Player>>(temp));
+			commandManager.Do(make_shared<CreateCommand<Player>>(temp));
 			pNum++;
 		}
 	}

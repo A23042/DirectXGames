@@ -5,9 +5,12 @@
 #include <list>
 #include <iterator>
 
+using namespace std;
+
 class CommandBase
 {
 public:
+	virtual ~CommandBase() = default;
 	virtual void Do() = 0;
 	virtual void Undo() = 0;
 };

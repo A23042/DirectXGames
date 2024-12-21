@@ -11,6 +11,7 @@ class CreateCommand : public CommandBase
 {
 public:
 	CreateCommand(C* targetObj) : targetObject(targetObj) {};
+	~CreateCommand() {};
 	void Do() override;
 	void Undo() override;
 private:
@@ -23,7 +24,15 @@ private:
 template<class C>
 inline void CreateCommand<C>::Do()
 {
-
+	// Ctrl+Zで消されたオブジェクトの生成
+	/*
+	auto it = find(HierarchyManager::GetHierarchyList().begin(), HierarchyManager::GetHierarchyList().end(), targetObject);
+	if(it == HierarchyManager::GetHierarchyList().end())
+	{
+		C* temp = new C();
+		temp = targetObject;
+	}
+	*/
 }
 
 // cppに書くとエラー発生

@@ -7,7 +7,7 @@
 class ScaleCommand : public CommandBase
 {
 public:
-	ScaleCommand(Object3D* targetObj, VECTOR3 oldScale) : targetObject(targetObj), newScale(targetObj->Scale()), oldScale(oldScale) {};
+	ScaleCommand(list<Object3D*> targetObj, list<VECTOR3> oldScale);
 	/// <summary>
 	/// コマンド実行
 	/// 与えられたサイズを代入する
@@ -18,7 +18,7 @@ public:
 	/// </summary>
 	void Undo() override;
 private:
-	Object3D* targetObject = nullptr;
-	VECTOR3 newScale = VECTOR3();
-	VECTOR3 oldScale = VECTOR3();
+	list<Object3D*> targetObject;
+	list<VECTOR3> newScale;
+	list<VECTOR3> oldScale;
 };

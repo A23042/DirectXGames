@@ -7,6 +7,7 @@ class CommandManager
 {
 public:
 	CommandManager() {};
+	~CommandManager() {};
 
 	/// <summary>
 	/// 初期設定
@@ -19,7 +20,7 @@ public:
 	/// 操作した後に呼び出す
 	/// </summary>
 	/// <param name="command">実行したコマンド</param>
-	void Do(std::shared_ptr<CommandBase> command);
+	void Do(shared_ptr<CommandBase> command);
 
 	/// <summary>
 	/// commandListに保存されている操作の巻き戻し
@@ -28,6 +29,6 @@ public:
 
 	void Redo();
 private:
-	std::list<std::shared_ptr<CommandBase>> commandList = {};
-	std::list<std::shared_ptr<CommandBase>>::iterator currentItr;
+	list<shared_ptr<CommandBase>> commandList = {};
+	list<shared_ptr<CommandBase>>::iterator currentItr;
 };

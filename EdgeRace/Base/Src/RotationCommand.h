@@ -8,7 +8,7 @@
 class RotationCommand : public CommandBase
 {
 public:
-	RotationCommand(Object3D* targetObj, VECTOR3 oldRot) : targetObject(targetObj), newRotation(targetObj->Rotation()), oldRotation(oldRot) {};
+	RotationCommand(std::list<Object3D*> targetObj, std::list<VECTOR3> oldRot);
 	/// <summary>
 	/// コマンド実行
 	/// 与えられた回転を代入する
@@ -19,7 +19,7 @@ public:
 	/// </summary>
 	void Undo() override;
 private:
-	Object3D* targetObject = nullptr;
-	VECTOR3 oldRotation = VECTOR3();
-	VECTOR3 newRotation = VECTOR3();
+	std::list<Object3D*> targetObject;
+	std::list<VECTOR3> oldRotation;
+	std::list<VECTOR3> newRotation;
 };

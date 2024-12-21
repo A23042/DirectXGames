@@ -24,6 +24,11 @@ void HierarchyManager::RemoveHierarchy(Object3D* obj)
 	}
 }
 
+void HierarchyManager::ClearHierarchy()
+{
+	hierarchyList.clear();
+}
+
 std::list<Object3D*> HierarchyManager::GetHierarchyList()
 {
 	return hierarchyList;

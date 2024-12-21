@@ -538,6 +538,7 @@
     <ClInclude Include="Src\CreateCommand.h" />
     <ClInclude Include="Src\CsvReader.h" />
     <ClInclude Include="Src\DataHolder.h" />
+    <ClInclude Include="Src\DeleteCommand.h" />
     <ClInclude Include="Src\DInput.h" />
     <ClInclude Include="Src\Direct3D.h" />
     <ClInclude Include="Src\Displace.h" />
@@ -606,7 +607,6 @@
     <ClCompile Include="Src\Collision.cpp" />
     <ClCompile Include="Src\CollisionManager.cpp" />
     <ClCompile Include="Src\CommandManager.cpp" />
-    <ClCompile Include="Src\CreateCommand.cpp" />
     <ClCompile Include="Src\CsvReader.cpp" />
     <ClCompile Include="Src\DataHolder.cpp" />
     <ClCompile Include="Src\DInput.cpp" />

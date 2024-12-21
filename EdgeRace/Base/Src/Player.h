@@ -11,7 +11,7 @@
 
 class Player : public Object3D {
 public:
-	Player(int num, bool isPhysic = true);
+	Player(int num = -1, bool isPhysic = true);
 	~Player();
 	void Start() override;
 	void Update() override;
