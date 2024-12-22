@@ -76,7 +76,7 @@ public:
 	/// 複製元オブジェクトの位置、回転、サイズを入れる
 	/// </summary>
 	/// <param name="ob">複製元オブジェクト</param>
-	void DupeObj();
+	void CloneObj();
 
 	/// <summary>
 	/// ステージセーブ

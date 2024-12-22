@@ -288,6 +288,32 @@ namespace ObjectManager {
 		}
 		return out;
 	}
+	// 2024.12.22 S.Matsunaga
+	/// <summary>
+	/// クラス名と探さないタグ、非表示以外オブジェクトをすべて探す
+	/// </summary>
+	/// <typeparam name="C">クラス名</typeparam>
+	/// <param name="tag">除外するタグ</param>
+	/// <returns>オブジェクトの実態list</returns>
+	template<class C> std::list<C*> FindGameObjectsVisibleWithOutTag(std::string tag)
+	{
+		std::list<C*> out;
+		out.clear();
+
+		const std::list<GameObject*> objs = GetAllObjects();
+
+		for (GameObject* node : objs) {
+			if (IsVisible(node))
+			{
+				C* obj = dynamic_cast<C*>(node);
+				if (obj != nullptr) {
+					if (!obj->IsTag(tag))
+						out.emplace_back(obj);
+				}
+			}
+		}
+		return out;
+	}
 
 	/// 2024.11.25 S.Matsunaga
 	/// <summary>

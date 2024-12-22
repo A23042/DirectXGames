@@ -89,8 +89,6 @@ StageEdit::StageEdit()
 	fallCheck = new FallCheck();
 	fallCheck->pObj.center = VECTOR3(0, -5, 0);
 
-	//line = new Line();
-
 	nState = sNone;
 	gState = sNoneGizmo;
 
@@ -133,14 +131,16 @@ void StageEdit::Update()
 	// ステージ読み書き用ImGui
 	StageImGui();
 
+	// Undo、Redoコマンド
 	if (pDI->CheckKey(KD_DAT, DIK_LCONTROL) && pDI->CheckKey(KD_TRG, DIK_Z))
 	{
 		commandManager.Undo();
-		selectObj.clear();
+		DeselectObj();
 	}
 	if (pDI->CheckKey(KD_DAT, DIK_LCONTROL) && pDI->CheckKey(KD_TRG, DIK_Y))
 	{
 		commandManager.Redo();
+		DeselectObj();
 	}
 
 }
@@ -212,7 +212,6 @@ void StageEdit::HasUpdate()
 					{
 						oldPos.push_back(obj->Position());
 					}
-					//oldPos = selectObj.front()->pObj.center;
 					gState = sPosGizmo;
 				}
 				else if (getGizmo == rotGizmoX || getGizmo == rotGizmoY || getGizmo == rotGizmoZ)
@@ -222,7 +221,6 @@ void StageEdit::HasUpdate()
 					{
 						oldRot.push_back(obj->Rotation());
 					}
-					//oldRot = selectObj.front()->Rotation();
 					gState = sRotGizmo;
 				}
 				else if (getGizmo == scaleGizmoX || getGizmo == scaleGizmoY || getGizmo == scaleGizmoZ)
@@ -232,7 +230,6 @@ void StageEdit::HasUpdate()
 					{
 						oldScale.push_back(obj->Scale());
 					}
-					//oldScale = selectObj.front()->Scale();
 					gState = sScaleGizmo;
 				}
 				isHit = true;
@@ -241,7 +238,7 @@ void StageEdit::HasUpdate()
 			if (!isHit)
 			{
 				// Gizmo以外のオブジェクトを調べる
-				list<Object3D*> objs = FindGameObjectsWithOutTag<Object3D>("Gizmo");
+				list<Object3D*> objs = FindGameObjectsVisibleWithOutTag<Object3D>("Gizmo");
 				VECTOR3 hit;
 				temp = GetClosestHitObject(objs, hit);
 				if (temp != nullptr)
@@ -799,13 +796,13 @@ void StageEdit::DeleteObj()
 		if(obj->editObj.name != "FallCheck")
 		{
 			HierarchyManager::RemoveHierarchy(obj);
-			commandManager.Do(make_shared<DeleteCommand<Object3D>>(obj));
 		}
 	}
+	commandManager.Do(make_shared<DeleteCommand<Object3D>>(selectObj));
 	selectObj.clear();
 }
 
-void StageEdit::DupeObj()
+void StageEdit::CloneObj()
 {
 	// コピーされたオブジェクトをtempに保存する
 	list<Object3D*> tempList = {};
@@ -848,6 +845,7 @@ void StageEdit::DupeObj()
 		{
 			tempObj = new Line();
 		}
+		// 複製されたオブジェクトを一つづつ配列に格納する
 		if(tempObj != nullptr)
 		{
 			tempObj->pObj.center = obj->pObj.center;
@@ -864,6 +862,7 @@ void StageEdit::DupeObj()
 	}
 	DeselectObj();
 	selectObj = tempList;
+	commandManager.Do(make_shared<CreateCommand<Object3D>>(tempList));	// Object3Dではなくそれぞれの型にしなければならない
 	for (Object3D* obj : selectObj)
 	{
 		obj->editObj.isSelect = true;
@@ -1290,7 +1289,7 @@ void StageEdit::Command()
 	// Ctrl + D オブジェクト複製
 	if (pDI->CheckKey(KD_DAT, DIK_LCONTROL) && pDI->CheckKey(KD_TRG, DIK_D))
 	{
-		DupeObj();
+		CloneObj();
 		return;	// 以下コード省略
 	}
 }

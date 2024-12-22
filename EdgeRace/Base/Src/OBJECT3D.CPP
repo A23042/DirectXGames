@@ -21,6 +21,7 @@ Object3D::~Object3D()
 
 void Object3D::Update()
 {
+	ObjectManager::SetVisible(this, ObjectManager::IsVisible(Parent()));
 }
 
 void Object3D::Draw()
