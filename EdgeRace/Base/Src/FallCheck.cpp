@@ -26,6 +26,16 @@ FallCheck::FallCheck(bool playScene) : isPlayScene(playScene)
 
 FallCheck::~FallCheck()
 {
+	if (mesh != nullptr)
+	{
+		delete mesh;
+		mesh = nullptr;
+	}
+	if (meshCol != nullptr)
+	{
+		delete meshCol;
+		meshCol = nullptr;
+	}
 }
 
 void FallCheck::Update()

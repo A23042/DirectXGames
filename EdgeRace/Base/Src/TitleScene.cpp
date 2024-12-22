@@ -14,7 +14,7 @@ TitleScene::TitleScene()
 	positionX = 0;
 	speedX = 1;
 	panel = new MenuPanel();
-	
+#if 1
 	// テキストファイルの読み方
 	char name[64];
 	// TestMapを使用する場合は0にする
@@ -39,6 +39,7 @@ TitleScene::TitleScene()
 		else if (str == "1")
 		{
 			str = csv->GetString(i, 1);
+			
 			if (str == "PLAYER")
 			{
 				float rotY = csv->GetFloat(i, 5);
@@ -63,6 +64,7 @@ TitleScene::TitleScene()
 				obj->pObj.e = e;
 				obj->pObj.f = f;
 			}
+			
 			else if (str == "BALL")
 			{
 				float e = csv->GetFloat(i, 5);
@@ -77,18 +79,19 @@ TitleScene::TitleScene()
 			{
 				obj = new FallCheck(true);
 			}
-			else
+			if(obj != nullptr)
 			{
-				assert(false);
+				float x = csv->GetFloat(i, 2);
+				float y = csv->GetFloat(i, 3);
+				float z = csv->GetFloat(i, 4);
+				obj->SetPosition(x, y, z);
 			}
-			float x = csv->GetFloat(i, 2);
-			float y = csv->GetFloat(i, 3);
-			float z = csv->GetFloat(i, 4);
-			obj->SetPosition(x, y, z);
 		}
 	}
+	SAFE_DELETE(csv);
 	Instantiate<Camera>();
 	Instantiate<CollisonManager>();
+#endif
 }
 
 TitleScene::~TitleScene()
@@ -138,6 +141,5 @@ void TitleScene::Update()
 
 void TitleScene::Draw()
 {
-	GameDevice()->m_pFont->Draw(
-		positionX, 20, "TitleScene", 16, RGB(255, 0, 0));
+	GameDevice()->m_pFont->Draw(positionX, 20, "TitleScene", 16, RGB(255, 0, 0));
 }

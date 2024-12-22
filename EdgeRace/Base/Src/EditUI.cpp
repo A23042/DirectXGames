@@ -16,6 +16,12 @@ EditUI::EditUI()
 
 EditUI::~EditUI()
 {
+	SAFE_DELETE(spr);
+	auto itr = sprImages.begin();
+	for (auto itr = sprImages.begin(); itr != sprImages.end(); itr++)
+	{
+		SAFE_DELETE(*itr);
+	}
 }
 
 void EditUI::Draw()

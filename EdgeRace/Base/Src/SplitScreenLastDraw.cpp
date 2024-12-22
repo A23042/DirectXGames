@@ -47,11 +47,13 @@ SplitScreenLastDraw::SplitScreenLastDraw()
 
 SplitScreenLastDraw::~SplitScreenLastDraw()
 {
-	if (sp != nullptr)
-	{
-		delete sp;
-		sp = nullptr;
-	}
+	SAFE_DELETE(sp);
+	SAFE_DELETE(baseSpr);
+	SAFE_DELETE(gageSpr);
+	SAFE_DELETE(base);
+	SAFE_DELETE(gage);
+	SAFE_DELETE(redArea);
+
 }
 
 void SplitScreenLastDraw::Start()

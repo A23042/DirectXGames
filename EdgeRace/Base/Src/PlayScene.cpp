@@ -139,6 +139,8 @@ PlayScene::PlayScene(int num)
 	data = SingleInstantiate<DataHolder>();
 	data->DontDestroyMe();
 	data->SetPlay(true);
+
+	SAFE_DELETE(csv);
 }
 
 PlayScene::~PlayScene()
@@ -147,10 +149,6 @@ PlayScene::~PlayScene()
 
 void PlayScene::Update()
 {
-	//if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_R))
-	{
-		//SceneManager::ChangeScene("ResultScene");
-	}
 	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_T))
 	{
 		SceneManager::ChangeScene("TitleScene");

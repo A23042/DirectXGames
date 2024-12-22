@@ -18,6 +18,7 @@ public:
 	{
 		parent = obj;
 	}
+	Object3D* GetParent() { return parent; }
 	const MATRIX4X4 matrix();
 private:
 	Object3D* parent;

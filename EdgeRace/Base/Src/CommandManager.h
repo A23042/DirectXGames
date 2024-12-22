@@ -2,6 +2,7 @@
 // コマンド(操作)を保存、管理するクラス
 #pragma once
 #include "CommandBase.h"
+#include "Macro.h"
 
 class CommandManager
 {

@@ -26,7 +26,6 @@ LoadStage::~LoadStage()
 
 void LoadStage::Start()
 {
-	//collManager = ObjectManager::FindGameObject<CollisonManager>();
 }
 
 void LoadStage::Update()
@@ -201,5 +200,5 @@ void LoadStage::Load(int num)
 			}
 		}
 	}
-
+	SAFE_DELETE(csv);
 }

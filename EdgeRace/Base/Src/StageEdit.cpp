@@ -73,7 +73,10 @@ StageEdit::StageEdit()
 	new Gizmo3D();
 
 	// 親Gizmoと移動、回転サイズGizmoの初期化
+	
 	gizmoC = new GizmoXYZ();
+	// ギズモオブジェクトでメモリリーク発生
+	// 原因不明
 	posGizmoX = new PosGizmoX(gizmoC);
 	posGizmoY = new PosGizmoY(gizmoC);
 	posGizmoZ = new PosGizmoZ(gizmoC);
@@ -85,7 +88,7 @@ StageEdit::StageEdit()
 	scaleGizmoX = new ScaleGizmoX(gizmoC);
 	scaleGizmoY = new ScaleGizmoY(gizmoC);
 	scaleGizmoZ = new ScaleGizmoZ(gizmoC);
-
+	
 	fallCheck = new FallCheck();
 	fallCheck->pObj.center = VECTOR3(0, -5, 0);
 
@@ -1077,7 +1080,7 @@ void StageEdit::Load(int n)
 			HierarchyManager::AddHierarchy(obj);
 		}
 	}
-	delete csv;
+	SAFE_DELETE(csv);
 }
 
 bool StageEdit::CursorLoop()

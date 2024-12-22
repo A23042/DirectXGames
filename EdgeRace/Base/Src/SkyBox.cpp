@@ -9,11 +9,7 @@ SkyBox::SkyBox()
 
 SkyBox::~SkyBox()
 {
-	if (mesh != nullptr)
-	{
-		delete mesh;
-		mesh = nullptr;
-	}
+	SAFE_DELETE(mesh);
 }
 
 void SkyBox::Update()

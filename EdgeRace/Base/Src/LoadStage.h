@@ -10,6 +10,4 @@ public:
 	void Start() override;
 	void Update() override;
 	void Load(int num);
-private:
-	CollisonManager* collManager = nullptr;
 };

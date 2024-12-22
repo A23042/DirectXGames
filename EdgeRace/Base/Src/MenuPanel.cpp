@@ -23,6 +23,13 @@ MenuPanel::MenuPanel()
 
 MenuPanel::~MenuPanel()
 {
+	SAFE_DELETE(spr);
+	SAFE_DELETE(BackGroundImage);
+	for (int i = 0; i < 3; i++)
+	{
+		SAFE_DELETE(Button[i]);
+		SAFE_DELETE(TextImage[i]);
+	}
 }
 
 void MenuPanel::Update()

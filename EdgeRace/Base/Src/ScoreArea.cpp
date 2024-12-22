@@ -6,33 +6,8 @@ ScoreArea::ScoreArea()
 
 ScoreArea::~ScoreArea()
 {
+	SAFE_DELETE(spr);
 }
-
-#if 0
-void ScoreArea::Draw()
-{
-	mesh->Render(transform.matrix());
-
-	// 各辺の頂点パーツ
-	int edgePoint[12][2] = {
-		{0, 1}, {1, 2}, {2, 3}, {3, 0},//正面：右、　下、　左、　下
-		{0, 4}, {1, 5}, {2, 6}, {3, 7},//側面：右上、右下、左下、左上
-		{4, 5}, {5, 6}, {6, 7}, {7, 4} //背面：右、　下、　左、　下、
-	};
-
-	// 選択されている場合自身のアウトライを表示させる
-	if (editObj.isSelect)
-	{
-		vPos = transform.scale / 2;
-		CubeSize(vPos.x, vPos.y, vPos.z);
-		if (spr == nullptr) spr = new CSprite;
-		for (int i = 0; i < 12; i++)
-		{
-			spr->DrawLine3D(vertex[edgePoint[i][1]], vertex[edgePoint[i][0]], RGB(0, 255, 50), 1.0f);
-		}
-	}
-}
-#endif
 
 ScoreArea1::ScoreArea1(VECTOR3 size, VECTOR3 rot)
 {
@@ -59,16 +34,9 @@ ScoreArea1::ScoreArea1(VECTOR3 size, VECTOR3 rot)
 
 ScoreArea1::~ScoreArea1()
 {
-	if (mesh != nullptr)
-	{
-		delete mesh;
-		mesh = nullptr;
-	}
-	if (meshCol != nullptr)
-	{
-		delete meshCol;
-		meshCol = nullptr;
-	}
+	SAFE_DELETE(spr);
+	SAFE_DELETE(mesh);
+	SAFE_DELETE(meshCol);
 	ObjectManager::RemoveArea(this);
 }
 
@@ -97,16 +65,9 @@ ScoreArea2::ScoreArea2(VECTOR3 size, VECTOR3 rot)
 
 ScoreArea2::~ScoreArea2()
 {
-	if (mesh != nullptr)
-	{
-		delete mesh;
-		mesh = nullptr;
-	}
-	if (meshCol != nullptr)
-	{
-		delete meshCol;
-		meshCol = nullptr;
-	}
+	SAFE_DELETE(spr);
+	SAFE_DELETE(mesh);
+	SAFE_DELETE(meshCol);
 	ObjectManager::RemoveArea(this);
 }
 
@@ -135,16 +96,9 @@ ScoreArea3::ScoreArea3(VECTOR3 size, VECTOR3 rot)
 
 ScoreArea3::~ScoreArea3()
 {
-	if (mesh != nullptr)
-	{
-		delete mesh;
-		mesh = nullptr;
-	}
-	if (meshCol != nullptr)
-	{
-		delete meshCol;
-		meshCol = nullptr;
-	}
+	SAFE_DELETE(spr);
+	SAFE_DELETE(mesh);
+	SAFE_DELETE(meshCol);
 	ObjectManager::RemoveArea(this);
 }
 

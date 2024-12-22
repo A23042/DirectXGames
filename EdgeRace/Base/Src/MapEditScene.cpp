@@ -14,6 +14,7 @@ MapEditScene::MapEditScene()
 
 MapEditScene::~MapEditScene()
 {
+	SAFE_DELETE(cs);
 }
 
 void MapEditScene::Update()

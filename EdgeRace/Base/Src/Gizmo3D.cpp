@@ -10,6 +10,7 @@ Gizmo3D::Gizmo3D()
 
 Gizmo3D::~Gizmo3D()
 {
+	SAFE_DELETE(mesh);
 }
 
 void Gizmo3D::Update()

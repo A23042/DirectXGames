@@ -29,6 +29,16 @@ MoveBox::MoveBox(VECTOR3 size, VECTOR3 rot, VECTOR3 move, VECTOR3 moveSpeed) : v
 
 MoveBox::~MoveBox()
 {
+	if (mesh != nullptr)
+	{
+		delete mesh;
+		mesh = nullptr;
+	}
+	if (meshCol != nullptr)
+	{
+		delete meshCol;
+		meshCol = nullptr;
+	}
 }
 
 void MoveBox::Start()

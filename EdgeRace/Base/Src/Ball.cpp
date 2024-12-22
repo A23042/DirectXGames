@@ -42,16 +42,8 @@ Ball::Ball(bool isPhysic,int pNum)
 Ball::~Ball()
 {
 	child->DestroyMe();
-	if (mesh != nullptr) 
-	{
-		delete mesh;
-		mesh = nullptr;
-	}
-	if (meshCol != nullptr)
-	{
-		delete meshCol;
-		meshCol = nullptr;
-	}
+	SAFE_DELETE(mesh);
+	SAFE_DELETE(meshCol);
 	ObjectManager::RemoveObj(this);
 }
 
@@ -71,57 +63,6 @@ void Ball::Update()
 	pObj.center += pObj.velocity * SceneManager::DeltaTime();
 	transform.position = pObj.center;
 
-	if (isPhysic)
-	{
-		//
-		// 現在一度BallAからBallBに衝突判定をしても
-		//			BallBからBallAに衝突判定を取っているので一度しか衝突判定をしない様に改善する
-		// 
-#if 0
-		// Boxとの衝突判定
-		std::list<Box*> boxes = ObjectManager::FindGameObjectsWithTag<Box>("STAGEOBJ");
-		for (Box* box : boxes)
-		{
-			if (box->CheckSphereAABBCollision(this->pObj))
-			{
-				VECTOR3 refVec = VECTOR3(0, 0, 0);
-				VECTOR3 pushVec = VECTOR3(0, 0, 0);
-				pushVec = box->HitSphereToCubeplane(this->pObj, refVec);
-				PushVec(-pushVec, refVec);
-			}
-		}
-#endif
-#if 0
-		// 自分以外のBallと衝突判定
-		std::list<Ball*> otherBall = ObjectManager::FindGameObjects<Ball>();
-		for (Ball* ball : otherBall)
-		{
-			if (ball != this)
-			{
-				if (ball->HitSphereToSphere(this->pObj))
-				{
-					ball->SetPosition(ball->pObj.center);
-					transform.position = pObj.center;
-				}
-			}
-		}
-#endif
-#if 0
-		// スコアエリアの中にいるか
-		for (ScoreArea* area : areaes)
-		{
-			if (area->CheckSphereAABBCollision(this->pObj))
-			{
-				area->ScoreCount(this->pObj);
-				break;
-			}
-			else
-			{
-				pObj.score = 0;
-			}
-		}
-#endif
-	}
 }
 
 

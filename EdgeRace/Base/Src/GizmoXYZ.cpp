@@ -14,16 +14,8 @@ GizmoXYZ::GizmoXYZ()
 
 GizmoXYZ::~GizmoXYZ()
 {
-	if (mesh != nullptr)
-	{
-		delete mesh;
-		mesh = nullptr;
-	}
-	if (meshCol != nullptr)
-	{
-		delete meshCol;
-		meshCol = nullptr;
-	}
+	SAFE_DELETE(mesh);
+	SAFE_DELETE(meshCol);
 }
 
 void GizmoXYZ::Update()
@@ -34,7 +26,7 @@ PosGizmoX::PosGizmoX(Object3D* parent)
 {
 	SetTag("Gizmo");
 	editObj.name = "posGizmoX";
-	transform.SetParent(parent);
+	//transform.SetParent(parent);
 	mesh = new CFbxMesh;
 	mesh->Load("Data/Gizmo/PosGizmoX.mesh");
 	meshCol = new MeshCollider;
@@ -45,16 +37,8 @@ PosGizmoX::PosGizmoX(Object3D* parent)
 
 PosGizmoX::~PosGizmoX()
 {
-	if (mesh != nullptr)
-	{
-		delete mesh;
-		mesh = nullptr;
-	}
-	if (meshCol != nullptr)
-	{
-		delete meshCol;
-		meshCol = nullptr;
-	}
+	SAFE_DELETE(mesh);
+	SAFE_DELETE(meshCol);
 }
 
 void PosGizmoX::Update()
@@ -75,16 +59,8 @@ PosGizmoY::PosGizmoY(Object3D* parent)
 
 PosGizmoY::~PosGizmoY()
 {
-	if (mesh != nullptr)
-	{
-		delete mesh;
-		mesh = nullptr;
-	}
-	if (meshCol != nullptr)
-	{
-		delete meshCol;
-		meshCol = nullptr;
-	}
+	SAFE_DELETE(mesh);
+	SAFE_DELETE(meshCol);
 }
 
 void PosGizmoY::Update()
@@ -107,16 +83,8 @@ PosGizmoZ::PosGizmoZ(Object3D* parent)
 
 PosGizmoZ::~PosGizmoZ()
 {
-	if (mesh != nullptr)
-	{
-		delete mesh;
-		mesh = nullptr;
-	}
-	if (meshCol != nullptr)
-	{
-		delete meshCol;
-		meshCol = nullptr;
-	}
+	SAFE_DELETE(mesh);
+	SAFE_DELETE(meshCol);
 }
 
 void PosGizmoZ::Update()
@@ -137,16 +105,8 @@ RotGizmoC::RotGizmoC(Object3D* parent)
 
 RotGizmoC::~RotGizmoC()
 {
-	if (mesh != nullptr)
-	{
-		delete mesh;
-		mesh = nullptr;
-	}
-	if (meshCol != nullptr)
-	{
-		delete meshCol;
-		meshCol = nullptr;
-	}
+	SAFE_DELETE(mesh);
+	SAFE_DELETE(meshCol);
 }
 
 void RotGizmoC::Update()
@@ -167,16 +127,8 @@ RotGizmoX::RotGizmoX(Object3D* parent)
 
 RotGizmoX::~RotGizmoX()
 {
-	if (mesh != nullptr)
-	{
-		delete mesh;
-		mesh = nullptr;
-	}
-	if (meshCol != nullptr)
-	{
-		delete meshCol;
-		meshCol = nullptr;
-	}
+	SAFE_DELETE(mesh);
+	SAFE_DELETE(meshCol);
 }
 
 void RotGizmoX::Update()
@@ -197,16 +149,8 @@ RotGizmoY::RotGizmoY(Object3D* parent)
 
 RotGizmoY::~RotGizmoY()
 {
-	if (mesh != nullptr)
-	{
-		delete mesh;
-		mesh = nullptr;
-	}
-	if (meshCol != nullptr)
-	{
-		delete meshCol;
-		meshCol = nullptr;
-	}
+	SAFE_DELETE(mesh);
+	SAFE_DELETE(meshCol);
 }
 
 void RotGizmoY::Update()
@@ -227,16 +171,8 @@ RotGizmoZ::RotGizmoZ(Object3D* parent)
 
 RotGizmoZ::~RotGizmoZ()
 {
-	if (mesh != nullptr)
-	{
-		delete mesh;
-		mesh = nullptr;
-	}
-	if (meshCol != nullptr)
-	{
-		delete meshCol;
-		meshCol = nullptr;
-	}
+	SAFE_DELETE(mesh);
+	SAFE_DELETE(meshCol);
 }
 
 void RotGizmoZ::Update()
@@ -258,16 +194,8 @@ ScaleGizmoX::ScaleGizmoX(Object3D* parent)
 
 ScaleGizmoX::~ScaleGizmoX()
 {
-	if (mesh != nullptr)
-	{
-		delete mesh;
-		mesh = nullptr;
-	}
-	if (meshCol != nullptr)
-	{
-		delete meshCol;
-		meshCol = nullptr;
-	}
+	SAFE_DELETE(mesh);
+	SAFE_DELETE(meshCol);
 }
 
 void ScaleGizmoX::Update()
@@ -287,16 +215,8 @@ ScaleGizmoY::ScaleGizmoY(Object3D* parent)
 
 ScaleGizmoY::~ScaleGizmoY()
 {
-	if (mesh != nullptr)
-	{
-		delete mesh;
-		mesh = nullptr;
-	}
-	if (meshCol != nullptr)
-	{
-		delete meshCol;
-		meshCol = nullptr;
-	}
+	SAFE_DELETE(mesh);
+	SAFE_DELETE(meshCol);
 }
 
 void ScaleGizmoY::Update()
@@ -317,16 +237,8 @@ ScaleGizmoZ::ScaleGizmoZ(Object3D* parent)
 
 ScaleGizmoZ::~ScaleGizmoZ()
 {
-	if (mesh != nullptr)
-	{
-		delete mesh;
-		mesh = nullptr;
-	}
-	if (meshCol != nullptr)
-	{
-		delete meshCol;
-		meshCol = nullptr;
-	}
+	SAFE_DELETE(mesh);
+	SAFE_DELETE(meshCol);
 }
 
 void ScaleGizmoZ::Update()

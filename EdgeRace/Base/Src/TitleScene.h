@@ -17,5 +17,5 @@ private: // クラスのメンバー変数はprivateにする
 	int stageNum = 1;
 
 	MenuPanel* panel = nullptr;
-	Player* player[2];
+	Player* player[2] = {};
 };
