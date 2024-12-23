@@ -789,6 +789,7 @@ void StageEdit::DeselectObj(Object3D* obj)
 	}
 
 	nState = sNone;
+	vGizmo = vNone;
 	SetGizmo();
 }
 
