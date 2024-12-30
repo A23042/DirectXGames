@@ -70,8 +70,9 @@ std::list<Object3D*> Frustum::CheckAABB()
 	std::list<Object3D*> objs = HierarchyManager::GetHierarchyList();
 	for (Object3D* obj : objs)
 	{
-		VECTOR3 min = obj->GetMeshColl()->GetBBox().min;
-		VECTOR3 max = obj->GetMeshColl()->GetBBox().max;
+		//MATRIX4X4 invTrans = XMMatrixInverse(nullptr, obj->Matrix());
+		VECTOR3 min = obj->GetMeshColl()->GetBBox().min * obj->Matrix();
+		VECTOR3 max = obj->GetMeshColl()->GetBBox().max * obj->Matrix();
 
 		VECTOR3 vertex[8] = {
 				VECTOR3(max.x, max.y, min.z),

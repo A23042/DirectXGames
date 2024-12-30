@@ -378,6 +378,7 @@ void StageEdit::HasUpdate()
 
 	if (!CheckInAreaCursor())
 		return;
+
 	if (GameDevice()->m_pDI->CheckMouse(KD_TRG, 0))
 	{
 		bool isHit = false;
@@ -427,25 +428,132 @@ void StageEdit::HasUpdate()
 			}
 			isHit = true;
 		}
-		// Gizmoに当たってなければ衝突判定をとる
-		if (!isHit)
+		else
 		{
-			// Gizmo以外のオブジェクトを調べる
-			list<Object3D*> objs = FindGameObjectsVisibleWithOutTag<Object3D>("Gizmo");
-			VECTOR3 hit;
-			temp = GetClosestHitObject(objs, hit);
-			if (temp != nullptr)
-			{
-				SelectObj(temp);
-			}
-			else
-			{
-				// 何も触ってなければ選択解除
-				DeselectObj();
-			}
+			startPos = mousePos;
+			isDrag = true;
 		}
 	}
+	if (isDrag && pDI->CheckMouse(KD_UTRG, 0))
+	{
+		if (abs(startPos.x - mousePos.x) < dragDistanse && abs(startPos.y - mousePos.y < dragDistanse))
+		{
+			bool isHit = false;
+			// オブジェクト探索
+			// 先に表示中のGizmoだけ衝突判定をとる
+			list<Object3D*> gizmos = FindGameObjectsVisibleWithTag<Object3D>("Gizmo");
+			Object3D* temp = nullptr;	// 衝突したオブジェクトの一時格納
+			VECTOR3 hit = VECTOR3();
+			temp = GetClosestHitObject(gizmos, hit);	// カーソルに重なってる一番近いオブジェクトを取る
+			if (temp != nullptr)
+			{
+				// オブジェクトの中心点を求める
+				GetObjCenter(selectObj);
+				// 衝突した場所
+				GetNearWorldPosEx();
+				prevMousePos = nearWorldPosEx;
+				getGizmo = temp;
 
+				// 操作前情報を登録しておく
+				// クリックしたギズモによって各GizumoのUpdateを回す
+				if (getGizmo == posGizmoX || getGizmo == posGizmoY || getGizmo == posGizmoZ)
+				{
+					oldPos.clear();
+					for (Object3D* obj : selectObj)
+					{
+						oldPos.push_back(obj->Position());
+					}
+					gState = sPosGizmo;
+				}
+				else if (getGizmo == rotGizmoX || getGizmo == rotGizmoY || getGizmo == rotGizmoZ)
+				{
+					oldRot.clear();
+					for (Object3D* obj : selectObj)
+					{
+						oldRot.push_back(obj->Rotation());
+					}
+					gState = sRotGizmo;
+				}
+				else if (getGizmo == scaleGizmoX || getGizmo == scaleGizmoY || getGizmo == scaleGizmoZ)
+				{
+					oldScale.clear();
+					for (Object3D* obj : selectObj)
+					{
+						oldScale.push_back(obj->Scale());
+					}
+					gState = sScaleGizmo;
+				}
+				isHit = true;
+			}
+			// Gizmoに当たってなければ衝突判定をとる
+			if (!isHit)
+			{
+				// Gizmo以外のオブジェクトを調べる
+				list<Object3D*> objs = FindGameObjectsVisibleWithOutTag<Object3D>("Gizmo");
+				VECTOR3 hit;
+				temp = GetClosestHitObject(objs, hit);
+				if (temp != nullptr)
+				{
+					SelectObj(temp);
+				}
+				else
+				{
+					// 何も触ってなければ選択解除
+					DeselectObj();
+				}
+			}
+		}
+		else
+		{
+			if (isDrag)
+			{
+				isDrag = false;
+				Frustum::CreateFrustum(startPos, mousePos);
+				list<Object3D*> objs = Frustum::CheckAABB();
+				SelectObj(objs);
+				start0Pos = XMVector3Unproject(VECTOR3(startPos.x, startPos.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+				start1Pos = XMVector3Unproject(VECTOR3(startPos.x, startPos.y, 1.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+
+				end0Pos = XMVector3Unproject(VECTOR3(mousePos.x, mousePos.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+				end1Pos = XMVector3Unproject(VECTOR3(mousePos.x, mousePos.y, 1.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+
+				leftTop.nearPos = start0Pos;
+				leftTop.farPos = start1Pos;
+
+				leftBottom.nearPos = VECTOR3(start0Pos.x, end0Pos.y, start0Pos.z);
+				leftBottom.farPos = VECTOR3(start1Pos.x, end1Pos.y, start1Pos.z);
+
+				rightTop.nearPos = VECTOR3(end0Pos.x, start0Pos.y, end0Pos.z);
+				rightTop.farPos = VECTOR3(end1Pos.x, start1Pos.y, end1Pos.z);
+
+				rightBottom.nearPos = end0Pos;
+				rightBottom.farPos = end1Pos;
+
+				// 各面の法線と定数 //左,右,上,下,手前,奥
+				normal[0] = normalize(cross(leftTop.farPos - leftTop.nearPos, leftBottom.farPos - leftTop.nearPos));
+				d[0] = dot(-normal[0], leftTop.nearPos);
+
+				normal[1] = normalize(cross(rightTop.nearPos - rightTop.farPos, rightBottom.nearPos - rightTop.farPos));
+				d[1] = dot(normal[1], rightTop.farPos);
+
+				normal[2] = normalize(cross(leftTop.nearPos - leftTop.farPos, rightTop.farPos - leftTop.farPos));
+				d[2] = dot(normal[2], leftTop.farPos);
+
+				normal[3] = normalize(cross(leftBottom.farPos - leftBottom.nearPos, rightBottom.farPos - leftBottom.nearPos));
+				d[3] = dot(normal[3], leftBottom.nearPos);
+
+				normal[4] = normalize(cross(leftTop.nearPos - rightTop.nearPos, rightBottom.nearPos - rightTop.nearPos));
+				d[4] = dot(normal[4], rightTop.nearPos);
+
+				normal[5] = normalize(cross(rightTop.farPos - leftTop.farPos, rightBottom.farPos - leftTop.farPos));
+				d[5] = dot(normal[5], leftTop.farPos);
+
+				dist = dot(normal[0], verpos) + d[0];
+				hit = verpos - normal[0] * dist;
+			}
+		}
+
+	}
 }
 void StageEdit::GizmoUpdate()
 {
