@@ -133,7 +133,7 @@ VECTOR3 BoxCollisionBase::HitSphereToCubeplane(PhysicsObject& tObj, VECTOR3& ref
 	// •½–Ê‚Æ‚Ì‹——£ŒvŽZ
 	for (int i = 0; i < 6; i++)
 	{
-		distance[i] = abs(dot(plane[i], tObj.center) + d[i]) / plane[i].Length();
+		distance[i] = abs(dot(plane[i], tObj.center) + d[i]);
 
 		// Õ“Ë‚µ‚Ä‚¢‚½‚ç‚ ‚Æ‚Ì‹——£ŒvŽZ‚ðÈ‚­
 		if (distance[i] <= tObj.radius)

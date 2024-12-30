@@ -155,6 +155,8 @@ public:
 
 	CFbxMesh* GetMesh() { return mesh; }
 
+	MeshCollider* GetMeshColl() {return meshCol; }
+
 protected:
 	CFbxMesh* mesh;
 	MeshCollider* meshCol;

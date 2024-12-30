@@ -402,6 +402,9 @@
     <ClInclude Include="Src\DeleteCommand.h">
       <Filter>ソース ファイル\13_Command</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Frustum.h">
+      <Filter>ソース ファイル\10_MapEditScene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Main.cpp">
@@ -594,6 +597,9 @@
       <Filter>ソース ファイル\13_Command</Filter>
     </ClCompile>
     <ClCompile Include="Src\HierarchyManager.cpp">
+      <Filter>ソース ファイル\10_MapEditScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Frustum.cpp">
       <Filter>ソース ファイル\10_MapEditScene</Filter>
     </ClCompile>
   </ItemGroup>

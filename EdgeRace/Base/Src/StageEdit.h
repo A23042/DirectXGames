@@ -56,6 +56,7 @@ public:
 	/// </summary>
 	/// <param name="ob">選択されたオブジェクト</param>
 	void SelectObj(Object3D* ob);
+	void SelectObj(list<Object3D*> obs);
 
 	/// <summary>
 	/// オブジェクトの選択解除
@@ -106,6 +107,8 @@ public:
 	void HierarchyImGui();
 
 	void StageImGui();
+
+	void ObjInfoImGui();
 
 	void Command();
 
@@ -202,21 +205,19 @@ private:
 	Object3D* fallCheck = nullptr;
 	Object3D* line = nullptr;
 
-	// マウススクリーン座標
-	POINT mousePos = {};
+	POINT mousePos = {};	// マウススクリーン座標
+	POINT startPos;		// ドラッグ開始位置
+	POINT endPos;		// ドラッグ終了位置
 
-	// 近視点
-	VECTOR3 nearWorldPos;
-	// 近視点からdirection方向に伸ばした点
-	VECTOR3 nearWorldPosEx;
-	// 遠視点
-	VECTOR3 farWorldPos;		
-	// 近視点から遠視点への方向
-	VECTOR3 direction;	
-	// 1フレーム前のカーソル近視点座標
-	VECTOR3 prevMousePos;
+	VECTOR3 nearWorldPos;	// 近視点
+	VECTOR3 nearWorldPosEx;	// 近視点からdirection方向に伸ばした点
+	VECTOR3 farWorldPos;	// 遠視点
+	VECTOR3 direction;		// 近視点から遠視点への方向
+	VECTOR3 prevMousePos;	// 1フレーム前のカーソル近視点座標
 
 	VECTOR3 objCenter;	// 複数オブジェクトの中心点
+
+	// コマンド保存用操作前の情報
 	list<VECTOR3> oldPos;
 	list<VECTOR3> oldRot;
 	list<VECTOR3> oldScale;
@@ -239,4 +240,5 @@ private:
 	bool isNew = false;	// 新規オブジェクト生成か
 	bool isTestMap = false;	// TestMapの編集中か
 	bool isCursorLoop = false;
+	bool isDrag = false;
 };

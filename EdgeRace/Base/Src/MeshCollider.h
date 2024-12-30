@@ -123,10 +123,6 @@ public:
 	/// <returns>“–‚½‚Á‚Ä‚¢‚ê‚Îtrue</returns>
 	bool CheckBoundingLine(const MATRIX4X4& trans, const VECTOR3& from, const VECTOR3& to);
 
-
-private:
-	Object3D* parent;
-
 	struct BoundingBox {
 		VECTOR3 min;
 		VECTOR3 max;
@@ -134,6 +130,11 @@ private:
 			min = VECTOR3(0, 0, 0), max = VECTOR3(0, 0, 0);
 		}
 	};
+
+	BoundingBox GetBBox() { return bBox; }
+private:
+	Object3D* parent;
+
 	struct BoundingBall {
 		VECTOR3 center;
 		float radius;

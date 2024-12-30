@@ -19,6 +19,7 @@
 #include "ScaleCommand.h"
 #include "CreateCommand.h"
 #include "DeleteCommand.h"
+#include "Frustum.h"
 
 namespace
 {
@@ -62,7 +63,32 @@ namespace
 	static const float defaultF = 0.02f;	// 摩擦
 	static const float defaultMass = 1;	// 質量
 
+	static const int dragDistanse = 15;	// ドラッグの終了時この距離離れていなければクリックとして扱う
+
 	CommandManager commandManager;
+
+	// デバッグ用変数
+	struct NearFarPos
+	{
+		VECTOR3 nearPos = VECTOR3();
+		VECTOR3 farPos = VECTOR3();
+	};
+
+	NearFarPos leftTop;
+	NearFarPos leftBottom;
+	NearFarPos rightTop;
+	NearFarPos rightBottom;
+
+	VECTOR3 start0Pos, start1Pos;
+	VECTOR3 end0Pos, end1Pos;
+	VECTOR3 normal[6];
+	float d[8];
+
+	float dist;	// 距離
+	VECTOR3 hit;	// 垂線を引いた点
+	VECTOR3 verpos = VECTOR3(-0.5, -0.5, -0.5);	// 距離を測る点
+
+	CSprite* spr;
 };
 
 // マウスのドラッグアンドドロップでステージオブジェクトの配置が理想
@@ -100,11 +126,13 @@ StageEdit::StageEdit()
 	tempMass = defaultMass;
 
 	commandManager.SetUp();
+	spr = new CSprite;
 }
 
 StageEdit::~StageEdit()
 {
 	HierarchyManager::ClearHierarchy();
+	SAFE_DELETE(spr);
 }
 
 void StageEdit::Update()
@@ -148,13 +176,53 @@ void StageEdit::Update()
 
 }
 
-#if 1
 void StageEdit::Draw()
 {
-	//CSprite* spr = new CSprite;
 	//spr->DrawLine3D(nearWorldPos, farWorldPos, RGB(255, 0, 0), 1);
-}
+
+	// テスト視錐台ライン描画
+#if 1
+	// 近視点から遠視点まで
+	spr->DrawLine3D(leftTop.nearPos, leftTop.farPos, RGB(255, 0, 0), 1.0f);
+	spr->DrawLine3D(leftBottom.nearPos, leftBottom.farPos, RGB(255, 0, 255), 1.0f);
+	spr->DrawLine3D(rightBottom.nearPos, rightBottom.farPos, RGB(0, 255, 0), 1.0f);
+	spr->DrawLine3D(rightTop.nearPos, rightTop.farPos, RGB(0, 255, 255), 1.0f);
+	// 遠視点枠
+	spr->DrawLine3D(start1Pos, rightTop.farPos, RGB(255, 255, 255), 1.0f);
+	spr->DrawLine3D(leftBottom.farPos, rightBottom.farPos, RGB(255, 255, 255), 1.0f);
+	spr->DrawLine3D(start1Pos, leftBottom.farPos, RGB(255, 255, 255), 1.0f);
+	spr->DrawLine3D(rightTop.farPos, rightBottom.farPos, RGB(255, 255, 255), 1.0f);
+	// 近視点枠
+	spr->DrawLine3D(start0Pos, rightTop.nearPos, RGB(255, 255, 255), 1.0f);
+	spr->DrawLine3D(leftBottom.nearPos, rightBottom.nearPos, RGB(255, 255, 255), 1.0f);
+	spr->DrawLine3D(start0Pos, leftBottom.nearPos, RGB(255, 255, 255), 1.0f);
+	spr->DrawLine3D(rightTop.nearPos, rightBottom.nearPos, RGB(255, 255, 255), 1.0f);
+
+	VECTOR3 center = (leftTop.nearPos + leftTop.farPos) / 2;
+	spr->DrawLine3D(center, center + normal[0] * 3,RGB(255,255,255));
+
+	center = (rightBottom.nearPos + rightBottom.farPos) / 2;
+	spr->DrawLine3D(center, center + normal[1] * 3, RGB(255, 255, 255));
+
+	center = (rightTop.nearPos + rightTop.farPos) / 2;
+	spr->DrawLine3D(center, center + normal[2] * 3, RGB(255, 255, 255));
+
+	center = (leftBottom.nearPos + leftBottom.farPos) / 2;
+	spr->DrawLine3D(center, center + normal[3] * 3, RGB(255, 255, 255));
+
+	center = (leftTop.nearPos + rightTop.nearPos) / 2;
+	spr->DrawLine3D(center, center + normal[4] * 3, RGB(255, 255, 255));
+
+	center = (leftTop.farPos + rightTop.farPos) / 2;
+	spr->DrawLine3D(center, center + normal[5] * 3, RGB(255, 255, 255));
+
+	spr->DrawLine3D(hit, VECTOR3(-0.5, -0.5, -0.5), RGB(0, 255, 0));
 #endif
+
+	ImGui::Begin("Distance");
+	ImGui::InputFloat("Distanse", &dist, 0.1f, 0.5f, "%.2f");
+	ImGui::End();
+}
 
 void StageEdit::NoneUpdate()
 {
@@ -163,11 +231,19 @@ void StageEdit::NoneUpdate()
 	{
 		if (GameDevice()->m_pDI->CheckMouse(KD_TRG, 0))
 		{
+			startPos = mousePos;
+			isDrag = true;
+		}
+	}
+	if (isDrag && pDI->CheckMouse(KD_UTRG, 0))
+	{
+		if (abs(startPos.x - mousePos.x) < dragDistanse && abs(startPos.y - mousePos.y < dragDistanse))
+		{
 			Object3D* temp = nullptr;
 			// Gizmo以外のオブジェクトと衝突判定
 			list<Object3D*> objs = FindGameObjectsWithOutTag<Object3D>("Gizmo");
 			VECTOR3 hit;
-			temp = GetClosestHitObject(objs, hit);
+			temp = GetClosestHitObject(objs, hit);	// Rayと衝突したオブジェクトの中で一番距離の近いものを返す
 			if (temp != nullptr)
 			{
 				SelectObj(temp);
@@ -177,6 +253,52 @@ void StageEdit::NoneUpdate()
 				return;
 			}
 		}
+		else
+		{
+			isDrag = false;
+			Frustum::CreateFrustum(startPos, mousePos);
+			list<Object3D*> objs = Frustum::CheckAABB();
+			SelectObj(objs);
+			start0Pos = XMVector3Unproject(VECTOR3(startPos.x, startPos.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+			start1Pos = XMVector3Unproject(VECTOR3(startPos.x, startPos.y, 1.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+
+			end0Pos =   XMVector3Unproject(VECTOR3(mousePos.x, mousePos.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+			end1Pos =   XMVector3Unproject(VECTOR3(mousePos.x, mousePos.y, 1.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+
+			leftTop.nearPos = start0Pos;
+			leftTop.farPos = start1Pos;
+
+			leftBottom.nearPos = VECTOR3(start0Pos.x, end0Pos.y, start0Pos.z);
+			leftBottom.farPos = VECTOR3(start1Pos.x, end1Pos.y, start1Pos.z);
+
+			rightTop.nearPos = VECTOR3(end0Pos.x, start0Pos.y, end0Pos.z);
+			rightTop.farPos = VECTOR3(end1Pos.x, start1Pos.y, end1Pos.z);
+
+			rightBottom.nearPos = end0Pos;
+			rightBottom.farPos = end1Pos;
+
+			// 各面の法線と定数 //左,右,上,下,手前,奥
+			normal[0] = normalize(cross(leftTop.farPos - leftTop.nearPos, leftBottom.farPos - leftTop.nearPos));
+			d[0] = dot(-normal[0], leftTop.nearPos);
+			
+			normal[1] = normalize(cross(rightTop.nearPos - rightTop.farPos, rightBottom.nearPos - rightTop.farPos));
+			d[1] = dot(normal[1], rightTop.farPos);
+
+			normal[2] = normalize(cross(leftTop.nearPos - leftTop.farPos, rightTop.farPos - leftTop.farPos));
+			d[2] = dot(normal[2], leftTop.farPos);
+
+			normal[3] = normalize(cross(leftBottom.farPos - leftBottom.nearPos, rightBottom.farPos - leftBottom.nearPos));
+			d[3] = dot(normal[3], leftBottom.nearPos);
+
+			normal[4] = normalize(cross(leftTop.nearPos - rightTop.nearPos, rightBottom.nearPos - rightTop.nearPos));
+			d[4] = dot(normal[4], rightTop.nearPos);
+
+			normal[5] = normalize(cross(rightTop.farPos - leftTop.farPos, rightBottom.farPos - leftTop.farPos));
+			d[5] = dot(normal[5], leftTop.farPos);
+			
+			dist = dot(normal[0], verpos) + d[0];
+			hit = verpos - normal[0] * dist;
+		}
 	}
 }
 
@@ -185,158 +307,9 @@ void StageEdit::HasUpdate()
 	// ショートカットキーコマンド
 	Command();
 	GizmoUpdate();
-	// マウス左クリック
-	if(CheckInAreaCursor())
-	{
-		if (GameDevice()->m_pDI->CheckMouse(KD_TRG, 0))
-		{
-			bool isHit = false;
-			// オブジェクト探索
-			// 先に表示中のGizmoだけ衝突判定をとる
-			list<Object3D*> gizmos = FindGameObjectsVisibleWithTag<Object3D>("Gizmo");
-			Object3D* temp = nullptr;	// 衝突したオブジェクトの一時格納
-			VECTOR3 hit = VECTOR3();
-			temp = GetClosestHitObject(gizmos, hit);	// カーソルに重なってる一番近いオブジェクトを取る
-			if (temp != nullptr)
-			{
-				// オブジェクトの中心点を求める
-				GetObjCenter(selectObj);
-				// 衝突した場所
-				GetNearWorldPosEx();
-				prevMousePos = nearWorldPosEx;
-				getGizmo = temp;
-				
-				// 操作前情報を登録しておく
-				// クリックしたギズモによって各GizumoのUpdateを回す
-				if (getGizmo == posGizmoX || getGizmo == posGizmoY || getGizmo == posGizmoZ)
-				{
-					oldPos.clear();
-					for(Object3D* obj : selectObj)
-					{
-						oldPos.push_back(obj->Position());
-					}
-					gState = sPosGizmo;
-				}
-				else if (getGizmo == rotGizmoX || getGizmo == rotGizmoY || getGizmo == rotGizmoZ)
-				{
-					oldRot.clear();
-					for(Object3D* obj : selectObj)
-					{
-						oldRot.push_back(obj->Rotation());
-					}
-					gState = sRotGizmo;
-				}
-				else if (getGizmo == scaleGizmoX || getGizmo == scaleGizmoY || getGizmo == scaleGizmoZ)
-				{
-					oldScale.clear();
-					for(Object3D* obj : selectObj)
-					{
-						oldScale.push_back(obj->Scale());
-					}
-					gState = sScaleGizmo;
-				}
-				isHit = true;
-			}
-			// Gizmoに当たってなければ衝突判定をとる
-			if (!isHit)
-			{
-				// Gizmo以外のオブジェクトを調べる
-				list<Object3D*> objs = FindGameObjectsVisibleWithOutTag<Object3D>("Gizmo");
-				VECTOR3 hit;
-				temp = GetClosestHitObject(objs, hit);
-				if (temp != nullptr)
-				{
-					SelectObj(temp);
-				}
-				else
-				{
-					// 何も触ってなければ選択解除
-					DeselectObj();
-				}
-			}
-		}
-	}
-
-	// ImGuiで場所、回転、スケールを変える
-	ImGui::SetNextWindowPos(objInfoImPos);
-	ImGui::SetNextWindowSize(objInfoImSize);
-
-	//Object3D* obj;
-	string name = "OBJINFO";
-	{
-		ImGui::SetNextWindowPos(objInfoImPos);
-		ImGui::SetNextWindowSize(objInfoImSize);
-		ImGui::Begin("Inspector");
-		ImGuiTabBarFlags tab_bar_flag = ImGuiBackendFlags_None;
-		if (ImGui::BeginTabBar("OBJECTINFO", tab_bar_flag))
-		{
-			int i = 1;
-			for(Object3D* obj : selectObj)
-			{
-				for (Object3D* tmp : HierarchyManager::GetHierarchyList())
-				{
-					if(tmp == obj)
-					{
-						break;
-					}
-					i++;
-				}
-
-				VECTOR3 tmpPos = obj->Position();
-				VECTOR3 tmpRot = obj->Rotation() * 180 / XM_PI;
-				VECTOR3 tmpScale = obj->Scale();
-
-				name = "[" + to_string(i) + "] :" + obj->editObj.name;
-				if (ImGui::BeginTabItem(name.c_str()))
-				{
-					ImGui::SliderFloat("e", &obj->pObj.e, 0.0f, 1.0f, "%.1f");
-					ImGui::SliderFloat("f", &obj->pObj.f, 0.0f, 0.1f, "%.2f");
-					ImGui::InputFloat("mass", &obj->pObj.mass, 0.5f, 1.0f);
-					// 場所
-					ImGui::InputFloat("PositionX", &tmpPos.x, 0.1f, 0.5f, "%.2f");
-					ImGui::InputFloat("PositionY", &tmpPos.y, 0.1f, 0.5f, "%.2f");
-					ImGui::InputFloat("PositionZ", &tmpPos.z, 0.1f, 0.5f, "%.2f");
-
-					obj->pObj.center = tmpPos;
-					obj->SetPosition(tmpPos);
-
-					// 回転
-					VECTOR3 rot = obj->Rotation();
-					ImGui::InputFloat("RotateX", &tmpRot.x, 5.0f, 0.5f, "%.2f");
-					ImGui::InputFloat("RotateY", &tmpRot.y, 5.0f, 0.5f, "%.2f");
-					ImGui::InputFloat("RotateZ", &tmpRot.z, 5.0f, 0.5f, "%.2f");
-					
-					obj->SetRotation(tmpRot / 180 * XM_PI);
-
-					// スケール
-					VECTOR3 scale = obj->Scale();
-					ImGui::InputFloat("ScaleX", &tmpScale.x, 0.1f, 0.5f, "%.2f");
-					ImGui::InputFloat("scaleY", &tmpScale.y, 0.1f, 0.5f, "%.2f");
-					ImGui::InputFloat("ScaleZ", &tmpScale.z, 0.1f, 0.5f, "%.2f");
-					if (tmpScale.x < 0.1f)
-					{
-						tmpScale.x = 0.1f;
-					}
-					else if (tmpScale.y < 0.1f)
-					{
-						tmpScale.y = 0.1f;
-					}
-					else if (tmpScale.z < 0.1f)
-					{
-						tmpScale.z = 0.1f;
-					}
-					obj->SetScale(tmpScale);
-
-					ImGui::EndTabItem();
-				}
-				
-			}
-			ImGui::EndTabBar();
-		}
-		ImGui::End();
-	}
 	
-
+	ObjInfoImGui();
+	
 	// ImGuiで入力された値をオブジェクトに適用
 	
 	// 場所はObjectが持っている構造体のCenterに適用させる
@@ -402,6 +375,77 @@ void StageEdit::HasUpdate()
 	default:
 		break;
 	}
+
+	if (!CheckInAreaCursor())
+		return;
+	if (GameDevice()->m_pDI->CheckMouse(KD_TRG, 0))
+	{
+		bool isHit = false;
+		// オブジェクト探索
+		// 先に表示中のGizmoだけ衝突判定をとる
+		list<Object3D*> gizmos = FindGameObjectsVisibleWithTag<Object3D>("Gizmo");
+		Object3D* temp = nullptr;	// 衝突したオブジェクトの一時格納
+		VECTOR3 hit = VECTOR3();
+		temp = GetClosestHitObject(gizmos, hit);	// カーソルに重なってる一番近いオブジェクトを取る
+		if (temp != nullptr)
+		{
+			// オブジェクトの中心点を求める
+			GetObjCenter(selectObj);
+			// 衝突した場所
+			GetNearWorldPosEx();
+			prevMousePos = nearWorldPosEx;
+			getGizmo = temp;
+
+			// 操作前情報を登録しておく
+			// クリックしたギズモによって各GizumoのUpdateを回す
+			if (getGizmo == posGizmoX || getGizmo == posGizmoY || getGizmo == posGizmoZ)
+			{
+				oldPos.clear();
+				for (Object3D* obj : selectObj)
+				{
+					oldPos.push_back(obj->Position());
+				}
+				gState = sPosGizmo;
+			}
+			else if (getGizmo == rotGizmoX || getGizmo == rotGizmoY || getGizmo == rotGizmoZ)
+			{
+				oldRot.clear();
+				for (Object3D* obj : selectObj)
+				{
+					oldRot.push_back(obj->Rotation());
+				}
+				gState = sRotGizmo;
+			}
+			else if (getGizmo == scaleGizmoX || getGizmo == scaleGizmoY || getGizmo == scaleGizmoZ)
+			{
+				oldScale.clear();
+				for (Object3D* obj : selectObj)
+				{
+					oldScale.push_back(obj->Scale());
+				}
+				gState = sScaleGizmo;
+			}
+			isHit = true;
+		}
+		// Gizmoに当たってなければ衝突判定をとる
+		if (!isHit)
+		{
+			// Gizmo以外のオブジェクトを調べる
+			list<Object3D*> objs = FindGameObjectsVisibleWithOutTag<Object3D>("Gizmo");
+			VECTOR3 hit;
+			temp = GetClosestHitObject(objs, hit);
+			if (temp != nullptr)
+			{
+				SelectObj(temp);
+			}
+			else
+			{
+				// 何も触ってなければ選択解除
+				DeselectObj();
+			}
+		}
+	}
+
 }
 void StageEdit::GizmoUpdate()
 {
@@ -442,7 +486,7 @@ void StageEdit::PosGizmoUpdate()
 			{
 				if (getGizmo->editObj.name == "posGizmoX")
 				{
-					objPos.x += diff.x;
+					//objPos.x += diff.x;
 					for(Object3D* obj : selectObj)
 					{
 						obj->pObj.center.x += diff.x;
@@ -450,7 +494,7 @@ void StageEdit::PosGizmoUpdate()
 				}
 				else if (getGizmo->editObj.name == "posGizmoY")
 				{
-					objPos.y += diff.y;
+					//objPos.y += diff.y;
 					for (Object3D* obj : selectObj)
 					{
 						obj->pObj.center.y += diff.y;
@@ -458,7 +502,7 @@ void StageEdit::PosGizmoUpdate()
 				}
 				else if (getGizmo->editObj.name == "posGizmoZ")
 				{
-					objPos.z += diff.z;
+					//objPos.z += diff.z;
 					for (Object3D* obj : selectObj)
 					{
 						obj->pObj.center.z += diff.z;
@@ -466,7 +510,7 @@ void StageEdit::PosGizmoUpdate()
 				}
 				else if (getGizmo->editObj.name == "gizmoCenter")
 				{
-					objPos += diff;
+					//objPos += diff;
 					for (Object3D* obj : selectObj)
 					{
 						obj->pObj.center += diff;
@@ -478,6 +522,10 @@ void StageEdit::PosGizmoUpdate()
 	}
 	if (pDI->CheckMouse(KD_UTRG, 0))
 	{
+		// MoveCommandnのコンストラクタ
+		// CommandManagerのDo
+		// MoveCommandのDo
+		// の順番で走る
 		commandManager.Do(make_shared<MoveCommand>(selectObj, oldPos));
 		
 		getGizmo = nullptr;
@@ -763,7 +811,57 @@ void StageEdit::SelectObj(Object3D* obj)
 	obj->editObj.isSelect = true;
 	nState = sHas;
 }
+#if 1
+void StageEdit::SelectObj(list<Object3D*> objs)
+{
+	//LCtrl押されてたら
+	if (pDI->CheckKey(KD_DAT, DIK_LCONTROL))
+	{
+		for (Object3D* obj : objs)
+		{
+			// Hierarchyになければ追加
+			if (find(selectObj.begin(), selectObj.end(), obj) == selectObj.end())
+			{
+				selectObj.push_back(obj);
+			}
+		}
+	}
+	else
+	{
+		DeselectObj();
+		for (Object3D* obj : objs)
+		{
+			obj->editObj.isSelect = true;
+			selectObj.push_back(obj);
+		}
+	}
+	// 選択されたオブジェクトの色を変える
+	for (Object3D* obj : selectObj)
+	{
+		obj->GetMesh()->m_vDiffuse = VECTOR4(1.0f, 0.2f, 1.0f, 1.0f);
+	}
 
+	// 選択されてるオブジェクトのGizmo表示
+	// 初めてGizmoが出る場合posGizmoを出す
+	if (vGizmo == vNone)
+	{
+		vGizmo = vPos;
+	}
+
+	//objPos = obj->pObj.center;
+	//objRot = obj->Rotation() * 180.0f / XM_PI;
+	//objScale = obj->Scale();
+
+	//tempE = obj->pObj.e;
+	//tempF = obj->pObj.f;
+	//tempMass = obj->pObj.mass;
+
+	// ステータスによって表示するGizmoを変える
+	SetGizmo();
+
+	nState = sHas;
+}
+#endif
 void StageEdit::DeselectObj(Object3D* obj)
 {
 	//if(getObj != nullptr)
@@ -1272,6 +1370,86 @@ void StageEdit::StageImGui()
 	if (ImGui::Button("PLAY"))
 	{
 		SceneManager::ChangeScene("PlayScene", stageNum);
+	}
+	ImGui::End();
+}
+
+void StageEdit::ObjInfoImGui()
+{
+	// ImGuiで場所、回転、スケールを変える
+	ImGui::SetNextWindowPos(objInfoImPos);
+	ImGui::SetNextWindowSize(objInfoImSize);
+
+	//Object3D* obj;
+	string name = "OBJINFO";
+	ImGui::SetNextWindowPos(objInfoImPos);
+	ImGui::SetNextWindowSize(objInfoImSize);
+	ImGui::Begin("Inspector");
+	ImGuiTabBarFlags tab_bar_flag = ImGuiBackendFlags_None;
+	if (ImGui::BeginTabBar("OBJECTINFO", tab_bar_flag))
+	{
+		int i = 1;
+		for (Object3D* obj : selectObj)
+		{
+			for (Object3D* tmp : HierarchyManager::GetHierarchyList())
+			{
+				if (tmp == obj)
+				{
+					break;
+				}
+				i++;
+			}
+
+			VECTOR3 tmpPos = obj->Position();
+			VECTOR3 tmpRot = obj->Rotation() * 180 / XM_PI;
+			VECTOR3 tmpScale = obj->Scale();
+
+			name = "[" + to_string(i) + "] :" + obj->editObj.name;
+			if (ImGui::BeginTabItem(name.c_str()))
+			{
+				ImGui::SliderFloat("e", &obj->pObj.e, 0.0f, 1.0f, "%.1f");
+				ImGui::SliderFloat("f", &obj->pObj.f, 0.0f, 0.1f, "%.2f");
+				ImGui::InputFloat("mass", &obj->pObj.mass, 0.5f, 1.0f);
+				// 場所
+				ImGui::InputFloat("PositionX", &tmpPos.x, 0.1f, 0.5f, "%.2f");
+				ImGui::InputFloat("PositionY", &tmpPos.y, 0.1f, 0.5f, "%.2f");
+				ImGui::InputFloat("PositionZ", &tmpPos.z, 0.1f, 0.5f, "%.2f");
+
+				obj->pObj.center = tmpPos;
+				obj->SetPosition(tmpPos);
+
+				// 回転
+				VECTOR3 rot = obj->Rotation();
+				ImGui::InputFloat("RotateX", &tmpRot.x, 5.0f, 0.5f, "%.2f");
+				ImGui::InputFloat("RotateY", &tmpRot.y, 5.0f, 0.5f, "%.2f");
+				ImGui::InputFloat("RotateZ", &tmpRot.z, 5.0f, 0.5f, "%.2f");
+
+				obj->SetRotation(tmpRot / 180 * XM_PI);
+
+				// スケール
+				VECTOR3 scale = obj->Scale();
+				ImGui::InputFloat("ScaleX", &tmpScale.x, 0.1f, 0.5f, "%.2f");
+				ImGui::InputFloat("scaleY", &tmpScale.y, 0.1f, 0.5f, "%.2f");
+				ImGui::InputFloat("ScaleZ", &tmpScale.z, 0.1f, 0.5f, "%.2f");
+				if (tmpScale.x < 0.1f)
+				{
+					tmpScale.x = 0.1f;
+				}
+				else if (tmpScale.y < 0.1f)
+				{
+					tmpScale.y = 0.1f;
+				}
+				else if (tmpScale.z < 0.1f)
+				{
+					tmpScale.z = 0.1f;
+				}
+				obj->SetScale(tmpScale);
+
+				ImGui::EndTabItem();
+			}
+
+		}
+		ImGui::EndTabBar();
 	}
 	ImGui::End();
 }

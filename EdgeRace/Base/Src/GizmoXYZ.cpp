@@ -224,7 +224,6 @@ ScaleGizmoZ::ScaleGizmoZ(Object3D* parent)
 	mesh->Load("Data/Gizmo/ScaleGizmoZ.mesh");
 	meshCol = new MeshCollider;
 	meshCol->MakeFromMesh(mesh);
-	transform.rotation.x = (180.0f / 180 * XM_PI);
 	ObjectManager::SetVisible(this, false);
 }
 

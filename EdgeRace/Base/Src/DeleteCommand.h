@@ -10,7 +10,7 @@ template<class C>
 class DeleteCommand : public CommandBase
 {
 public:
-	DeleteCommand(list<C*> targetObj);	// 複数操作時のコンストラクタ
+	DeleteCommand(list<C*> targetObj) : targetObject(targetObj) {};	// 複数操作時のコンストラクタ
 	DeleteCommand(C* targetObj);		// 単一操作時のコンストラクタ
 	~DeleteCommand() {};
 	void Do() override;
@@ -20,17 +20,11 @@ private:
 };
 
 template<class C>
-inline DeleteCommand<C>::DeleteCommand(list<C*> targetObj) : targetObject(targetObj)
-{
-}
-
-template<class C>
 inline DeleteCommand<C>::DeleteCommand(C* targetObj)
 {
 	targetObject.push_back(targetObj);
 }
 
-// Ctrl+Zで生成オブジェクトの削除
 template<class C>
 inline void DeleteCommand<C>::Do()
 {
@@ -41,7 +35,6 @@ inline void DeleteCommand<C>::Do()
 	}
 }
 
-// オブジェクト生成
 template<class C>
 inline void DeleteCommand<C>::Undo()
 {

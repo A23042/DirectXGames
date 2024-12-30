@@ -547,6 +547,7 @@
     <ClInclude Include="Src\EmptyCommand.h" />
     <ClInclude Include="Src\FallCheck.h" />
     <ClInclude Include="Src\FbxMesh.h" />
+    <ClInclude Include="Src\Frustum.h" />
     <ClInclude Include="Src\GameMain.h" />
     <ClInclude Include="Src\GameObject.h" />
     <ClInclude Include="Src\Gizmo3D.h" />
@@ -616,6 +617,7 @@
     <ClCompile Include="Src\EditUI.cpp" />
     <ClCompile Include="Src\FallCheck.cpp" />
     <ClCompile Include="Src\FbxMesh.cpp" />
+    <ClCompile Include="Src\Frustum.cpp" />
     <ClCompile Include="Src\GameMain.cpp" />
     <ClCompile Include="Src\Gizmo3D.cpp" />
     <ClCompile Include="Src\GizmoXYZ.cpp" />

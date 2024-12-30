@@ -1,5 +1,7 @@
 // 2024.12.19 S.Matsunaga
 // コマンド(操作)を保存、管理するクラス
+// CommandBaseを継承したコマンドクラスをリスト配列に格納
+// イテレータでリストの参照をしてUndoとRedoで参照コマンドの実行
 #pragma once
 #include "CommandBase.h"
 #include "Macro.h"
@@ -28,8 +30,11 @@ public:
 	/// </summary>
 	void Undo();
 
+	/// <summary>
+	/// commandListに保存されている操作の次の実行
+	/// </summary>
 	void Redo();
 private:
-	list<shared_ptr<CommandBase>> commandList = {};
-	list<shared_ptr<CommandBase>>::iterator currentItr;
+	list<shared_ptr<CommandBase>> commandList = {};		// 実行されたコマンドの格納
+	list<shared_ptr<CommandBase>>::iterator currentItr;	// 格納されたコマンドの参照場所
 };

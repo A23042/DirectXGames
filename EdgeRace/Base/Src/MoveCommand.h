@@ -19,6 +19,6 @@ public:
 	void Undo() override;
 private:
 	list<Object3D*> targetObject = {};
-	list<VECTOR3> newPosition;
-	list<VECTOR3> oldPosition;
+	list<VECTOR3> newPosition;	// 実行時の座標
+	list<VECTOR3> oldPosition;	// 実行前の座標
 };
