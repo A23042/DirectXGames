@@ -14,13 +14,14 @@ void Frustum::CreateFrustum(POINT startPos, POINT endPos)
 	MATRIX4X4 mPrj = GameDevice()->m_mProj;
 	MATRIX4X4 identity = XMMatrixIdentity();
 
-	// 近視点(0)と遠視点(1)
-	VECTOR3 start0Pos = XMVector3Unproject(VECTOR3(startPos.x, startPos.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
-	VECTOR3 start1Pos = XMVector3Unproject(VECTOR3(startPos.x, startPos.y, 1.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+	// 左上と右下の点を取る
+	VECTOR2 min, max;
+	min.x = min(startPos.x, endPos.x);
+	max.x = max(startPos.x, endPos.x);
+	min.y = min(startPos.y, endPos.y);
+	max.y = max(startPos.y, endPos.y);
 
-	VECTOR3 end0Pos =   XMVector3Unproject(VECTOR3(endPos.x, endPos.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
-	VECTOR3 end1Pos =   XMVector3Unproject(VECTOR3(endPos.x, endPos.y, 1.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
-
+	// 近視点と遠視点
 	struct NearFarPos
 	{
 		VECTOR3 nearPos = VECTOR3();
@@ -28,20 +29,21 @@ void Frustum::CreateFrustum(POINT startPos, POINT endPos)
 	};
 
 	NearFarPos leftTop;
-	leftTop.nearPos = start0Pos;
-	leftTop.farPos = start1Pos;
-
-	NearFarPos leftBottom;
-	leftBottom.nearPos = VECTOR3(start0Pos.x,end0Pos.y,start0Pos.z);
-	leftBottom.farPos = VECTOR3(start1Pos.x, end1Pos.y, start1Pos.z);
-
-	NearFarPos rightTop;
-	rightTop.nearPos = VECTOR3(end0Pos.x, start0Pos.y, end0Pos.z);
-	rightTop.farPos = VECTOR3(end1Pos.x, start1Pos.y, end1Pos.z);
+	leftTop.nearPos = XMVector3Unproject(VECTOR3(min.x, min.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+	leftTop.farPos = XMVector3Unproject(VECTOR3(min.x, min.y, 1.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
 
 	NearFarPos rightBottom;
-	rightBottom.nearPos = end0Pos;
-	rightBottom.farPos = end1Pos;
+	rightBottom.nearPos = XMVector3Unproject(VECTOR3(max.x, max.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+	rightBottom.farPos = XMVector3Unproject(VECTOR3(max.x, max.y, 1.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+
+	NearFarPos leftBottom;
+	leftBottom.nearPos = VECTOR3(leftTop.nearPos.x, rightBottom.nearPos.y, leftTop.nearPos.z);
+	leftBottom.farPos = VECTOR3(leftTop.farPos.x, rightBottom.farPos.y, leftTop.farPos.z);
+
+	NearFarPos rightTop;
+	rightTop.nearPos = VECTOR3(rightBottom.nearPos.x, leftTop.nearPos.y, rightBottom.nearPos.z);
+	rightTop.farPos = VECTOR3(rightBottom.farPos.x, leftTop.farPos.y, rightBottom.farPos.z);
+
 
 	// 各面の法線と定数 //左,右,上,下,手前,奥
 	normal[0] = normalize(cross(leftTop.farPos - leftTop.nearPos, leftBottom.farPos - leftTop.nearPos));
@@ -70,10 +72,9 @@ std::list<Object3D*> Frustum::CheckAABB()
 	std::list<Object3D*> objs = HierarchyManager::GetHierarchyList();
 	for (Object3D* obj : objs)
 	{
-		//MATRIX4X4 invTrans = XMMatrixInverse(nullptr, obj->Matrix());
 		VECTOR3 min = obj->GetMeshColl()->GetBBox().min * obj->Matrix();
 		VECTOR3 max = obj->GetMeshColl()->GetBBox().max * obj->Matrix();
-
+		// バウンディングボックスのすべての頂点
 		VECTOR3 vertex[8] = {
 				VECTOR3(max.x, max.y, min.z),
 				VECTOR3(max.x, min.y, min.z),
@@ -84,31 +85,30 @@ std::list<Object3D*> Frustum::CheckAABB()
 				VECTOR3(min.x, min.y, max.z),
 				VECTOR3(min.x, max.y, max.z),
 		};
-		//distance[i] = abs(dot(plane[i], tObj.center) + d[i]) / plane[i].Length();
 		// objのバウンディングボックスがフラスタム(視錐台)の内側にいるか判定を取る
-		int icount = 0;
+		// 一つでも面の外側にいたらfor文を抜ける
+		bool outFlag = false;
 		for (int i = 0; i < 6; i++)
 		{
-			int jcount = 0;
 			for (int j = 0; j < 8; j++)
 			{
 				float dist = 0.0f;
 				dist = dot(normal[i], vertex[j]) + d[i];
-				if (dist > 0)
+				if (dist < 0)
 				{
-					jcount++;
+					outFlag = true;
+					break;
 				}
 			}
-			if (jcount == 8)
+			if (outFlag)
 			{
-				icount++;
+				break;
 			}
 		}
-		if (icount == 6)
+		if(!outFlag)
 		{
 			inFrustum.push_back(obj);
 		}
 	}
-
 	return inFrustum;
 }

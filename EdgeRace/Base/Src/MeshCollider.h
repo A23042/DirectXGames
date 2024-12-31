@@ -131,6 +131,12 @@ public:
 		}
 	};
 
+	/// 2024.12.30 S.Matsunaga
+	/// <summary>
+	/// メッシュコライダーのバウンディングボックスボックスを返す
+	/// 座標やサイズ等反映させるにはオブジェクトのマトリクスを掛ける必要がある
+	/// </summary>
+	/// <returns>バウンディングボックスの最小点と最大点</returns>
 	BoundingBox GetBBox() { return bBox; }
 private:
 	Object3D* parent;

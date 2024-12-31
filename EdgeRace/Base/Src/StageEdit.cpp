@@ -84,10 +84,6 @@ namespace
 	VECTOR3 normal[6];
 	float d[8];
 
-	float dist;	// 距離
-	VECTOR3 hit;	// 垂線を引いた点
-	VECTOR3 verpos = VECTOR3(-0.5, -0.5, -0.5);	// 距離を測る点
-
 	CSprite* spr;
 };
 
@@ -216,12 +212,7 @@ void StageEdit::Draw()
 	center = (leftTop.farPos + rightTop.farPos) / 2;
 	spr->DrawLine3D(center, center + normal[5] * 3, RGB(255, 255, 255));
 
-	spr->DrawLine3D(hit, VECTOR3(-0.5, -0.5, -0.5), RGB(0, 255, 0));
 #endif
-
-	ImGui::Begin("Distance");
-	ImGui::InputFloat("Distanse", &dist, 0.1f, 0.5f, "%.2f");
-	ImGui::End();
 }
 
 void StageEdit::NoneUpdate()
@@ -240,10 +231,9 @@ void StageEdit::NoneUpdate()
 		if (abs(startPos.x - mousePos.x) < dragDistanse && abs(startPos.y - mousePos.y < dragDistanse))
 		{
 			Object3D* temp = nullptr;
-			// Gizmo以外のオブジェクトと衝突判定
-			list<Object3D*> objs = FindGameObjectsWithOutTag<Object3D>("Gizmo");
+			// ヒエラルキーにあるオブジェクトと衝突判定
 			VECTOR3 hit;
-			temp = GetClosestHitObject(objs, hit);	// Rayと衝突したオブジェクトの中で一番距離の近いものを返す
+			temp = GetClosestHitObject(HierarchyManager::GetHierarchyList(), hit);	// Rayと衝突したオブジェクトの中で一番距離の近いものを返す
 			if (temp != nullptr)
 			{
 				SelectObj(temp);
@@ -259,45 +249,7 @@ void StageEdit::NoneUpdate()
 			Frustum::CreateFrustum(startPos, mousePos);
 			list<Object3D*> objs = Frustum::CheckAABB();
 			SelectObj(objs);
-			start0Pos = XMVector3Unproject(VECTOR3(startPos.x, startPos.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
-			start1Pos = XMVector3Unproject(VECTOR3(startPos.x, startPos.y, 1.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
-
-			end0Pos =   XMVector3Unproject(VECTOR3(mousePos.x, mousePos.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
-			end1Pos =   XMVector3Unproject(VECTOR3(mousePos.x, mousePos.y, 1.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
-
-			leftTop.nearPos = start0Pos;
-			leftTop.farPos = start1Pos;
-
-			leftBottom.nearPos = VECTOR3(start0Pos.x, end0Pos.y, start0Pos.z);
-			leftBottom.farPos = VECTOR3(start1Pos.x, end1Pos.y, start1Pos.z);
-
-			rightTop.nearPos = VECTOR3(end0Pos.x, start0Pos.y, end0Pos.z);
-			rightTop.farPos = VECTOR3(end1Pos.x, start1Pos.y, end1Pos.z);
-
-			rightBottom.nearPos = end0Pos;
-			rightBottom.farPos = end1Pos;
-
-			// 各面の法線と定数 //左,右,上,下,手前,奥
-			normal[0] = normalize(cross(leftTop.farPos - leftTop.nearPos, leftBottom.farPos - leftTop.nearPos));
-			d[0] = dot(-normal[0], leftTop.nearPos);
-			
-			normal[1] = normalize(cross(rightTop.nearPos - rightTop.farPos, rightBottom.nearPos - rightTop.farPos));
-			d[1] = dot(normal[1], rightTop.farPos);
-
-			normal[2] = normalize(cross(leftTop.nearPos - leftTop.farPos, rightTop.farPos - leftTop.farPos));
-			d[2] = dot(normal[2], leftTop.farPos);
-
-			normal[3] = normalize(cross(leftBottom.farPos - leftBottom.nearPos, rightBottom.farPos - leftBottom.nearPos));
-			d[3] = dot(normal[3], leftBottom.nearPos);
-
-			normal[4] = normalize(cross(leftTop.nearPos - rightTop.nearPos, rightBottom.nearPos - rightTop.nearPos));
-			d[4] = dot(normal[4], rightTop.nearPos);
-
-			normal[5] = normalize(cross(rightTop.farPos - leftTop.farPos, rightBottom.farPos - leftTop.farPos));
-			d[5] = dot(normal[5], leftTop.farPos);
-			
-			dist = dot(normal[0], verpos) + d[0];
-			hit = verpos - normal[0] * dist;
+			DebugFrustum();
 		}
 	}
 }
@@ -381,7 +333,6 @@ void StageEdit::HasUpdate()
 
 	if (GameDevice()->m_pDI->CheckMouse(KD_TRG, 0))
 	{
-		bool isHit = false;
 		// オブジェクト探索
 		// 先に表示中のGizmoだけ衝突判定をとる
 		list<Object3D*> gizmos = FindGameObjectsVisibleWithTag<Object3D>("Gizmo");
@@ -426,7 +377,6 @@ void StageEdit::HasUpdate()
 				}
 				gState = sScaleGizmo;
 			}
-			isHit = true;
 		}
 		else
 		{
@@ -434,125 +384,35 @@ void StageEdit::HasUpdate()
 			isDrag = true;
 		}
 	}
+	// 範囲選択ドラッグ中にクリックが離されたとき
 	if (isDrag && pDI->CheckMouse(KD_UTRG, 0))
 	{
+		// ドラッグ範囲が狭ければ普通のクリックとして判定を取る
 		if (abs(startPos.x - mousePos.x) < dragDistanse && abs(startPos.y - mousePos.y < dragDistanse))
 		{
-			bool isHit = false;
-			// オブジェクト探索
-			// 先に表示中のGizmoだけ衝突判定をとる
-			list<Object3D*> gizmos = FindGameObjectsVisibleWithTag<Object3D>("Gizmo");
-			Object3D* temp = nullptr;	// 衝突したオブジェクトの一時格納
-			VECTOR3 hit = VECTOR3();
-			temp = GetClosestHitObject(gizmos, hit);	// カーソルに重なってる一番近いオブジェクトを取る
+			Object3D* temp = nullptr;
+			// Gizmo以外のオブジェクトと判定
+			VECTOR3 hit;
+			temp = GetClosestHitObject(HierarchyManager::GetHierarchyList(), hit);
 			if (temp != nullptr)
 			{
-				// オブジェクトの中心点を求める
-				GetObjCenter(selectObj);
-				// 衝突した場所
-				GetNearWorldPosEx();
-				prevMousePos = nearWorldPosEx;
-				getGizmo = temp;
-
-				// 操作前情報を登録しておく
-				// クリックしたギズモによって各GizumoのUpdateを回す
-				if (getGizmo == posGizmoX || getGizmo == posGizmoY || getGizmo == posGizmoZ)
-				{
-					oldPos.clear();
-					for (Object3D* obj : selectObj)
-					{
-						oldPos.push_back(obj->Position());
-					}
-					gState = sPosGizmo;
-				}
-				else if (getGizmo == rotGizmoX || getGizmo == rotGizmoY || getGizmo == rotGizmoZ)
-				{
-					oldRot.clear();
-					for (Object3D* obj : selectObj)
-					{
-						oldRot.push_back(obj->Rotation());
-					}
-					gState = sRotGizmo;
-				}
-				else if (getGizmo == scaleGizmoX || getGizmo == scaleGizmoY || getGizmo == scaleGizmoZ)
-				{
-					oldScale.clear();
-					for (Object3D* obj : selectObj)
-					{
-						oldScale.push_back(obj->Scale());
-					}
-					gState = sScaleGizmo;
-				}
-				isHit = true;
+				SelectObj(temp);
 			}
-			// Gizmoに当たってなければ衝突判定をとる
-			if (!isHit)
+			else
 			{
-				// Gizmo以外のオブジェクトを調べる
-				list<Object3D*> objs = FindGameObjectsVisibleWithOutTag<Object3D>("Gizmo");
-				VECTOR3 hit;
-				temp = GetClosestHitObject(objs, hit);
-				if (temp != nullptr)
-				{
-					SelectObj(temp);
-				}
-				else
-				{
-					// 何も触ってなければ選択解除
-					DeselectObj();
-				}
+				// 何も触ってなければ選択解除
+				DeselectObj();
 			}
 		}
+		// 範囲選択のドラッグがされたとき
 		else
 		{
-			if (isDrag)
-			{
-				isDrag = false;
-				Frustum::CreateFrustum(startPos, mousePos);
-				list<Object3D*> objs = Frustum::CheckAABB();
-				SelectObj(objs);
-				start0Pos = XMVector3Unproject(VECTOR3(startPos.x, startPos.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
-				start1Pos = XMVector3Unproject(VECTOR3(startPos.x, startPos.y, 1.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
-
-				end0Pos = XMVector3Unproject(VECTOR3(mousePos.x, mousePos.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
-				end1Pos = XMVector3Unproject(VECTOR3(mousePos.x, mousePos.y, 1.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
-
-				leftTop.nearPos = start0Pos;
-				leftTop.farPos = start1Pos;
-
-				leftBottom.nearPos = VECTOR3(start0Pos.x, end0Pos.y, start0Pos.z);
-				leftBottom.farPos = VECTOR3(start1Pos.x, end1Pos.y, start1Pos.z);
-
-				rightTop.nearPos = VECTOR3(end0Pos.x, start0Pos.y, end0Pos.z);
-				rightTop.farPos = VECTOR3(end1Pos.x, start1Pos.y, end1Pos.z);
-
-				rightBottom.nearPos = end0Pos;
-				rightBottom.farPos = end1Pos;
-
-				// 各面の法線と定数 //左,右,上,下,手前,奥
-				normal[0] = normalize(cross(leftTop.farPos - leftTop.nearPos, leftBottom.farPos - leftTop.nearPos));
-				d[0] = dot(-normal[0], leftTop.nearPos);
-
-				normal[1] = normalize(cross(rightTop.nearPos - rightTop.farPos, rightBottom.nearPos - rightTop.farPos));
-				d[1] = dot(normal[1], rightTop.farPos);
-
-				normal[2] = normalize(cross(leftTop.nearPos - leftTop.farPos, rightTop.farPos - leftTop.farPos));
-				d[2] = dot(normal[2], leftTop.farPos);
-
-				normal[3] = normalize(cross(leftBottom.farPos - leftBottom.nearPos, rightBottom.farPos - leftBottom.nearPos));
-				d[3] = dot(normal[3], leftBottom.nearPos);
-
-				normal[4] = normalize(cross(leftTop.nearPos - rightTop.nearPos, rightBottom.nearPos - rightTop.nearPos));
-				d[4] = dot(normal[4], rightTop.nearPos);
-
-				normal[5] = normalize(cross(rightTop.farPos - leftTop.farPos, rightBottom.farPos - leftTop.farPos));
-				d[5] = dot(normal[5], leftTop.farPos);
-
-				dist = dot(normal[0], verpos) + d[0];
-				hit = verpos - normal[0] * dist;
-			}
+			Frustum::CreateFrustum(startPos, mousePos);
+			list<Object3D*> objs = Frustum::CheckAABB();
+			SelectObj(objs);
+			DebugFrustum();
 		}
-
+		isDrag = false;
 	}
 }
 void StageEdit::GizmoUpdate()
@@ -1684,4 +1544,51 @@ bool StageEdit::CheckInAreaCursor()
 		mousePos.x > judgeSkipArea3.x && mousePos.x < judgeSkipArea3.x + judgeSkipArea3.z &&
 		mousePos.y > judgeSkipArea3.y && mousePos.y < judgeSkipArea3.y + judgeSkipArea3.w)
 	return false;
+}
+
+void StageEdit::DebugFrustum()
+{
+	VECTOR2 min, max;
+	min.x = min(startPos.x, mousePos.x);
+	max.x = max(startPos.x, mousePos.x);
+	min.y = min(startPos.y, mousePos.y);
+	max.y = max(startPos.y, mousePos.y);
+
+	start0Pos = XMVector3Unproject(VECTOR3(min.x, min.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+	start1Pos = XMVector3Unproject(VECTOR3(min.x, min.y, 1.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+
+	end0Pos = XMVector3Unproject(VECTOR3(max.x, max.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+	end1Pos = XMVector3Unproject(VECTOR3(max.x, max.y, 1.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+
+	leftTop.nearPos = start0Pos;
+	leftTop.farPos = start1Pos;
+
+	leftBottom.nearPos = VECTOR3(start0Pos.x, end0Pos.y, start0Pos.z);
+	leftBottom.farPos = VECTOR3(start1Pos.x, end1Pos.y, start1Pos.z);
+
+	rightTop.nearPos = VECTOR3(end0Pos.x, start0Pos.y, end0Pos.z);
+	rightTop.farPos = VECTOR3(end1Pos.x, start1Pos.y, end1Pos.z);
+
+	rightBottom.nearPos = end0Pos;
+	rightBottom.farPos = end1Pos;
+
+	// 各面の法線と定数 //左,右,上,下,手前,奥
+	normal[0] = normalize(cross(leftTop.farPos - leftTop.nearPos, leftBottom.farPos - leftTop.nearPos));
+	d[0] = dot(-normal[0], leftTop.nearPos);
+
+	normal[1] = normalize(cross(rightTop.nearPos - rightTop.farPos, rightBottom.nearPos - rightTop.farPos));
+	d[1] = dot(normal[1], rightTop.farPos);
+
+	normal[2] = normalize(cross(leftTop.nearPos - leftTop.farPos, rightTop.farPos - leftTop.farPos));
+	d[2] = dot(normal[2], leftTop.farPos);
+
+	normal[3] = normalize(cross(leftBottom.farPos - leftBottom.nearPos, rightBottom.farPos - leftBottom.nearPos));
+	d[3] = dot(normal[3], leftBottom.nearPos);
+
+	normal[4] = normalize(cross(leftTop.nearPos - rightTop.nearPos, rightBottom.nearPos - rightTop.nearPos));
+	d[4] = dot(normal[4], rightTop.nearPos);
+
+	normal[5] = normalize(cross(rightTop.farPos - leftTop.farPos, rightBottom.farPos - leftTop.farPos));
+	d[5] = dot(normal[5], leftTop.farPos);
+
 }

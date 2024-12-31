@@ -147,6 +147,10 @@ public:
 	/// <returns>ImGui上だったらfalse</returns>
 	bool CheckInAreaCursor();
 
+	/// <summary>
+	/// デバッグ表示用フラスタム
+	/// </summary>
+	void DebugFrustum();
 private:
 	// sステータス
 	// オブジェクト選択状態の時ImGuiで位置、回転、サイズを変える
