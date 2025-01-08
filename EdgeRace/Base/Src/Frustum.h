@@ -15,5 +15,5 @@ namespace Frustum
 	/// 作成したフラスタムの中にバウンディングボックスが完全に内包されているか
 	/// </summary>
 	/// <returns>フラスタムの中に入っているオブジェクト</returns>
-	std::list<Object3D*> CheckAABB();
+	std::list<Object3D*> CheckAABB(POINT startPos, POINT endPos);
 }

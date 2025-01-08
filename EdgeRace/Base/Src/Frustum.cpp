@@ -37,12 +37,12 @@ void Frustum::CreateFrustum(POINT startPos, POINT endPos)
 	rightBottom.farPos = XMVector3Unproject(VECTOR3(max.x, max.y, 1.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
 
 	NearFarPos leftBottom;
-	leftBottom.nearPos = VECTOR3(leftTop.nearPos.x, rightBottom.nearPos.y, leftTop.nearPos.z);
-	leftBottom.farPos = VECTOR3(leftTop.farPos.x, rightBottom.farPos.y, leftTop.farPos.z);
+	leftBottom.nearPos = XMVector3Unproject(VECTOR3(min.x, max.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+	leftBottom.farPos = XMVector3Unproject(VECTOR3(min.x, max.y, 1.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
 
 	NearFarPos rightTop;
-	rightTop.nearPos = VECTOR3(rightBottom.nearPos.x, leftTop.nearPos.y, rightBottom.nearPos.z);
-	rightTop.farPos = VECTOR3(rightBottom.farPos.x, leftTop.farPos.y, rightBottom.farPos.z);
+	rightTop.nearPos = XMVector3Unproject(VECTOR3(max.x, min.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+	rightTop.farPos = XMVector3Unproject(VECTOR3(max.x, min.y, 1.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
 
 
 	// 各面の法線と定数 //左,右,上,下,手前,奥
@@ -65,8 +65,9 @@ void Frustum::CreateFrustum(POINT startPos, POINT endPos)
 	d[5] = dot(-normal[5], leftTop.farPos);
 }
 
-std::list<Object3D*> Frustum::CheckAABB()
+std::list<Object3D*> Frustum::CheckAABB(POINT startPos, POINT endPos)
 {
+	CreateFrustum(startPos, endPos);
 	std::list<Object3D*> inFrustum = {};
 	// AABBの最小点と最大点
 	std::list<Object3D*> objs = HierarchyManager::GetHierarchyList();
@@ -88,15 +89,14 @@ std::list<Object3D*> Frustum::CheckAABB()
 		// objのバウンディングボックスがフラスタム(視錐台)の内側にいるか判定を取る
 		// 一つでも面の外側にいたらfor文を抜ける
 		bool outFlag = false;
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < 6; i++)	// フラスタムの各面
 		{
-			for (int j = 0; j < 8; j++)
+			for (int j = 0; j < 8; j++)	// バウンディングボックスの頂点
 			{
-				float dist = 0.0f;
-				dist = dot(normal[i], vertex[j]) + d[i];
+				float dist = dot(normal[i], vertex[j]) + d[i];;
 				if (dist < 0)
 				{
-					outFlag = true;
+					outFlag = true;	// 範囲外
 					break;
 				}
 			}

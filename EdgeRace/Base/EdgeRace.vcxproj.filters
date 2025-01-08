@@ -69,6 +69,9 @@
     <Filter Include="ソース ファイル\13_Command">
       <UniqueIdentifier>{efe3f59c-ae76-42a0-8e06-c050f01f203c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\14_Object">
+      <UniqueIdentifier>{48b86878-2e2f-4be4-8293-86d8582fcfd0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Hlsl\DisplaceSkinMesh.hlsli">
@@ -309,15 +312,6 @@
     <ClInclude Include="Src\ResultScore.h">
       <Filter>ソース ファイル\09_ResultScene</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Box.h">
-      <Filter>ソース ファイル\08_PlayScene</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Ball.h">
-      <Filter>ソース ファイル\08_PlayScene</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\MoveBox.h">
-      <Filter>ソース ファイル\08_PlayScene</Filter>
-    </ClInclude>
     <ClInclude Include="Src\MapEditScene.h">
       <Filter>ソース ファイル\10_MapEditScene</Filter>
     </ClInclude>
@@ -339,15 +333,6 @@
     <ClInclude Include="Src\GizmoXYZ.h">
       <Filter>ソース ファイル\10_MapEditScene</Filter>
     </ClInclude>
-    <ClInclude Include="Src\ScoreArea.h">
-      <Filter>ソース ファイル\08_PlayScene</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\FallCheck.h">
-      <Filter>ソース ファイル\08_PlayScene</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Line.h">
-      <Filter>ソース ファイル\10_MapEditScene</Filter>
-    </ClInclude>
     <ClInclude Include="Src\OutlineBall.h">
       <Filter>ソース ファイル\12_OutLine</Filter>
     </ClInclude>
@@ -362,9 +347,6 @@
     </ClInclude>
     <ClInclude Include="Src\BoxCollisionBase.h">
       <Filter>ソース ファイル\02_ゲームライブラリ</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\SkyBox.h">
-      <Filter>ソース ファイル\08_PlayScene</Filter>
     </ClInclude>
     <ClInclude Include="Src\DataHolder.h">
       <Filter>ソース ファイル\08_PlayScene</Filter>
@@ -404,6 +386,27 @@
     </ClInclude>
     <ClInclude Include="Src\Frustum.h">
       <Filter>ソース ファイル\10_MapEditScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Ball.h">
+      <Filter>ソース ファイル\14_Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Box.h">
+      <Filter>ソース ファイル\14_Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\FallCheck.h">
+      <Filter>ソース ファイル\14_Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\MoveBox.h">
+      <Filter>ソース ファイル\14_Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\SkyBox.h">
+      <Filter>ソース ファイル\14_Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\ScoreArea.h">
+      <Filter>ソース ファイル\14_Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Line.h">
+      <Filter>ソース ファイル\14_Object</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -518,15 +521,6 @@
     <ClCompile Include="Src\ResultScore.cpp">
       <Filter>ソース ファイル\09_ResultScene</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Box.cpp">
-      <Filter>ソース ファイル\08_PlayScene</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Ball.cpp">
-      <Filter>ソース ファイル\08_PlayScene</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\MoveBox.cpp">
-      <Filter>ソース ファイル\08_PlayScene</Filter>
-    </ClCompile>
     <ClCompile Include="Src\MapEditScene.cpp">
       <Filter>ソース ファイル\10_MapEditScene</Filter>
     </ClCompile>
@@ -548,15 +542,6 @@
     <ClCompile Include="Src\GizmoXYZ.cpp">
       <Filter>ソース ファイル\10_MapEditScene</Filter>
     </ClCompile>
-    <ClCompile Include="Src\ScoreArea.cpp">
-      <Filter>ソース ファイル\08_PlayScene</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\FallCheck.cpp">
-      <Filter>ソース ファイル\08_PlayScene</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Line.cpp">
-      <Filter>ソース ファイル\10_MapEditScene</Filter>
-    </ClCompile>
     <ClCompile Include="Src\CollisionManager.cpp">
       <Filter>ソース ファイル\08_PlayScene</Filter>
     </ClCompile>
@@ -571,9 +556,6 @@
     </ClCompile>
     <ClCompile Include="Src\BoxCollisionBase.cpp">
       <Filter>ソース ファイル\02_ゲームライブラリ</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\SkyBox.cpp">
-      <Filter>ソース ファイル\08_PlayScene</Filter>
     </ClCompile>
     <ClCompile Include="Src\DataHolder.cpp">
       <Filter>ソース ファイル\08_PlayScene</Filter>
@@ -601,6 +583,27 @@
     </ClCompile>
     <ClCompile Include="Src\Frustum.cpp">
       <Filter>ソース ファイル\10_MapEditScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Ball.cpp">
+      <Filter>ソース ファイル\14_Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Box.cpp">
+      <Filter>ソース ファイル\14_Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\FallCheck.cpp">
+      <Filter>ソース ファイル\14_Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\MoveBox.cpp">
+      <Filter>ソース ファイル\14_Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\SkyBox.cpp">
+      <Filter>ソース ファイル\14_Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\ScoreArea.cpp">
+      <Filter>ソース ファイル\14_Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Line.cpp">
+      <Filter>ソース ファイル\14_Object</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

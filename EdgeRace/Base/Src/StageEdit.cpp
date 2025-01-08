@@ -113,6 +113,7 @@ StageEdit::StageEdit()
 	
 	fallCheck = new FallCheck();
 	fallCheck->pObj.center = VECTOR3(0, -5, 0);
+	HierarchyManager::AddHierarchy(fallCheck);
 
 	nState = sNone;
 	gState = sNoneGizmo;
@@ -246,8 +247,7 @@ void StageEdit::NoneUpdate()
 		else
 		{
 			isDrag = false;
-			Frustum::CreateFrustum(startPos, mousePos);
-			list<Object3D*> objs = Frustum::CheckAABB();
+			list<Object3D*> objs = Frustum::CheckAABB(startPos, mousePos);
 			SelectObj(objs);
 			DebugFrustum();
 		}
@@ -407,8 +407,7 @@ void StageEdit::HasUpdate()
 		// 範囲選択のドラッグがされたとき
 		else
 		{
-			Frustum::CreateFrustum(startPos, mousePos);
-			list<Object3D*> objs = Frustum::CheckAABB();
+			list<Object3D*> objs = Frustum::CheckAABB(startPos, mousePos);
 			SelectObj(objs);
 			DebugFrustum();
 		}
@@ -448,41 +447,38 @@ void StageEdit::PosGizmoUpdate()
 		GetNearWorldPosEx();
 		// ここでGizmoを触ってオブジェクトを動かす
 		VECTOR3 diff = nearWorldPosEx - prevMousePos;
-		if (diff.Length() != 0)
+		if (pDI->CheckMouse(KD_DAT, 0) && diff.Length() != 0)
 		{
-			if (pDI->CheckMouse(KD_DAT, 0))
+			if (getGizmo->editObj.name == "posGizmoX")
 			{
-				if (getGizmo->editObj.name == "posGizmoX")
+				//objPos.x += diff.x;
+				for(Object3D* obj : selectObj)
 				{
-					//objPos.x += diff.x;
-					for(Object3D* obj : selectObj)
-					{
-						obj->pObj.center.x += diff.x;
-					}
+					obj->pObj.center.x += diff.x;
 				}
-				else if (getGizmo->editObj.name == "posGizmoY")
+			}
+			else if (getGizmo->editObj.name == "posGizmoY")
+			{
+				//objPos.y += diff.y;
+				for (Object3D* obj : selectObj)
 				{
-					//objPos.y += diff.y;
-					for (Object3D* obj : selectObj)
-					{
-						obj->pObj.center.y += diff.y;
-					}
+					obj->pObj.center.y += diff.y;
 				}
-				else if (getGizmo->editObj.name == "posGizmoZ")
+			}
+			else if (getGizmo->editObj.name == "posGizmoZ")
+			{
+				//objPos.z += diff.z;
+				for (Object3D* obj : selectObj)
 				{
-					//objPos.z += diff.z;
-					for (Object3D* obj : selectObj)
-					{
-						obj->pObj.center.z += diff.z;
-					}
+					obj->pObj.center.z += diff.z;
 				}
-				else if (getGizmo->editObj.name == "gizmoCenter")
+			}
+			else if (getGizmo->editObj.name == "gizmoCenter")
+			{
+				//objPos += diff;
+				for (Object3D* obj : selectObj)
 				{
-					//objPos += diff;
-					for (Object3D* obj : selectObj)
-					{
-						obj->pObj.center += diff;
-					}
+					obj->pObj.center += diff;
 				}
 			}
 		}
@@ -525,40 +521,37 @@ void StageEdit::RotGizmoUpdate()
 		GetNearWorldPosEx();
 		// ここでGizmoを触ってオブジェクトを動かす
 		VECTOR3 diff = nearWorldPosEx - prevMousePos;
-		if (diff.Length() != 0)
+		if (pDI->CheckMouse(KD_DAT, 0) && diff.Length() != 0)
 		{
-			if (pDI->CheckMouse(KD_DAT, 0))
+			if (CursorLoop())
 			{
-				if (CursorLoop())
-				{
-					GetWorldPos();
-					prevMousePos = nearWorldPosEx;
-					return;
-				}
+				GetWorldPos();
+				prevMousePos = nearWorldPosEx;
+				return;
+			}
 
-				if (getGizmo->editObj.name == "rotGizmoX")
+			if (getGizmo->editObj.name == "rotGizmoX")
+			{
+				objRot.x = (objRot.x) + (diff.y * 200 / 180.0f * XM_PI);
+				for (Object3D* obj : selectObj)
 				{
-					objRot.x = (objRot.x) + (diff.y * 200 / 180.0f * XM_PI);
-					for (Object3D* obj : selectObj)
-					{
-						obj->SetRotation(obj->Rotation().x + (diff.y / 180.0f * XM_PI), obj->Rotation().y, obj->Rotation().z);
-					}
+					obj->SetRotation(obj->Rotation().x + (diff.y / 180.0f * XM_PI), obj->Rotation().y, obj->Rotation().z);
 				}
-				else if (getGizmo->editObj.name == "rotGizmoY")
+			}
+			else if (getGizmo->editObj.name == "rotGizmoY")
+			{
+				objRot.y = (objRot.y) - (diff.x * 100 / 180.0f * XM_PI) + (-diff.z * 100 / 180.0f * XM_PI);
+				for (Object3D* obj : selectObj)
 				{
-					objRot.y = (objRot.y) - (diff.x * 100 / 180.0f * XM_PI) + (-diff.z * 100 / 180.0f * XM_PI);
-					for (Object3D* obj : selectObj)
-					{
-						obj->SetRotation(obj->Rotation().x, obj->Rotation().y - (diff.x / 180.0f * XM_PI) + (-diff.z / 180.0f * XM_PI), obj->Rotation().z);
-					}
+					obj->SetRotation(obj->Rotation().x, obj->Rotation().y - (diff.x / 180.0f * XM_PI) + (-diff.z / 180.0f * XM_PI), obj->Rotation().z);
 				}
-				else if (getGizmo->editObj.name == "rotGizmoZ")
+			}
+			else if (getGizmo->editObj.name == "rotGizmoZ")
+			{
+				objRot.z = (objRot.z) + (diff.y * 200 / 180.0f * XM_PI);
+				for (Object3D* obj : selectObj)
 				{
-					objRot.z = (objRot.z) + (diff.y * 200 / 180.0f * XM_PI);
-					for (Object3D* obj : selectObj)
-					{
-						obj->SetRotation(obj->Rotation().x, obj->Rotation().y, obj->Rotation().z + (diff.y / 180.0f * XM_PI));
-					}
+					obj->SetRotation(obj->Rotation().x, obj->Rotation().y, obj->Rotation().z + (diff.y / 180.0f * XM_PI));
 				}
 			}
 		}
@@ -599,50 +592,46 @@ void StageEdit::ScaleGizmoUpdate()
 		GetNearWorldPosEx();
 		// ここでGizmoを触ってオブジェクトを動かす
 		VECTOR3 diff = nearWorldPosEx - prevMousePos;
-		if (diff.Length() != 0)
+		if (pDI->CheckMouse(KD_DAT, 0) && diff.Length() != 0)
 		{
-			if (pDI->CheckMouse(KD_DAT, 0))
+			if (CursorLoop())
 			{
-				if (CursorLoop())
+				GetWorldPos();
+				GetNearWorldPosEx();
+				prevMousePos = nearWorldPosEx;
+				return;
+			}
+			if (getGizmo->editObj.name == "scaleGizmoX")
+			{
+				objScale.x += diff.x * 2;
+				for (Object3D* obj : selectObj)
 				{
-					GetWorldPos();
-					GetNearWorldPosEx();
-					prevMousePos = nearWorldPosEx;
-					return;
+					obj->SetScale(VECTOR3(obj->Scale().x + diff.x * 2, obj->Scale().y, obj->Scale().z));
 				}
-				if (getGizmo->editObj.name == "scaleGizmoX")
+			}
+			else if (getGizmo->editObj.name == "scaleGizmoY")
+			{
+				objScale.y += diff.y * 2;
+				for (Object3D* obj : selectObj)
 				{
-					objScale.x += diff.x * 2;
-					for (Object3D* obj : selectObj)
-					{
-						obj->SetScale(VECTOR3(obj->Scale().x + diff.x * 2, obj->Scale().y, obj->Scale().z));
-					}
+					obj->SetScale(VECTOR3(obj->Scale().x, obj->Scale().y + diff.y * 2, obj->Scale().z));
 				}
-				else if (getGizmo->editObj.name == "scaleGizmoY")
+			}
+			else if (getGizmo->editObj.name == "scaleGizmoZ")
+			{
+				objScale.z += diff.z * 2;
+				for (Object3D* obj : selectObj)
 				{
-					objScale.y += diff.y * 2;
-					for (Object3D* obj : selectObj)
-					{
-						obj->SetScale(VECTOR3(obj->Scale().x, obj->Scale().y + diff.y * 2, obj->Scale().z));
-					}
+					obj->SetScale(VECTOR3(obj->Scale().x, obj->Scale().y, obj->Scale().z + diff.z * 2));
 				}
-				else if (getGizmo->editObj.name == "scaleGizmoZ")
+			}
+			else if (getGizmo->editObj.name == "gizmoCenter")
+			{
+				objScale += diff * 2;
+				for (Object3D* obj : selectObj)
 				{
-					objScale.z += diff.z * 2;
-					for (Object3D* obj : selectObj)
-					{
-						obj->SetScale(VECTOR3(obj->Scale().x, obj->Scale().y, obj->Scale().z + diff.z * 2));
-					}
+					obj->SetScale(obj->Scale() + diff * 2);
 				}
-				else if (getGizmo->editObj.name == "gizmoCenter")
-				{
-					objScale += diff * 2;
-					for (Object3D* obj : selectObj)
-					{
-						obj->SetScale(obj->Scale() + diff * 2);
-					}
-				}
-
 			}
 		}
 		GetNearWorldPosEx();
@@ -816,14 +805,6 @@ void StageEdit::SelectObj(list<Object3D*> objs)
 		vGizmo = vPos;
 	}
 
-	//objPos = obj->pObj.center;
-	//objRot = obj->Rotation() * 180.0f / XM_PI;
-	//objScale = obj->Scale();
-
-	//tempE = obj->pObj.e;
-	//tempF = obj->pObj.f;
-	//tempMass = obj->pObj.mass;
-
 	// ステータスによって表示するGizmoを変える
 	SetGizmo();
 
@@ -861,15 +842,20 @@ void StageEdit::DeselectObj(Object3D* obj)
 
 void StageEdit::DeleteObj()
 {
+	bool isDelete = false;
 	for (Object3D* obj : selectObj)
 	{
 		if(obj->editObj.name != "FallCheck")
 		{
 			HierarchyManager::RemoveHierarchy(obj);
+			isDelete = true;
 		}
 	}
-	commandManager.Do(make_shared<DeleteCommand<Object3D>>(selectObj));
-	selectObj.clear();
+	if (isDelete)
+	{
+		commandManager.Do(make_shared<DeleteCommand<Object3D>>(selectObj));
+		selectObj.clear();
+	}
 }
 
 void StageEdit::CloneObj()
@@ -932,7 +918,7 @@ void StageEdit::CloneObj()
 	}
 	DeselectObj();
 	selectObj = tempList;
-	commandManager.Do(make_shared<CreateCommand<Object3D>>(tempList));	// Object3Dではなくそれぞれの型にしなければならない
+	commandManager.Do(make_shared<CreateCommand<Object3D>>(tempList));
 	for (Object3D* obj : selectObj)
 	{
 		obj->editObj.isSelect = true;
@@ -1467,14 +1453,11 @@ Object3D* StageEdit::GetClosestHitObject(list<Object3D*>objs, VECTOR3 &closestHi
 				firstFlag = false;
 				temp = obj;
 			}
-			else
+			else if(minDistance > distance)
 			{
-				if (minDistance > distance)
-				{
-					minDistance = distance;
-					closestHit = hit;
-					temp = obj;
-				}
+				minDistance = distance;
+				closestHit = hit;
+				temp = obj;
 			}
 		}
 	}
@@ -1563,11 +1546,11 @@ void StageEdit::DebugFrustum()
 	leftTop.nearPos = start0Pos;
 	leftTop.farPos = start1Pos;
 
-	leftBottom.nearPos = VECTOR3(start0Pos.x, end0Pos.y, start0Pos.z);
-	leftBottom.farPos = VECTOR3(start1Pos.x, end1Pos.y, start1Pos.z);
-
-	rightTop.nearPos = VECTOR3(end0Pos.x, start0Pos.y, end0Pos.z);
-	rightTop.farPos = VECTOR3(end1Pos.x, start1Pos.y, end1Pos.z);
+	leftBottom.nearPos = XMVector3Unproject(VECTOR3(min.x, max.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+	leftBottom.farPos = XMVector3Unproject(VECTOR3(min.x, max.y, 1.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+	
+	rightTop.nearPos = XMVector3Unproject(VECTOR3(max.x, min.y, 0.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
+	rightTop.farPos = XMVector3Unproject(VECTOR3(max.x, min.y, 1.0f), 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 1, mPrj, mView, identity);
 
 	rightBottom.nearPos = end0Pos;
 	rightBottom.farPos = end1Pos;

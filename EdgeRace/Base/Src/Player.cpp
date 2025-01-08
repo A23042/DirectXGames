@@ -105,7 +105,6 @@ void Player::Update()
 	if (isPhysic)
 	{
 		// ŠeBox‚Æ‚ÌÕ“Ë”»’è
-		// CollisionManager‚ÅŠÇ—‚µ‚Ä‚¢‚éBox‚ÆÕ“Ë”»’è‚ðŽæ‚é
 		//for (Object3D* obj : collManager->GetBoxes())
 		for (Box* obj : ObjectManager::anyObjList<Box>)
 		{

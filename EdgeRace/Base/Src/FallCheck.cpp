@@ -20,7 +20,8 @@ FallCheck::FallCheck(bool playScene) : isPlayScene(playScene)
 
 		meshCol = new MeshCollider();
 		meshCol->MakeFromMesh(mesh);
-		ObjectManager::SetDrawOrder(this, 100);
+		//ObjectManager::SetDrawOrder(this, 100);
+		//mesh->m_vDiffuse = VECTOR4(1.0f, 1.0f, 1.0f, 0.6f);
 	}
 }
 

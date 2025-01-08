@@ -9,15 +9,11 @@ void CommandManager::SetUp()
 
 void CommandManager::Do(shared_ptr<CommandBase> command)
 {
-	// リストの中身が有れば
-	//if(commandList.size() != 0)
+	// currentItrがcommandListの最後の要素を指していなければ
+	if (currentItr != prev(commandList.end()))
 	{
-		// currentItrがcommandListの最後の要素を指していなければ
-		if (currentItr != prev(commandList.end()))
-		{
-			// currentItrの次の要素から最後まで消す
-			commandList.erase(next(currentItr), commandList.end());
-		}
+		// currentItrの次の要素から最後まで消す
+		commandList.erase(next(currentItr), commandList.end());
 	}
 	// コマンドの実行
 	command->Do();
