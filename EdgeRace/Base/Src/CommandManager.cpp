@@ -42,3 +42,9 @@ void CommandManager::Redo()
 		(*currentItr)->Do();
 	}
 }
+
+void CommandManager::ReSet()
+{
+	currentItr = commandList.begin();
+	commandList.erase(next(currentItr), commandList.end());
+}

@@ -34,6 +34,11 @@ public:
 	/// commandListに保存されている操作の次の実行
 	/// </summary>
 	void Redo();
+
+	/// <summary>
+	/// commandListを初期化
+	/// </summary>
+	void ReSet();
 private:
 	list<shared_ptr<CommandBase>> commandList = {};		// 実行されたコマンドの格納
 	list<shared_ptr<CommandBase>>::iterator currentItr;	// 格納されたコマンドの参照場所

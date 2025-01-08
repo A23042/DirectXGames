@@ -1134,6 +1134,7 @@ void StageEdit::Load(int n)
 		}
 	}
 	SAFE_DELETE(csv);
+	commandManager.ReSet();
 }
 
 bool StageEdit::CursorLoop()
