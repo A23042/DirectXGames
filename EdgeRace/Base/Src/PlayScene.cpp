@@ -149,6 +149,22 @@ PlayScene::~PlayScene()
 
 void PlayScene::Update()
 {
+	// ‰æ–Ê•ªŠ„‚ÌØ‚è‘Ö‚¦•û “r’†‚Å‚à“®“I‚ÉØ‚è‘Ö‚¦‰Â”\
+#if 1
+	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_L))
+	{
+		SplitScreen* ss = ObjectManager::FindGameObject<SplitScreen>();
+		if (ss->Multi())
+		{
+			ss->SetSingleScreen();
+		}
+		else
+		{
+			ss->SetMultiScreen();
+		}
+	}
+#endif
+
 	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_T))
 	{
 		SceneManager::ChangeScene("TitleScene");
