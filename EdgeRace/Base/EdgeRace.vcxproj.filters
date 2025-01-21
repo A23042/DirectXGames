@@ -408,6 +408,12 @@
     <ClInclude Include="Src\Line.h">
       <Filter>ソース ファイル\14_Object</Filter>
     </ClInclude>
+    <ClInclude Include="Src\SubCamera.h">
+      <Filter>ソース ファイル\10_MapEditScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\MainCamera.h">
+      <Filter>ソース ファイル\10_MapEditScene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Main.cpp">
@@ -604,6 +610,12 @@
     </ClCompile>
     <ClCompile Include="Src\Line.cpp">
       <Filter>ソース ファイル\14_Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\SubCamera.cpp">
+      <Filter>ソース ファイル\10_MapEditScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\MainCamera.cpp">
+      <Filter>ソース ファイル\10_MapEditScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

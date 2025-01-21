@@ -2,12 +2,15 @@
 #include "Object3D.h"
 #include "SplitScreen.h"
 
+class MainCamera;
+class SubCamera;
+
 class Camera : public Object3D {
 public:
-	Camera();
+	Camera(bool isEditor = false);
 	~Camera();
 	void Update() override;
-	void Draw() override;
+	//void Draw() override;
 
 	MATRIX4X4 View(int counter) { return view[counter]; }
 	VECTOR3 EyePt(int counter) { return eyePt[counter]; }
@@ -29,4 +32,9 @@ private:
 	std::vector<MATRIX4X4> view;
 	std::vector<VECTOR3> eyePt;
 	std::vector<VECTOR3> lookatPt;
+
+	MainCamera* mainCam = nullptr;
+	SubCamera* subCam = nullptr;
+
+	bool isEditor;
 };

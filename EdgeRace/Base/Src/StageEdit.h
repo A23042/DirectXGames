@@ -10,6 +10,7 @@
 using namespace std;
 using namespace ObjectManager;
 
+class SubCamera;
 class StageEdit : public Object3D {
 public:
 	StageEdit();
@@ -190,8 +191,12 @@ private:
 	//Object3D* getObj = nullptr;	
 	list<Object3D*> selectObj;
 
+	//list<SubCamera*> subCm;
+
 	// ‘I‘ğó‘Ô‚ÌGizmo
 	Object3D* getGizmo = nullptr;
+
+	Object3D* cameraObj = nullptr;
 
 	// TODO:”z—ñ‚É‚·‚é
 	// 3DGizmoXYZ

@@ -1,13 +1,16 @@
 #include "Camera.h"
 #include "Player.h"
 #include "Ball.h"
+#include "SubCamera.h"
+#include "MainCamera.h"
 //                                      後方視点　　　　　　真上視点
 static const VECTOR3 CameraPos[] = { VECTOR3(0, 8, -18), VECTOR3(0, 10, -0.5) };
 static const VECTOR3 LookPos[] =   { VECTOR3(0, 0,  3), VECTOR3(0,  1,  1  ) };
 static const float CHANGE_TIME_LIMIT = 0.5f; // 秒
 
-Camera::Camera()
+Camera::Camera(bool isEditor)
 {
+	this->isEditor = isEditor;
 	ObjectManager::SetVisible(this, false);	// 自体非表示
 	SetDrawOrder(-1000);	// 最後に処理する
 	viewType = 0;
@@ -34,113 +37,102 @@ void Camera::Update()
 {
 	if (ssObj->Multi())
 	{
-		std::list<Player*> pcs = ObjectManager::FindGameObjects<Player>();
-		for(Player* pc : pcs)
-		// 多画面のとき
-		for (int i = 0; i < ssObj->MultiSize(); i++)
+		if (!isEditor)
 		{
-
-			// ２画面のとき
-			switch (i)
-			{
-			case 0:
-			{
-				// 画面0はPlayer1視点
-				//Player* pc = ObjectManager::FindGameObject<Player>();
-					if (pc->GetPlNum() == 0)
+			std::list<Player*> pcs = ObjectManager::FindGameObjects<Player>();
+			for (Player* pc : pcs)
+				// 多画面のとき
+				for (int i = 0; i < ssObj->MultiSize(); i++)
+				{
+					// ２画面のとき
+					switch (i)
 					{
-						if (pc != nullptr)
+					case 0:
+					{
+						// 画面0はPlayer1視点
+						//Player* pc = ObjectManager::FindGameObject<Player>();
+						if (pc->GetPlNum() == 0)
 						{
-							updateCamera(i, pc->Position(), pc->Rotation());
-						}
-						else {
-							updateCamera(i, VECTOR3(0, 0, 0), VECTOR3(0, 0, 0));
+							if (pc != nullptr)
+							{
+								updateCamera(i, pc->Position(), pc->Rotation());
+							}
+							else {
+								updateCamera(i, VECTOR3(0, 0, 0), VECTOR3(0, 0, 0));
+							}
 						}
 					}
-			}
-			break;
+					break;
 
-			case 1:
-			{
-				// 画面1はPlayer2視点
-				
-				if (pc->GetPlNum() == 1)
-				{
+					case 1:
+					{
+						// 画面1はPlayer2視点
+
+						if (pc->GetPlNum() == 1)
+						{
 #if 1
-					if (pc != nullptr)
-					{
-						updateCamera(i, pc->Position(), pc->Rotation());
-					}
-					else {
-						updateCamera(i, VECTOR3(0, 0, 0), VECTOR3(0, 0, 0));
-					}
+							if (pc != nullptr)
+							{
+								updateCamera(i, pc->Position(), pc->Rotation());
+							}
+							else {
+								updateCamera(i, VECTOR3(0, 0, 0), VECTOR3(0, 0, 0));
+							}
 #else
-					updateCamera(i, VECTOR3(0, 2, -15), VECTOR3(0, 0, 0));
+							updateCamera(i, VECTOR3(0, 2, -15), VECTOR3(0, 0, 0));
 #endif
-				}
-			}
-			break;
-			}
+						}
+					}
+					break;
+					}
 
-			/*
-			// ４画面のとき
-			switch (i)
+				}
+		}
+		else
+		{
+			for (int i = 0; i < 2; i++)
 			{
-			case 0:
+				// ２画面のとき
+				switch (i)
 				{
-					// 画面0はPlayer視点
-					Player* pc = ObjectManager::FindGameObject<Player>();
-					if (pc != nullptr)
-					{
-						updateCamera(i, pc->Position(), pc->Rotation());
-					}
-					else {
-						updateCamera(i, VECTOR3(0,0,0), VECTOR3(0,0,0));
-					}
-				}
-				break;
+				case 0:
+					//transform.position = mainCam->Position();
+					//lookPosition = mainCam->GetLookPos();
+					mainCam = ObjectManager::FindGameObject<MainCamera>();
+					updateCamera(i, mainCam->Position(), mainCam->GetLookPos());
+					/*
+					eyePt[i] = transform.position;   // カメラ座標
+					lookatPt[i] = lookPosition;      // 注視点
+					view[i] = XMMatrixLookAtLH(	    // ビューマトリックス
+						transform.position,
+						lookPosition,
+						VECTOR3(0, 1, 0));
+					*/
+					break;
+				case 1:
+					SubCamera * sub = ObjectManager::FindGameObject<SubCamera>();
+					updateCamera(i, sub->Position(), sub->GetLookPos());
+					/*
+					transform.position = sub->Position();
+					lookPosition = sub->GetLookPos();
 
-			case 1:
-				{
-					// 画面1はEnemyRS視点
-					EnemyRS* enm = ObjectManager::FindGameObject<EnemyRS>();
-					if (enm != nullptr && enm->Mesh() != nullptr)
-					{
-						updateCamera(i, enm->Position(), enm->Rotation());
-					}
-					else {
-						updateCamera(i, VECTOR3(0, 0, 0), VECTOR3(0, 0, 0));
-					}
+					eyePt[i] = transform.position;   // カメラ座標
+					lookatPt[i] = VECTOR3();      // 注視点
+					view[i] = XMMatrixLookAtLH(	    // ビューマトリックス
+						transform.position,
+						lookPosition,
+						VECTOR3(0, 1, 0));
+					*/
+					break;
 				}
-				break;
 
-			case 2:
-				{
-					// 画面2はEnemyGolem視点
-					EnemyGolem* enm = ObjectManager::FindGameObject<EnemyGolem>();
-					if (enm != nullptr && enm->Mesh() != nullptr)
-					{
-						updateCamera(i, enm->Position(), enm->Rotation());
-					}
-					else {
-						updateCamera(i, VECTOR3(0, 0, 0), VECTOR3(0, 0, 0));
-					}
-				}
-				break;
-
-			case 3:
-				{
-					// 画面3は原点視点
-					updateCamera(i, VECTOR3(0, 0, 0), VECTOR3(0, 0, 0));
-				}
-				break;
 			}
-			*/
 		}
 	}
 	else 
 	{
 		// １画面のときPlayer視点
+		/*
 		Player* pc = ObjectManager::FindGameObject<Player>();
 		if (pc != nullptr)
 		{
@@ -149,62 +141,72 @@ void Camera::Update()
 		else {
 			updateCamera(0, VECTOR3(0, 0, 0), VECTOR3(0, 0, 0));
 		}
+		*/
 	}
 }
-
+/*
 void Camera::Draw()
 {
 	GameDevice()->m_mView = XMMatrixLookAtLH(
 		transform.position, // カメラ座標
 		lookPosition, // 注視点
 		VECTOR3(0, 1, 0));
+	GameDevice()->m_vEyePt = transform.position;
 }
-
+*/
 void Camera::updateCamera(int counter, VECTOR3 pos, VECTOR3 rot)
 {
+	if (!isEditor)
+	{
+		// プレイヤーの行列を求める
+		MATRIX4X4 rotY = XMMatrixRotationY(rot.y);
+		MATRIX4X4 trans = XMMatrixTranslation(pos.x, pos.y / 2.0f + 0.0f, pos.z);
+		MATRIX4X4 m = rotY * trans;
+		// プレイヤーが回転・移動してない時のカメラ位置に
+		// プレイヤーの回転・移動行列を掛けると、
+		if (changeTime >= CHANGE_TIME_LIMIT)
+		{
+			transform.position = CameraPos[viewType] * m;
+			lookPosition = LookPos[viewType] * m;
+		}
+		else
+		{	// 視点切り替え中
+			changeTime += 1.0f / 60.0f;
+			float timeRate = changeTime / CHANGE_TIME_LIMIT; // 0.0～1.0
+			float rate = timeRate;
+			VECTOR3 position = (changePosGoal - changePosStart) * rate + changePosStart;
+			VECTOR3 look = (changeLookGoal - changeLookStart) * rate + changeLookStart;
+			transform.position = position * m;
+			lookPosition = look * m;
+		}
+		// カメラが壁にめり込まないようにする
+		VECTOR3 start = pos;
+		VECTOR3 end = transform.position;
+		// startからendに向かうベクトルを作り、長さに0.2を加える
+		VECTOR3 camVec = end - start;
+		camVec = XMVector3Normalize(camVec) * (camVec.Length() + 0.2f);
+		end = start + camVec;
+		{
 
-			// プレイヤーの行列を求める
-			MATRIX4X4 rotY = XMMatrixRotationY(rot.y);
-			MATRIX4X4 trans = XMMatrixTranslation(pos.x, pos.y / 2.0f + 0.0f, pos.z);
-			MATRIX4X4 m = rotY * trans;
-			// プレイヤーが回転・移動してない時のカメラ位置に
-			// プレイヤーの回転・移動行列を掛けると、
-			if (changeTime >= CHANGE_TIME_LIMIT) 
+			std::list<Object3D*> objList = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ");
+			for (Object3D* g : objList)
 			{
-				transform.position = CameraPos[viewType] * m;
-				lookPosition = LookPos[viewType] * m;
-			}
-			else 
-			{	// 視点切り替え中
-				changeTime += 1.0f / 60.0f;
-				float timeRate = changeTime / CHANGE_TIME_LIMIT; // 0.0～1.0
-				float rate = timeRate;
-				VECTOR3 position = (changePosGoal - changePosStart) * rate + changePosStart;
-				VECTOR3 look = (changeLookGoal - changeLookStart) * rate + changeLookStart;
-				transform.position = position * m;
-				lookPosition = look * m;
-			}
-			// カメラが壁にめり込まないようにする
-			VECTOR3 start = pos;
-			VECTOR3 end = transform.position;
-			// startからendに向かうベクトルを作り、長さに0.2を加える
-			VECTOR3 camVec = end - start;
-			camVec = XMVector3Normalize(camVec) * (camVec.Length() + 0.2f);
-			end = start + camVec;
-			{
-
-				std::list<Object3D*> objList = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ");
-				for (Object3D* g : objList)
+				VECTOR3 hit;
+				if (g->HitLineToMesh(start, end, &hit))
 				{
-					VECTOR3 hit;
-					if (g->HitLineToMesh(start, end, &hit)) 
-					{
-						end = hit;
-					}
+					end = hit;
 				}
 			}
-			//endから0.2手前に置く;
-			//transform.position = XMVector3Normalize(camVec) * ((end - start).Length() - 0.2f) + start;
+		}
+		//endから0.2手前に置く;
+		//transform.position = XMVector3Normalize(camVec) * ((end - start).Length() - 0.2f) + start;
+
+	}
+	else
+	{
+		transform.position = pos;
+		lookPosition = rot;
+	}
 
 
 			// ------------------------------------------------------------------

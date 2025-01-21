@@ -20,6 +20,9 @@
 #include "CreateCommand.h"
 #include "DeleteCommand.h"
 #include "Frustum.h"
+#include "SubCamera.h"
+#include "SplitScreen.h"
+#include "Camera.h"
 
 namespace
 {
@@ -59,11 +62,12 @@ namespace
 	);
 
 
-	static const float defaultE = 0.8f;	// 反発係数
-	static const float defaultF = 0.02f;	// 摩擦
-	static const float defaultMass = 1;	// 質量
-
-	static const int dragDistanse = 15;	// ドラッグの終了時この距離離れていなければクリックとして扱う
+	static const float DEFAULT_E = 0.8f;	// 反発係数
+	static const float DEFAULT_F = 0.02f;	// 摩擦
+	static const float DEFAULT_MASS = 1;	// 質量
+	static const int DRAG_DISTANCE = 15;	// ドラッグの終了時この距離離れていなければクリックとして扱う
+	static const int SCALE_RATE = 2;
+	static const int ROTATE_RATE = 300;
 
 	CommandManager commandManager;
 
@@ -95,18 +99,13 @@ StageEdit::StageEdit()
 	new Gizmo3D();
 
 	// 親Gizmoと移動、回転サイズGizmoの初期化
-	
 	gizmoC = new GizmoXYZ();
-	// ギズモオブジェクトでメモリリーク発生
-	// 原因不明
 	posGizmoX = new PosGizmoX(gizmoC);
 	posGizmoY = new PosGizmoY(gizmoC);
 	posGizmoZ = new PosGizmoZ(gizmoC);
-	
 	rotGizmoX = new RotGizmoX(gizmoC);
 	rotGizmoY = new RotGizmoY(gizmoC);
 	rotGizmoZ = new RotGizmoZ(gizmoC);
-
 	scaleGizmoX = new ScaleGizmoX(gizmoC);
 	scaleGizmoY = new ScaleGizmoY(gizmoC);
 	scaleGizmoZ = new ScaleGizmoZ(gizmoC);
@@ -115,12 +114,15 @@ StageEdit::StageEdit()
 	fallCheck->pObj.center = VECTOR3(0, -5, 0);
 	HierarchyManager::AddHierarchy(fallCheck);
 
+	//cameraObj = new SubCamera();
+	HierarchyManager::AddHierarchy(new SubCamera());
+	HierarchyManager::AddHierarchy(new Box());
 	nState = sNone;
 	gState = sNoneGizmo;
 
-	tempE = defaultE;
-	tempF = defaultF;
-	tempMass = defaultMass;
+	tempE = DEFAULT_E;
+	tempF = DEFAULT_F;
+	tempMass = DEFAULT_MASS;
 
 	commandManager.SetUp();
 	spr = new CSprite;
@@ -135,7 +137,17 @@ StageEdit::~StageEdit()
 void StageEdit::Update()
 {
 	// 各行列とカーソルのワールド座標取得
-	mView = GameDevice()->m_mView;
+	SplitScreen* ss = FindGameObject<SplitScreen>();
+	if (ss->Multi())
+	{
+		Camera* cm = FindGameObject<Camera>();
+		mView = cm->View(0);
+	}
+	else
+	{
+		mView = GameDevice()->m_mView;
+	}
+
 	mPrj = GameDevice()->m_mProj;
 	identity = XMMatrixIdentity();
 	judgeArea = CheckInAreaCursor();
@@ -170,7 +182,7 @@ void StageEdit::Update()
 		commandManager.Redo();
 		DeselectObj();
 	}
-
+	
 }
 
 void StageEdit::Draw()
@@ -214,6 +226,14 @@ void StageEdit::Draw()
 	spr->DrawLine3D(center, center + normal[5] * 3, RGB(255, 255, 255));
 
 #endif
+	// グリッド線表示
+	for (int i = 0; i < 50; i++)
+	{
+		spr->DrawLine3D(VECTOR3(-100, 0, 2 * i), VECTOR3(100, 0, 2 * i), RGB(255, 255, 255), 0.5f);
+		spr->DrawLine3D(VECTOR3(-100, 0, -2 * i), VECTOR3(100, 0, -2 * i), RGB(255, 255, 255), 0.5f);
+		spr->DrawLine3D(VECTOR3(2 * i, 0, 100), VECTOR3(2 * i, 0, -100), RGB(255, 255, 255), 0.5f);
+		spr->DrawLine3D(VECTOR3(-2 * i, 0, 100), VECTOR3(-2 * i, 0, -100), RGB(255, 255, 255), 0.5f);
+	}
 }
 
 void StageEdit::NoneUpdate()
@@ -229,7 +249,7 @@ void StageEdit::NoneUpdate()
 	}
 	if (isDrag && pDI->CheckMouse(KD_UTRG, 0))
 	{
-		if (abs(startPos.x - mousePos.x) < dragDistanse && abs(startPos.y - mousePos.y < dragDistanse))
+		if (abs(startPos.x - mousePos.x) < DRAG_DISTANCE && abs(startPos.y - mousePos.y < DRAG_DISTANCE))
 		{
 			Object3D* temp = nullptr;
 			// ヒエラルキーにあるオブジェクトと衝突判定
@@ -388,7 +408,7 @@ void StageEdit::HasUpdate()
 	if (isDrag && pDI->CheckMouse(KD_UTRG, 0))
 	{
 		// ドラッグ範囲が狭ければ普通のクリックとして判定を取る
-		if (abs(startPos.x - mousePos.x) < dragDistanse && abs(startPos.y - mousePos.y < dragDistanse))
+		if (abs(startPos.x - mousePos.x) < DRAG_DISTANCE && abs(startPos.y - mousePos.y < DRAG_DISTANCE))
 		{
 			Object3D* temp = nullptr;
 			// Gizmo以外のオブジェクトと判定
@@ -455,6 +475,7 @@ void StageEdit::PosGizmoUpdate()
 				for(Object3D* obj : selectObj)
 				{
 					obj->pObj.center.x += diff.x;
+					//obj->SetPosition(VECTOR3(obj->Position().x + diff.x, obj->Position().y, obj->Position().z));
 				}
 			}
 			else if (getGizmo->editObj.name == "posGizmoY")
@@ -526,31 +547,25 @@ void StageEdit::RotGizmoUpdate()
 			if (CursorLoop())
 			{
 				GetWorldPos();
+				GetNearWorldPosEx();
 				prevMousePos = nearWorldPosEx;
 				return;
 			}
-
-			if (getGizmo->editObj.name == "rotGizmoX")
+			for (Object3D* obj : selectObj)
 			{
-				objRot.x = (objRot.x) + (diff.y * 200 / 180.0f * XM_PI);
-				for (Object3D* obj : selectObj)
+				if (getGizmo->editObj.name == "rotGizmoX")
 				{
+					objRot.x = (objRot.x) + (diff.y * ROTATE_RATE / 180.0f * XM_PI);
 					obj->SetRotation(obj->Rotation().x + (diff.y / 180.0f * XM_PI), obj->Rotation().y, obj->Rotation().z);
 				}
-			}
-			else if (getGizmo->editObj.name == "rotGizmoY")
-			{
-				objRot.y = (objRot.y) - (diff.x * 100 / 180.0f * XM_PI) + (-diff.z * 100 / 180.0f * XM_PI);
-				for (Object3D* obj : selectObj)
+				else if (getGizmo->editObj.name == "rotGizmoY")
 				{
+					objRot.y = (objRot.y) - (diff.x * ROTATE_RATE / 180.0f * XM_PI) + (-diff.z * ROTATE_RATE / 180.0f * XM_PI);
 					obj->SetRotation(obj->Rotation().x, obj->Rotation().y - (diff.x / 180.0f * XM_PI) + (-diff.z / 180.0f * XM_PI), obj->Rotation().z);
 				}
-			}
-			else if (getGizmo->editObj.name == "rotGizmoZ")
-			{
-				objRot.z = (objRot.z) + (diff.y * 200 / 180.0f * XM_PI);
-				for (Object3D* obj : selectObj)
+				else if (getGizmo->editObj.name == "rotGizmoZ")
 				{
+					objRot.z = (objRot.z) + (diff.y * ROTATE_RATE / 180.0f * XM_PI);
 					obj->SetRotation(obj->Rotation().x, obj->Rotation().y, obj->Rotation().z + (diff.y / 180.0f * XM_PI));
 				}
 			}
@@ -601,37 +616,33 @@ void StageEdit::ScaleGizmoUpdate()
 				prevMousePos = nearWorldPosEx;
 				return;
 			}
-			if (getGizmo->editObj.name == "scaleGizmoX")
+			for (Object3D* obj : selectObj)
 			{
-				objScale.x += diff.x * 2;
-				for (Object3D* obj : selectObj)
+				if (!obj->editObj.isScaling)
 				{
-					obj->SetScale(VECTOR3(obj->Scale().x + diff.x * 2, obj->Scale().y, obj->Scale().z));
+					continue;
 				}
-			}
-			else if (getGizmo->editObj.name == "scaleGizmoY")
-			{
-				objScale.y += diff.y * 2;
-				for (Object3D* obj : selectObj)
+				if (getGizmo->editObj.name == "scaleGizmoX")
 				{
-					obj->SetScale(VECTOR3(obj->Scale().x, obj->Scale().y + diff.y * 2, obj->Scale().z));
+					objScale.x += diff.x * SCALE_RATE;
+					obj->SetScale(VECTOR3(obj->Scale().x + diff.x * SCALE_RATE, obj->Scale().y, obj->Scale().z));
 				}
-			}
-			else if (getGizmo->editObj.name == "scaleGizmoZ")
-			{
-				objScale.z += diff.z * 2;
-				for (Object3D* obj : selectObj)
+				else if (getGizmo->editObj.name == "scaleGizmoY")
 				{
-					obj->SetScale(VECTOR3(obj->Scale().x, obj->Scale().y, obj->Scale().z + diff.z * 2));
+					objScale.y += diff.y * SCALE_RATE;
+					obj->SetScale(VECTOR3(obj->Scale().x, obj->Scale().y + diff.y * SCALE_RATE, obj->Scale().z));
 				}
-			}
-			else if (getGizmo->editObj.name == "gizmoCenter")
-			{
-				objScale += diff * 2;
-				for (Object3D* obj : selectObj)
+				else if (getGizmo->editObj.name == "scaleGizmoZ")
 				{
-					obj->SetScale(obj->Scale() + diff * 2);
+					objScale.z += diff.z * SCALE_RATE;
+					obj->SetScale(VECTOR3(obj->Scale().x, obj->Scale().y, obj->Scale().z + diff.z * SCALE_RATE));
 				}
+				else if (getGizmo->editObj.name == "gizmoCenter")
+				{
+					objScale += diff * SCALE_RATE;
+					obj->SetScale(obj->Scale() + diff * SCALE_RATE);
+				}
+
 			}
 		}
 		GetNearWorldPosEx();
@@ -732,9 +743,9 @@ void StageEdit::SelectObj(Object3D* obj)
 	}
 	if (isNew)
 	{
-		obj->pObj.e = defaultE;
-		obj->pObj.f = defaultF;
-		obj->pObj.mass = defaultMass;
+		obj->pObj.e = DEFAULT_E;
+		obj->pObj.f = DEFAULT_F;
+		obj->pObj.mass = DEFAULT_MASS;
 		//selectObj.push_back(obj);
 		HierarchyManager::AddHierarchy(obj);
 		isNew = false;
@@ -836,7 +847,7 @@ void StageEdit::DeselectObj(Object3D* obj)
 	}
 
 	nState = sNone;
-	vGizmo = vNone;
+	//vGizmo = vNone;
 	SetGizmo();
 }
 
@@ -901,6 +912,10 @@ void StageEdit::CloneObj()
 		{
 			tempObj = new Line();
 		}
+		else if (obj->editObj.name == "Camera")
+		{
+			tempObj = new SubCamera();
+		}
 		// 複製されたオブジェクトを一つづつ配列に格納する
 		if(tempObj != nullptr)
 		{
@@ -946,7 +961,8 @@ void StageEdit::Save(int n)
 	// データを書く
 	// セーブするためにオブジェクト探索
 
-	list<Object3D*> objs = FindGameObjects<Object3D>();
+	//list<Object3D*> objs = FindGameObjects<Object3D>();
+	list<Object3D*> objs = HierarchyManager::GetHierarchyList();
 	for (Object3D* obj : objs)
 	{
 		if (obj->IsTag("PLAYER"))
@@ -1036,6 +1052,19 @@ void StageEdit::Save(int n)
 		// 改行
 		ofs << endl;
 		}
+		else if (obj->IsTag("CAMERA"))
+		{
+			if (obj->editObj.name == "Camera")
+			{
+				SubCamera* temp = dynamic_cast<SubCamera*>(obj);
+				int num = temp->GetNum();
+				ofs << "1" << "," << "Camera" << ",";
+				ofs << obj->Position().x << "," << obj->Position().y << "," << obj->Position().z << ",";
+				ofs << obj->Rotation().x << "," << obj->Rotation().y << "," << obj->Rotation().z << ",";
+				ofs << num << ",";
+			}
+			ofs << endl;
+		}
 	}
 	// ファイルを閉じる
 	ofs.close();
@@ -1124,11 +1153,20 @@ void StageEdit::Load(int n)
 				obj = new Line();
 				obj->SetScale(csv->GetVector3(i, 5));
 			}
+			else if (str == "Camera")
+			{
+				SubCamera* camera = new SubCamera(true);
+				camera->SetNum(csv->GetInt(i, 8));
+				obj = camera;
+				obj->SetRotation(csv->GetVector3(i, 5));
+				
+			}
 			else 
 			{
 				continue;
 				//assert(false);
 			}
+			obj->pObj.center = csv->GetVector3(i, 2);
 			obj->SetPosition(csv->GetVector3(i, 2));
 			HierarchyManager::AddHierarchy(obj);
 		}
@@ -1202,7 +1240,8 @@ void StageEdit::CheckResetObj(list<Object3D*> objs)
 			obj->editObj.name == "scoreArea1" ||
 			obj->editObj.name == "scoreArea2" ||
 			obj->editObj.name == "scoreArea3" ||
-			obj->editObj.name == "Line"
+			obj->editObj.name == "Line" ||
+			obj->editObj.name == "Camera"
 			)
 		{
 			// ヒエラルキーから削除
@@ -1277,6 +1316,15 @@ void StageEdit::CreateObjImGui()
 			commandManager.Do(make_shared<CreateCommand<Player>>(temp));
 			pNum++;
 		}
+	}
+	if (ImGui::Button("Camera"))
+	{
+		isNew = true;
+		SubCamera* temp = new SubCamera();
+		//subCm.push_back(temp);
+		//temp->SetNum(ObjectManager::GetObjctList<SubCamera>().size());
+		SelectObj(temp);
+		commandManager.Do(make_shared<CreateCommand<SubCamera>>(temp));
 	}
 	ImGui::End();
 }
@@ -1362,9 +1410,15 @@ void StageEdit::ObjInfoImGui()
 			name = "[" + to_string(i) + "] :" + obj->editObj.name;
 			if (ImGui::BeginTabItem(name.c_str()))
 			{
-				ImGui::SliderFloat("e", &obj->pObj.e, 0.0f, 1.0f, "%.1f");
-				ImGui::SliderFloat("f", &obj->pObj.f, 0.0f, 0.1f, "%.2f");
-				ImGui::InputFloat("mass", &obj->pObj.mass, 0.5f, 1.0f);
+				if (obj->editObj.name == "Camera")
+				{
+					SubCamera* camera = dynamic_cast<SubCamera*>(obj);
+					int num = camera->GetNum();
+					ImGui::InputInt("Number", &num, 0.0f);
+				}
+				ImGui::SliderFloat("E", &obj->pObj.e, 0.0f, 1.0f, "%.1f");
+				ImGui::SliderFloat("F", &obj->pObj.f, 0.0f, 0.1f, "%.2f");
+				ImGui::InputFloat("Mass", &obj->pObj.mass, 0.5f, 1.0f);
 				// 場所
 				ImGui::InputFloat("PositionX", &tmpPos.x, 0.1f, 0.5f, "%.2f");
 				ImGui::InputFloat("PositionY", &tmpPos.y, 0.1f, 0.5f, "%.2f");
@@ -1386,19 +1440,22 @@ void StageEdit::ObjInfoImGui()
 				ImGui::InputFloat("ScaleX", &tmpScale.x, 0.1f, 0.5f, "%.2f");
 				ImGui::InputFloat("scaleY", &tmpScale.y, 0.1f, 0.5f, "%.2f");
 				ImGui::InputFloat("ScaleZ", &tmpScale.z, 0.1f, 0.5f, "%.2f");
-				if (tmpScale.x < 0.1f)
+				if (obj->editObj.isScaling)
 				{
-					tmpScale.x = 0.1f;
+					if (tmpScale.x < 0.1f)
+					{
+						tmpScale.x = 0.1f;
+					}
+					else if (tmpScale.y < 0.1f)
+					{
+						tmpScale.y = 0.1f;
+					}
+					else if (tmpScale.z < 0.1f)
+					{
+						tmpScale.z = 0.1f;
+					}
+					obj->SetScale(tmpScale);
 				}
-				else if (tmpScale.y < 0.1f)
-				{
-					tmpScale.y = 0.1f;
-				}
-				else if (tmpScale.z < 0.1f)
-				{
-					tmpScale.z = 0.1f;
-				}
-				obj->SetScale(tmpScale);
 
 				ImGui::EndTabItem();
 			}

@@ -53,6 +53,8 @@ Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
 	pObj.isPlayer = true;
 	pObj.pNum = playerNum;
 
+	editObj.isScaling = false;
+
 	myE = 0;
 	myF = 0;
 	restShot = RestShot;

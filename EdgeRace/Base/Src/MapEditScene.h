@@ -1,6 +1,7 @@
 #pragma once
 #include "SceneBase.h"
 
+class SplitScreen;
 class MapEditScene : public SceneBase
 {
 public:
@@ -10,4 +11,5 @@ public:
 	void Draw() override;
 private:
 	CSprite* cs;
+	SplitScreen* ss;
 };

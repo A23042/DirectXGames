@@ -3,13 +3,19 @@
 #include "Gizmo3D.h"
 #include "EditorCamera.h"
 #include "EditUI.h"
+#include "SplitScreen.h"
+#include "MainCamera.h"
+#include "SubCamera.h"
+#include "Camera.h"
 
 MapEditScene::MapEditScene()
 {
 	new StageEdit();
-	new EditorCamera();
 	new EditUI();
 	cs = new CSprite;
+	new MainCamera();
+	//new EditorCamera();
+	new Camera(true);
 }
 
 MapEditScene::~MapEditScene()
@@ -23,6 +29,23 @@ void MapEditScene::Update()
 	{
 		SceneManager::ChangeScene("TitleScene");
 	}
+	// ‰æ–Ê•ªŠ„‚ÌØ‚è‘Ö‚¦•û “r’†‚Å‚à“®“I‚ÉØ‚è‘Ö‚¦‰Â”\
+#if 1
+	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_L))
+	{
+		ss = ObjectManager::FindGameObject<SplitScreen>();
+		if (ss->Multi())
+		{
+			ss->SetSingleScreen();
+		}
+		else
+		{
+			ss->SetMultiSizeEditor();
+			ss->SetMultiScreen();
+		}
+	}
+#endif
+
 }
 
 void MapEditScene::Draw()
@@ -35,5 +58,5 @@ void MapEditScene::Draw()
 		cs->DrawLine3D(VECTOR3(2 * i, 0, 100), VECTOR3(2 * i, 0, -100), RGB(255, 255, 255), 0.5f);
 		cs->DrawLine3D(VECTOR3(-2 * i, 0, 100), VECTOR3(-2 * i, 0, -100), RGB(255, 255, 255), 0.5f);
 	}
-	GameDevice()->m_pFont->Draw(400, 15, _T("EDIT SCENE"), 16, RGB(255, 0, 0));
+	//GameDevice()->m_pFont->Draw(400, 15, _T("EDIT SCENE"), 16, RGB(255, 0, 0));
 }

@@ -7,7 +7,7 @@ class Score;
 class SplitScreen;
 class Camera;
 class DataHolder;
-
+class Gizmo3D;
 /// ‰æ–Ê•ªŠ„ƒNƒ‰ƒX
 /// </summary>
 class SplitScreenLastDraw : public Object3D
@@ -26,7 +26,8 @@ private:
 	SplitScreen* ss = nullptr;
 	Camera* cm = nullptr;
 	DataHolder* data = nullptr;
-	CSprite* sp;
+	CSprite* sp = nullptr;
+	Gizmo3D* gizmo = nullptr;
 
 	int p0Score = 0;
 	int p1Score = 0;

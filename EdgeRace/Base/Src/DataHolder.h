@@ -18,5 +18,4 @@ public:
 
 private:
 	bool isPlay = false;
-
 };

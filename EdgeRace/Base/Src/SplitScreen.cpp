@@ -2,6 +2,7 @@
 #include "PlayScene.h"
 #include "Camera.h"
 #include "SplitScreenLastDraw.h"
+#include "EditorCamera.h"
 
 SplitScreen::SplitScreen()
 {
@@ -87,11 +88,15 @@ SplitScreen::SplitScreen()
 	multi = false;
 	multiNo = 0;
 	GameDevice()->m_pD3D->m_pDeviceContext->RSSetViewports(1, &vpSingle);
-
+	spr = new CSprite();
+	black = new CSpriteImage();
+	black->Load("Data/Image/BlackGround.png");
 }
 
 SplitScreen::~SplitScreen()
 {
+	SAFE_DELETE(spr);
+	SAFE_DELETE(black);
 }
 
 void SplitScreen::Start()
@@ -109,9 +114,65 @@ void SplitScreen::SetSingleScreen()
 void SplitScreen::SetMultiScreen()
 {
 	multi = true;
-	GameDevice()->m_mProj = GameDevice()->m_mProjVerticalLong;	  // 縦横比 縦長(２画面のとき)
-	//GameDevice()->m_mProj = GameDevice()->m_mProjStandard;	  // 縦横比 標準
+	if (isEditor)
+	{
+		GameDevice()->m_mProj = GameDevice()->m_mProjStandard;	  // 縦横比 標準
+	}
+	else
+	{
+		GameDevice()->m_mProj = GameDevice()->m_mProjVerticalLong;	  // 縦横比 縦長(２画面のとき)
+	}
 	ObjectManager::SetDrawTimes((int)vpMulti.size());
+}
+
+void SplitScreen::SetMultiSizeEditor()
+{
+	isEditor = true;
+	vpMulti.clear();
+	D3D11_VIEWPORT vp = {};
+	// 多画面(２画面)	---------------------------
+	// 左半分画面　[0]
+	vpMulti.emplace_back(vp);
+	vpMulti.back().Width = WINDOW_WIDTH;
+	vpMulti.back().Height = WINDOW_HEIGHT;
+	vpMulti.back().MinDepth = 0.0f;
+	vpMulti.back().MaxDepth = 1.0f;
+	vpMulti.back().TopLeftX = 0;
+	vpMulti.back().TopLeftY = 0;
+
+	// 右半分画面　[1]
+	vpMulti.emplace_back(vp);
+	vpMulti.back().Width = WINDOW_WIDTH / 4;
+	vpMulti.back().Height = WINDOW_HEIGHT / 4;
+	vpMulti.back().MinDepth = 0.0f;
+	vpMulti.back().MaxDepth = 1.0f;
+	vpMulti.back().TopLeftX = WINDOW_WIDTH - WINDOW_WIDTH / 3;
+	vpMulti.back().TopLeftY = WINDOW_HEIGHT - WINDOW_HEIGHT / 3;
+}
+
+void SplitScreen::SetMultiSizePlay()
+{
+	isEditor = false;
+	vpMulti.clear();
+	D3D11_VIEWPORT vp = {};
+	// 多画面(２画面)	---------------------------
+	// 左半分画面　[0]
+	vpMulti.emplace_back(vp);
+	vpMulti.back().Width = WINDOW_WIDTH / 2;
+	vpMulti.back().Height = WINDOW_HEIGHT;
+	vpMulti.back().MinDepth = 0.0f;
+	vpMulti.back().MaxDepth = 1.0f;
+	vpMulti.back().TopLeftX = 0;
+	vpMulti.back().TopLeftY = 0;
+
+	// 右半分画面　[1]
+	vpMulti.emplace_back(vp);
+	vpMulti.back().Width = WINDOW_WIDTH / 2;
+	vpMulti.back().Height = WINDOW_HEIGHT;
+	vpMulti.back().MinDepth = 0.0f;
+	vpMulti.back().MaxDepth = 1.0f;
+	vpMulti.back().TopLeftX = WINDOW_WIDTH / 2;
+	vpMulti.back().TopLeftY = 0;
 }
 
 
@@ -120,6 +181,16 @@ void SplitScreen::Draw()
 	Camera* cm = ObjectManager::FindGameObject<Camera>();
 	if (multi)
 	{
+		// Ｚバッファのみ全クリヤーする。（画面は消さずに、Ｚバッファのみクリヤーする）
+		// この処理は、ここで３Ｄオブジェクトの描画を行うときは必須
+		// ２Ｄスプライトのみ描画を行うときは不要
+		if (GameDevice()->m_pD3D->m_pTarget_DSTexDSV)
+		{
+		    GameDevice()->m_pD3D->m_pDeviceContext->ClearDepthStencilView(GameDevice()->m_pD3D->m_pTarget_DSTexDSV, D3D11_CLEAR_DEPTH, 1.0f, 0); // 深度バッファクリア
+		}
+		
+		spr->Draw(black, vpMulti.back().TopLeftX, vpMulti.back().TopLeftY, 0, 0, vpMulti.back().Width, vpMulti.back().Height, 1.0f);
+
 		// 多画面
 		GameDevice()->m_pD3D->m_pDeviceContext->RSSetViewports(1, &vpMulti[ObjectManager::DrawCounter()]);
 

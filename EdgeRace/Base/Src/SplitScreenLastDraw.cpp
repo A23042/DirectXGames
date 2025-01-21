@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "Score.h"
 #include "SplitScreen.h"
+#include "Gizmo3D.h"
 
 const float scoreViewTime = 0.5f;
 const float scoreUpTime = 0.1f;
@@ -105,7 +106,7 @@ void SplitScreenLastDraw::Update()
 
 void SplitScreenLastDraw::Draw()
 {
-	//if (cm == nullptr)
+	if (cm == nullptr)
 	{
 		cm = ObjectManager::FindGameObject<Camera>();
 	}
@@ -122,9 +123,9 @@ void SplitScreenLastDraw::Draw()
 			// Ｚバッファのみ全クリヤーする。（画面は消さずに、Ｚバッファのみクリヤーする）
 			// この処理は、ここで３Ｄオブジェクトの描画を行うときは必須
 			// ２Ｄスプライトのみ描画を行うときは不要
-			//if (GameDevice()->m_pD3D->m_pTarget_DSTexDSV){
-			//    GameDevice()->m_pD3D->m_pDeviceContext->ClearDepthStencilView(GameDevice()->m_pD3D->m_pTarget_DSTexDSV, D3D11_CLEAR_DEPTH, 1.0f, 0); // 深度バッファクリア
-			//}
+			if (GameDevice()->m_pD3D->m_pTarget_DSTexDSV){
+			    GameDevice()->m_pD3D->m_pDeviceContext->ClearDepthStencilView(GameDevice()->m_pD3D->m_pTarget_DSTexDSV, D3D11_CLEAR_DEPTH, 1.0f, 0); // 深度バッファクリア
+			}
 
 			GameDevice()->m_vEyePt = cm->EyePt(0); // カメラ座標
 			GameDevice()->m_vLookatPt = cm->LookatPt(0); // 注視点
@@ -136,52 +137,60 @@ void SplitScreenLastDraw::Draw()
 			// ここに最後に画面全体に描画したい処理を書く
 			// 例えば、枠線スプライトや全体ステータスの描画など
 
-			// ゲージ表示
-			pls = ObjectManager::FindGameObjects<Player>();
-			for (Player* pl : pls)
+			// PlaySceneとEditSceneで処理を分ける
+			if (data != nullptr)
 			{
-				switch (pl->GetPlNum())
+				// ゲージ表示
+				pls = ObjectManager::FindGameObjects<Player>();
+				for (Player* pl : pls)
 				{
-				case 0:
-					baseSpr->Draw(base, posX, posY, 0, 0, width, height);
-					gageSpr->Draw(gage, posX, posY, 0, 0, width * pl->GetRate(0), height);
-					break;
-				case 1:
-					baseSpr->Draw(base, WINDOW_WIDTH / 2 + posX, posY, 0, 0, width, height);
-					gageSpr->Draw(gage, WINDOW_WIDTH / 2 + posX, posY, 0, 0, width * pl->GetRate(1), height);
-					break;
+					switch (pl->GetPlNum())
+					{
+					case 0:
+						baseSpr->Draw(base, posX, posY, 0, 0, width, height);
+						gageSpr->Draw(gage, posX, posY, 0, 0, width * pl->GetRate(0), height);
+						break;
+					case 1:
+						baseSpr->Draw(base, WINDOW_WIDTH / 2 + posX, posY, 0, 0, width, height);
+						gageSpr->Draw(gage, WINDOW_WIDTH / 2 + posX, posY, 0, 0, width * pl->GetRate(1), height);
+						break;
+					}
 				}
-			}
-			
-			char strP0[64]; // 文字列を用意
-			sprintf_s<64>(strP0, "P0Score: %2d", score->GetP0Score());
-			GameDevice()->m_pFont->Draw(40, 40, strP0, 48, RGB(255, 255, 255));
 
-			sprintf_s<64>(strP0, "P1Score: %2d", score->GetP1Score());
-			GameDevice()->m_pFont->Draw(WINDOW_WIDTH - 280, 40, strP0, 48, RGB(255, 255, 255));
+				char strP0[64]; // 文字列を用意
+				sprintf_s<64>(strP0, "P0Score: %2d", score->GetP0Score());
+				GameDevice()->m_pFont->Draw(40, 40, strP0, 48, RGB(255, 255, 255));
 
-			// スコア表示
-			if(!data->IsPlay())
-			{
-				sp->DrawRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, RGB(0, 0, 0), 0.2f);
+				sprintf_s<64>(strP0, "P1Score: %2d", score->GetP1Score());
+				GameDevice()->m_pFont->Draw(WINDOW_WIDTH - 280, 40, strP0, 48, RGB(255, 255, 255));
 
-				float x = WINDOW_WIDTH / 3;
+				// スコア表示
+				if (!data->IsPlay())
+				{
+					sp->DrawRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, RGB(0, 0, 0), 0.2f);
+
+					float x = WINDOW_WIDTH / 3;
 #if 1
-				GameDevice()->m_pFont->Draw(x, 0, "RESULT", 64, RGB(255, 255, 255));
-				if (timer >= scoreViewTime) {
-					char strP0[64]; // 文字列を用意
-					sprintf_s<64>(strP0, "Player0Score: %6d", viewP0Score);
-					GameDevice()->m_pFont->Draw(x, 200, strP0, 64, RGB(255, 255, 255));
+					GameDevice()->m_pFont->Draw(x, 0, "RESULT", 64, RGB(255, 255, 255));
+					if (timer >= scoreViewTime) {
+						char strP0[64]; // 文字列を用意
+						sprintf_s<64>(strP0, "Player0Score: %6d", viewP0Score);
+						GameDevice()->m_pFont->Draw(x, 200, strP0, 64, RGB(255, 255, 255));
 
-					char strP1[64]; // 文字列を用意
-					sprintf_s<64>(strP1, "Player1Score: %6d", viewP1Score);
-					GameDevice()->m_pFont->Draw(x, 400, strP1, 64, RGB(255, 255, 255));
+						char strP1[64]; // 文字列を用意
+						sprintf_s<64>(strP1, "Player1Score: %6d", viewP1Score);
+						GameDevice()->m_pFont->Draw(x, 400, strP1, 64, RGB(255, 255, 255));
+					}
+					if (viewP0Score >= score->GetP0Score() && viewP1Score >= score->GetP1Score()) {
+						GameDevice()->m_pFont->Draw(x, 600, "PUSH R KEY", 64, RGB(255, 255, 255));
+					}
 				}
-				if (viewP0Score >= score->GetP0Score() && viewP1Score >= score->GetP1Score()) {
-					GameDevice()->m_pFont->Draw(x, 600, "PUSH R KEY", 64, RGB(255, 255, 255));
-				}
-			}
 #endif
+			}
+			else
+			{
+			}
+
 			//baseSpr->Draw(redArea, 0, 0, 0, 0, redArea->m_dwImageWidth, redArea->m_dwImageHeight, 0.6f);
 
 			// -----------------------------------------------------------------

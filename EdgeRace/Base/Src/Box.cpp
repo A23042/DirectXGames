@@ -54,7 +54,7 @@ void Box::Update()
 void Box::Draw()
 {
 	mesh->Render(transform.matrix());
-#if 0
+#if 1
 	// 各辺の頂点パーツ
 	int edgePoint[12][2] = {
 		{0, 1}, {1, 2}, {2, 3}, {3, 0},//正面：右、　下、　左、　下
@@ -64,22 +64,11 @@ void Box::Draw()
 
 	vPos = transform.scale / 2;
 	CubeSize(vPos.x, vPos.y, vPos.z);
-
-	// 選択されている場合自身のアウトライを表示させる
-	if(editObj.isSelect)
-	{	
-		for (int i = 0; i < 12; i++)
-		{
-			spr->DrawLine3D(vertex[edgePoint[i][1]], vertex[edgePoint[i][0]], RGB(0, 255, 50), 1.0f);
-		}
-	}
-	else
+	for (int i = 0; i < 12; i++)
 	{
-		for (int i = 0; i < 12; i++)
-		{
-			spr->DrawLine3D(vertex[edgePoint[i][1]], vertex[edgePoint[i][0]], RGB(0, 0, 0), 1.0f);
-		}
+		spr->DrawLine3D(vertex[edgePoint[i][1]], vertex[edgePoint[i][0]], RGB(0, 0, 0), 1.0f);
 	}
+
 #endif
 }
 

@@ -117,9 +117,12 @@ PlayScene::PlayScene(int num)
 			}
 			else 
 			{
-				assert(false);
+				//assert(false);
 			}
-			obj->SetPosition(csv->GetVector3(i, 2));
+			if (obj != nullptr)
+			{
+				obj->SetPosition(csv->GetVector3(i, 2));
+			}
 		}
 	}
 	Instantiate<Camera>();
@@ -160,6 +163,7 @@ void PlayScene::Update()
 		}
 		else
 		{
+			ss->SetMultiSizePlay();
 			ss->SetMultiScreen();
 		}
 	}

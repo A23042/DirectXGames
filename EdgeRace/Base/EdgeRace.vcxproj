@@ -557,6 +557,7 @@
     <ClInclude Include="Src\LoadStage.h" />
     <ClInclude Include="Src\Macro.h" />
     <ClInclude Include="Src\Main.h" />
+    <ClInclude Include="Src\MainCamera.h" />
     <ClInclude Include="Src\MainControl.h" />
     <ClInclude Include="Src\MapEditScene.h" />
     <ClInclude Include="Src\MenuPanel.h" />
@@ -589,6 +590,7 @@
     <ClInclude Include="Src\SplitScreenLastDraw.h" />
     <ClInclude Include="Src\Sprite3D.h" />
     <ClInclude Include="Src\StageEdit.h" />
+    <ClInclude Include="Src\SubCamera.h" />
     <ClInclude Include="Src\TitleScene.h" />
     <ClInclude Include="Src\XAudio.h" />
   </ItemGroup>
@@ -625,6 +627,7 @@
     <ClCompile Include="Src\Line.cpp" />
     <ClCompile Include="Src\LoadStage.cpp" />
     <ClCompile Include="Src\Main.cpp" />
+    <ClCompile Include="Src\MainCamera.cpp" />
     <ClCompile Include="Src\MainControl.cpp" />
     <ClCompile Include="Src\MapEditScene.cpp" />
     <ClCompile Include="Src\MenuPanel.cpp" />
@@ -656,6 +659,7 @@
     <ClCompile Include="Src\SplitScreenLastDraw.cpp" />
     <ClCompile Include="Src\Sprite3D.cpp" />
     <ClCompile Include="Src\StageEdit.cpp" />
+    <ClCompile Include="Src\SubCamera.cpp" />
     <ClCompile Include="Src\TitleScene.cpp" />
     <ClCompile Include="Src\XAudio.cpp" />
   </ItemGroup>

@@ -322,7 +322,12 @@ namespace ObjectManager {
 	/// </summary>
 	/// <typeparam name="C">任意のオブジェクトクラス型</typeparam>
 	template<class C> std::list<C*> anyObjList;	// 任意のオブジェクトリスト
-
+	
+	template<class C> std::list<C*> GetObjctList()
+	{
+		return anyObjList<C>;
+	}
+	
 	/// 2024.11.25 S.Matsunaga
 	/// <summary>
 	/// 任意のオブジェクトリストに追加する

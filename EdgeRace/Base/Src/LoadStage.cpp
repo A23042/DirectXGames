@@ -14,10 +14,14 @@
 #include "ScoreArea.h"
 #include "FallCheck.h"
 #include "Line.h"
+#include "SplitScreen.h"
+#include "SubCamera.h"
 
 LoadStage::LoadStage()
 {
 	ObjectManager::SetVisible(this, false);
+	timeCount = 0.0f;
+	moveTime = 4.0f;
 }
 
 LoadStage::~LoadStage()
@@ -26,14 +30,42 @@ LoadStage::~LoadStage()
 
 void LoadStage::Start()
 {
+	ss = ObjectManager::FindGameObject<SplitScreen>();
+	camera = ObjectManager::FindGameObject<Camera>();
 }
 
 void LoadStage::Update()
 {
+	if (!ss->Multi())
+	{
+		if (isLoad)
+		{
+			timeCount += SceneManager::DeltaTime();
+			float rate = timeCount / moveTime;	// 割合移動
+			if (rate >= 1)
+			{
+				rate = 1;
+			}
+			VECTOR3 position = (endPos - startPos) * rate + startPos;
+			camera->SetPosition(position);
+		}
+		VECTOR3 pos = camera->Position();
+		if (pos == endPos)
+		{
+			ss->SetMultiScreen();
+			isLoad = false;
+			timeCount = 0.0f;
+		}
+	}
 }
 
 void LoadStage::Load(int num)
 {
+	isLoad = true;
+	if (ss != nullptr)
+	{
+		ss->SetSingleScreen();
+	}
 	// 現在配置されているオブジェクトをリセット
 	std::list<Object3D*> objs = ObjectManager::FindGameObjects<Object3D>();
 	for (Object3D* obj : objs)
@@ -59,7 +91,7 @@ void LoadStage::Load(int num)
 	sprintf_s<64>(name, "data/TestStageCsv/testStage%02d.csv", num);
 #endif
 	CsvReader* csv = new CsvReader(name);
-
+	SubCamera* temp = nullptr;
 	assert(csv->GetLines() > 0);
 	for (int i = 0; i < csv->GetLines(); i++)
 	{	// １行ずつ読む
@@ -76,9 +108,6 @@ void LoadStage::Load(int num)
 			str = csv->GetString(i, 1);
 			if (str == "PLAYER")
 			{
-				float x = csv->GetFloat(i, 2);
-				float y = csv->GetFloat(i, 3);
-				float z = csv->GetFloat(i, 4);
 				float rotY = csv->GetFloat(i, 5);
 				float e = csv->GetFloat(i, 6);
 				float f = csv->GetFloat(i, 7);
@@ -91,8 +120,8 @@ void LoadStage::Load(int num)
 					if (pl->GetPlNum() == num)
 					{
 						obj = pl;
-						obj->SetPosition(x, y, z);
-						obj->pObj.center = VECTOR3(x, y, z);
+						obj->pObj.center = csv->GetVector3(i, 2);
+						obj->SetPosition(obj->pObj.center);
 						obj->SetRotation(VECTOR3(0, rotY, 0));
 						obj->pObj.e = e;
 						obj->pObj.f = f;
@@ -106,8 +135,8 @@ void LoadStage::Load(int num)
 			else if (str == "BOX")
 			{
 				Box* box = nullptr;
-				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
-				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
+				VECTOR3 size = csv->GetVector3(i, 5);
+				VECTOR3 rot = csv->GetVector3(i, 8);
 				float e = csv->GetFloat(i, 11);
 				float f = csv->GetFloat(i, 12);
 				box = new Box(size, rot);	// 直方体のサイズと回転量を渡す
@@ -118,10 +147,10 @@ void LoadStage::Load(int num)
 			}
 			else if (str == "MBox")
 			{
-				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
-				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
-				VECTOR3 move = VECTOR3(csv->GetFloat(i, 11), csv->GetFloat(i, 12), csv->GetFloat(i, 13));
-				VECTOR3 moveSpeed = VECTOR3(csv->GetFloat(i, 14), csv->GetFloat(i, 15), csv->GetFloat(i, 16));
+				VECTOR3 size = csv->GetVector3(i, 5);
+				VECTOR3 rot = csv->GetVector3(i, 8);
+				VECTOR3 move = csv->GetVector3(i, 11);
+				VECTOR3 moveSpeed = csv->GetVector3(i, 14);
 				float e = csv->GetFloat(i, 17);
 				float f = csv->GetFloat(i, 18);
 				obj = new MoveBox(size, rot, move, moveSpeed);	// 直方体のサイズと回転量、移動量を渡す
@@ -143,24 +172,24 @@ void LoadStage::Load(int num)
 			}
 			else if (str == "Area1")
 			{
-				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
-				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
+				VECTOR3 size = csv->GetVector3(i, 5);
+				VECTOR3 rot = csv->GetVector3(i, 8);
 				ScoreArea* area = new ScoreArea1(size, rot);
 				//collManager->AddArea(area);
 				obj = area;
 			}
 			else if (str == "Area2")
 			{
-				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
-				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
+				VECTOR3 size = csv->GetVector3(i, 5);
+				VECTOR3 rot = csv->GetVector3(i, 8);
 				ScoreArea* area = new ScoreArea2(size, rot);
 				//collManager->AddArea(area);
 				obj = area;
 			}
 			else if (str == "Area3")
 			{
-				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
-				VECTOR3 rot = VECTOR3(csv->GetFloat(i, 8), csv->GetFloat(i, 9), csv->GetFloat(i, 10));
+				VECTOR3 size = csv->GetVector3(i, 5);
+				VECTOR3 rot = csv->GetVector3(i, 8);
 				ScoreArea* area = new ScoreArea3(size, rot);
 				//collManager->AddArea(area);
 				obj = area;
@@ -183,22 +212,34 @@ void LoadStage::Load(int num)
 					line = new Line(true);
 				}
 				obj = line;
-				VECTOR3 size = VECTOR3(csv->GetFloat(i, 5), csv->GetFloat(i, 6), csv->GetFloat(i, 7));
+				VECTOR3 size = csv->GetVector3(i, 5);
 				obj->SetScale(size);
 			}
-			else
+			else if (str == "Camera")
 			{
-				assert(false);
+				temp = new SubCamera(false);
+				VECTOR3 rot = csv->GetVector3(i, 5);
+				int num = csv->GetInt(i, 8);
+				if (num == 1)
+				{
+					startPos = csv->GetVector3(i, 2);
+					camera->SetPosition(startPos);
+				}
+				temp->SetNum(num);
+				temp->SetPosition(csv->GetVector3(i, 2));
+				temp->SetRotation(rot);
+				obj = temp;
 			}
-			float x = csv->GetFloat(i, 2);
-			float y = csv->GetFloat(i, 3);
-			float z = csv->GetFloat(i, 4);
 			if(obj != nullptr)
 			{
-				obj->SetPosition(x, y, z);
-				obj->pObj.center = VECTOR3(x, y, z);
+				obj->pObj.center = csv->GetVector3(i, 2);
+				obj->SetPosition(obj->pObj.center);
 			}
 		}
+	}
+	if (temp != nullptr)
+	{
+		endPos = temp->Position();
 	}
 	SAFE_DELETE(csv);
 }

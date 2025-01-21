@@ -76,6 +76,7 @@ public:
 	{
 		std::string name = "";	// オブジェクトの名前
 		bool isSelect = false;	// 選択状態かどうか
+		bool isScaling = true;	// スケールの変更を許可するか
 	}editObj;
 
 	void SetPosition(const VECTOR3& pos);

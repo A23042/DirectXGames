@@ -15,12 +15,16 @@ public:
 
 	void SetSingleScreen();
 	void SetMultiScreen();
+	void SetMultiSizeEditor();
+	void SetMultiSizePlay();
 	int  MultiSize() { return (int)vpMulti.size(); }
 	bool Multi() { return multi; }
 private:
 	bool multi;
+	bool isEditor = false;
 	D3D11_VIEWPORT vpSingle;
 	std::vector<D3D11_VIEWPORT> vpMulti;
 	int  multiNo;
-
+	CSprite* spr;
+	CSpriteImage* black;
 };
