@@ -1,16 +1,42 @@
 #include "Frustum.h"
 #include "HierarchyManager.h"
+#include "SplitScreen.h"
+#include "Camera.h"
 
 namespace
 {
 	VECTOR3 normal[6] = {};
 	float d[6] = {};
+	SplitScreen* ss = nullptr;
+	Camera* camera = nullptr;
 }
 
 void Frustum::CreateFrustum(POINT startPos, POINT endPos)
 {
-	
-	MATRIX4X4 mView = GameDevice()->m_mView;
+	MATRIX4X4 mView;
+	if (camera == nullptr)
+	{
+		camera = ObjectManager::FindGameObject<Camera>();
+	}
+	if (ss == nullptr)
+	{
+		ss = ObjectManager::FindGameObject<SplitScreen>();
+	}
+	else
+	{
+		if (ss->Multi())
+		{
+			if (camera != nullptr)
+			{
+				mView = camera->View(0);
+			}
+		}
+		else
+		{
+			mView = GameDevice()->m_mView;
+		}
+	}
+
 	MATRIX4X4 mPrj = GameDevice()->m_mProj;
 	MATRIX4X4 identity = XMMatrixIdentity();
 
