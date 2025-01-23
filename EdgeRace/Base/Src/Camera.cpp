@@ -4,8 +4,8 @@
 #include "SubCamera.h"
 #include "MainCamera.h"
 //                                      後方視点　　　　　　真上視点
-static const VECTOR3 CameraPos[] = { VECTOR3(0, 8, -18), VECTOR3(0, 10, -0.5) };
-static const VECTOR3 LookPos[] =   { VECTOR3(0, 0,  3), VECTOR3(0,  1,  1  ) };
+static const VECTOR3 CameraPos[] = { VECTOR3(0, 8, -18), VECTOR3(0, 0, 0) };
+static const VECTOR3 LookPos[] =   { VECTOR3(0, 0,  3), VECTOR3(0, -3, 10) };
 static const float CHANGE_TIME_LIMIT = 0.5f; // 秒
 
 Camera::Camera(bool isEditor)
@@ -110,8 +110,12 @@ void Camera::Update()
 					*/
 					break;
 				case 1:
-					SubCamera * sub = ObjectManager::FindGameObject<SubCamera>();
-					updateCamera(i, sub->Position(), sub->GetLookPos());
+					if (subCam == nullptr)
+					{
+						subCam = ObjectManager::FindGameObject<SubCamera>();
+
+					}
+					updateCamera(i, subCam->Position(), subCam->GetLookPos());
 					/*
 					transform.position = sub->Position();
 					lookPosition = sub->GetLookPos();
@@ -131,6 +135,18 @@ void Camera::Update()
 	}
 	else 
 	{
+		if (!isEditor)
+		{
+			//mainCam = ObjectManager::FindGameObject<MainCamera>();
+			//updateCamera(0, mainCam->Position(), mainCam->GetLookPos());
+
+			updateCamera(0, transform.position, transform.rotation);
+		}
+		else
+		{
+			mainCam = ObjectManager::FindGameObject<MainCamera>();
+			updateCamera(0, mainCam->Position(), mainCam->GetLookPos());
+		}
 		// １画面のときPlayer視点
 		/*
 		Player* pc = ObjectManager::FindGameObject<Player>();
@@ -208,28 +224,27 @@ void Camera::updateCamera(int counter, VECTOR3 pos, VECTOR3 rot)
 		lookPosition = rot;
 	}
 
+	// ------------------------------------------------------------------
+	// カメラ座標を配列に設定する
+	eyePt[counter] = transform.position;   // カメラ座標
+	lookatPt[counter] = lookPosition;      // 注視点
+	view[counter] = XMMatrixLookAtLH(	    // ビューマトリックス
+		transform.position,
+		lookPosition,
+		VECTOR3(0, 1, 0));
 
-			// ------------------------------------------------------------------
-			// カメラ座標を配列に設定する
-			eyePt[counter] = transform.position;   // カメラ座標
-			lookatPt[counter] = lookPosition;      // 注視点
-			view[counter] = XMMatrixLookAtLH(	    // ビューマトリックス
-				transform.position,
-				lookPosition,
-				VECTOR3(0, 1, 0));
-
-			// ------------------------------------------------------------------
-			// 視点からの距離の２乗をDrawObjectに設定する
-			// これは、視点からの距離の降順に描画したいため
+	// ------------------------------------------------------------------
+	// 視点からの距離の２乗をDrawObjectに設定する
+	// これは、視点からの距離の降順に描画したいため
+	{
+		std::list<Object3D*> objList = ObjectManager::FindGameObjects<Object3D>();
+		for (Object3D*& obj : objList)
+		{
+			if (obj != this)
 			{
-				std::list<Object3D*> objList = ObjectManager::FindGameObjects<Object3D>();
-				for (Object3D*& obj : objList)
-				{
-					if (obj != this)
-					{
-						float distQ = magnitudeSQ(obj->Position() - transform.position);
-						ObjectManager::SetEyeDist(obj, distQ, counter);  // 視点からの距離の２乗をDrawObjectに設定
-					}
-				}
+				float distQ = magnitudeSQ(obj->Position() - transform.position);
+				ObjectManager::SetEyeDist(obj, distQ, counter);  // 視点からの距離の２乗をDrawObjectに設定
 			}
+		}
+	}
 }

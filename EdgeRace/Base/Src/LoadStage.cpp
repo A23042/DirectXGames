@@ -47,7 +47,9 @@ void LoadStage::Update()
 				rate = 1;
 			}
 			VECTOR3 position = (endPos - startPos) * rate + startPos;
+			VECTOR3 rotation = (endRot - startRot) * rate + startRot;
 			camera->SetPosition(position);
+			camera->SetRotation(rotation);
 		}
 		VECTOR3 pos = camera->Position();
 		if (pos == endPos)
@@ -70,12 +72,15 @@ void LoadStage::Load(int num)
 	std::list<Object3D*> objs = ObjectManager::FindGameObjects<Object3D>();
 	for (Object3D* obj : objs)
 	{
-		if (obj->editObj.name == "Box"
+		if (obj->editObj.name == "Player"
+			|| obj->editObj.name == "Box"
 			|| obj->editObj.name == "MoveBox"
 			|| obj->editObj.name == "Ball"
 			|| obj->editObj.name == "scoreArea1"
 			|| obj->editObj.name == "scoreArea2"
 			|| obj->editObj.name == "scoreArea3"
+			|| obj->editObj.name == "Line"
+			|| obj->editObj.name == "Camera"
 			)
 		{
 			obj->DestroyMe();
@@ -113,24 +118,13 @@ void LoadStage::Load(int num)
 				float f = csv->GetFloat(i, 7);
 				float mass = csv->GetFloat(i, 8);
 				int num = csv->GetFloat(i, 9);
-				// Player‚ÍÄ“x¶¬‚¹‚¸‚à‚Æ‚à‚Æ‚ ‚éPlayer‚ğg‚¤
-				std::list<Player*> pls = ObjectManager::FindGameObjects<Player>();
-				for (Player* pl : pls)
-				{
-					if (pl->GetPlNum() == num)
-					{
-						obj = pl;
-						obj->pObj.center = csv->GetVector3(i, 2);
-						obj->SetPosition(obj->pObj.center);
-						obj->SetRotation(VECTOR3(0, rotY, 0));
-						obj->pObj.e = e;
-						obj->pObj.f = f;
-						obj->pObj.mass = mass;
-						pl->Reset();
-						continue;
-					}
-				}
-				//obj = new Player(num);
+				player[num] = new Player(num);
+				obj = player[num];
+				obj->SetRotation(VECTOR3(0, rotY, 0));
+				obj->pObj.e = e;
+				obj->pObj.f = f;
+				obj->pObj.mass = mass;
+
 			}
 			else if (str == "BOX")
 			{
@@ -217,6 +211,10 @@ void LoadStage::Load(int num)
 			}
 			else if (str == "Camera")
 			{
+				if (camera == nullptr)
+				{
+					camera = ObjectManager::FindGameObject<Camera>();
+				}
 				temp = new SubCamera(false);
 				VECTOR3 rot = csv->GetVector3(i, 5);
 				int num = csv->GetInt(i, 8);
@@ -224,6 +222,8 @@ void LoadStage::Load(int num)
 				{
 					startPos = csv->GetVector3(i, 2);
 					camera->SetPosition(startPos);
+					startRot = csv->GetVector3(i, 5);
+					camera->SetRotation(startRot);
 				}
 				temp->SetNum(num);
 				temp->SetPosition(csv->GetVector3(i, 2));
@@ -240,6 +240,7 @@ void LoadStage::Load(int num)
 	if (temp != nullptr)
 	{
 		endPos = temp->Position();
+		endRot = temp->Rotation();
 	}
 	SAFE_DELETE(csv);
 }

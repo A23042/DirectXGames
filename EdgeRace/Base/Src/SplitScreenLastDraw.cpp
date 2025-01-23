@@ -127,9 +127,12 @@ void SplitScreenLastDraw::Draw()
 			    GameDevice()->m_pD3D->m_pDeviceContext->ClearDepthStencilView(GameDevice()->m_pD3D->m_pTarget_DSTexDSV, D3D11_CLEAR_DEPTH, 1.0f, 0); // 深度バッファクリア
 			}
 
-			GameDevice()->m_vEyePt = cm->EyePt(0); // カメラ座標
-			GameDevice()->m_vLookatPt = cm->LookatPt(0); // 注視点
-			GameDevice()->m_mView = cm->View(0);   // ビューマトリックス
+			if (cm != nullptr)
+			{
+				GameDevice()->m_vEyePt = cm->EyePt(0); // カメラ座標
+				GameDevice()->m_vLookatPt = cm->LookatPt(0); // 注視点
+				GameDevice()->m_mView = cm->View(0);   // ビューマトリックス
+			}
 
 			// -----------------------------------------------------------------
 

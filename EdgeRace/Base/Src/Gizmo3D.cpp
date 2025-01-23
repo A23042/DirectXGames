@@ -1,6 +1,6 @@
 #include "Gizmo3D.h"
-#include "EditorCamera.h"
 #include "SplitScreen.h"
+#include "Camera.h"
 
 Gizmo3D::Gizmo3D()
 {
@@ -17,7 +17,7 @@ Gizmo3D::~Gizmo3D()
 
 void Gizmo3D::Update()
 {
-	EditorCamera* cm = ObjectManager::FindGameObject<EditorCamera>();
+	Camera* cm = ObjectManager::FindGameObject<Camera>();
 	// 3DGizmo表示位置
 	// 常にWindowの左下に配置する
 	if (cm != nullptr)

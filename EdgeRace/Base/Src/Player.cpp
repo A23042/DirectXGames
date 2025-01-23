@@ -59,21 +59,15 @@ Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
 	myF = 0;
 	restShot = RestShot;
 	SetDrawOrder(-100);
+	ObjectManager::AddObj(this);
 }
 
 Player::~Player()
 {
 	child->DestroyMe();
-	if (mesh != nullptr)
-	{
-		delete mesh;
-		mesh = nullptr;
-	}
-	if (meshCol != nullptr)
-	{
-		delete meshCol;
-		meshCol = nullptr;
-	}
+	SAFE_DELETE(mesh);
+	SAFE_DELETE(meshCol);
+	ObjectManager::RemoveObj(this);
 }
 
 void Player::Start()

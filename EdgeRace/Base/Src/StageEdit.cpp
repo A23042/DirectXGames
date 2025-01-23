@@ -183,6 +183,26 @@ void StageEdit::Update()
 		DeselectObj();
 	}
 	
+	// カメラが一つ選択されているときだけ右下のウィンドウに投影する
+	if (pDI->CheckKey(KD_TRG, DIK_L))
+	{
+		// セレクトされているオブジェクトが一つの場合かつ
+		// それがカメラオブジェクトだったら
+		if (ObjectManager::GetObjctList<SubCamera>().size() >= 1)
+		{
+			ss = ObjectManager::FindGameObject<SplitScreen>();
+			if (ss->Multi())
+			{
+				ss->SetSingleScreen();
+			}
+			else
+			{
+				ss->SetMultiSizeEditor();
+				ss->SetMultiScreen();
+			}
+
+		}
+	}
 }
 
 void StageEdit::Draw()
@@ -433,6 +453,21 @@ void StageEdit::HasUpdate()
 		}
 		isDrag = false;
 	}
+
+	// 選択されてるオブジェクトの中にカメラがあればそのカメラ視点を右下に映す
+	//if(// カメラが選択されているか)
+	{
+		//if (// 選択されているカメラが一つだったら)
+		{
+
+		}
+		//else
+		{
+			// 複数選択されている場合番号の早いものを投影する
+		}
+		// 画面を分割する
+	}
+
 }
 void StageEdit::GizmoUpdate()
 {
@@ -740,6 +775,15 @@ void StageEdit::SelectObj(Object3D* obj)
 	{
 		DeselectObj();
 		selectObj.push_back(obj);
+		if (obj->editObj.name == "Camera")
+		{
+			Camera* camera = FindGameObject<Camera>();
+			camera->SetSubCamera(dynamic_cast<SubCamera*>(obj));
+			SplitScreen* ss = FindGameObject<SplitScreen>();
+			ss->SetMultiSizeEditor();
+			ss->SetMultiScreen();
+		}
+
 	}
 	if (isNew)
 	{

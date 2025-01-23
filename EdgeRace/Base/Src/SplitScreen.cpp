@@ -2,7 +2,6 @@
 #include "PlayScene.h"
 #include "Camera.h"
 #include "SplitScreenLastDraw.h"
-#include "EditorCamera.h"
 
 SplitScreen::SplitScreen()
 {
@@ -189,7 +188,11 @@ void SplitScreen::Draw()
 		    GameDevice()->m_pD3D->m_pDeviceContext->ClearDepthStencilView(GameDevice()->m_pD3D->m_pTarget_DSTexDSV, D3D11_CLEAR_DEPTH, 1.0f, 0); // 深度バッファクリア
 		}
 		
-		spr->Draw(black, vpMulti.back().TopLeftX, vpMulti.back().TopLeftY, 0, 0, vpMulti.back().Width, vpMulti.back().Height, 1.0f);
+		if (isEditor)
+		{
+			// Editor画面の分割の場合重なるところに黒挿入
+			spr->Draw(black, vpMulti.back().TopLeftX, vpMulti.back().TopLeftY, 0, 0, vpMulti.back().Width, vpMulti.back().Height, 1.0f);
+		}
 
 		// 多画面
 		GameDevice()->m_pD3D->m_pDeviceContext->RSSetViewports(1, &vpMulti[ObjectManager::DrawCounter()]);

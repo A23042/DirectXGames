@@ -1,7 +1,6 @@
 #include "MapEditScene.h"
 #include "StageEdit.h"
 #include "Gizmo3D.h"
-#include "EditorCamera.h"
 #include "EditUI.h"
 #include "SplitScreen.h"
 #include "MainCamera.h"
@@ -14,7 +13,6 @@ MapEditScene::MapEditScene()
 	new EditUI();
 	cs = new CSprite;
 	new MainCamera();
-	//new EditorCamera();
 	new Camera(true);
 }
 
@@ -27,10 +25,13 @@ void MapEditScene::Update()
 {
 	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_T)) 
 	{
+		ss = ObjectManager::FindGameObject<SplitScreen>();
+		ss->SetMultiSizePlay();
+		ss->SetSingleScreen();
 		SceneManager::ChangeScene("TitleScene");
 	}
 	// ‰æ–Ê•ªŠ„‚ÌØ‚è‘Ö‚¦•û “r’†‚Å‚à“®“I‚ÉØ‚è‘Ö‚¦‰Â”\
-#if 1
+#if 0
 	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_L))
 	{
 		ss = ObjectManager::FindGameObject<SplitScreen>();

@@ -52,6 +52,11 @@ void SubCamera::Update()
 
 void SubCamera::Draw()
 {
+	if (!isAuto)
+	{
+		return;
+	}
+
 	if (ss != nullptr)
 	{
 		if (ss->Multi())
