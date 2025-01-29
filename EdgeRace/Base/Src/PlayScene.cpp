@@ -17,7 +17,8 @@ PlayScene::PlayScene(int num)
 {
 	// Œõ‚Ì•ûŒü‚ð‚È‚­‚·‚±‚Æ‚Å‰e‚ª‚È‚­‚È‚é
 	//GameDevice()->m_vLightDir = VECTOR3();
-	SingleInstantiate<Camera>();
+	//SingleInstantiate<Camera>();
+	new Camera();
 	sc = ObjectManager::FindGameObject<Score>();
 	if (sc == nullptr) 
 	{
@@ -36,6 +37,10 @@ PlayScene::PlayScene(int num)
 	data->SetPlay(true);
 	loadStage->Load(1);
 	//SAFE_DELETE(csv);
+
+	SplitScreen* ss = ObjectManager::FindGameObject<SplitScreen>();
+	ss->SetMultiSizePlay();
+	ss->SetMultiScreen();
 }
 
 PlayScene::~PlayScene()
@@ -45,7 +50,7 @@ PlayScene::~PlayScene()
 void PlayScene::Update()
 {
 	// ‰æ–Ê•ªŠ„‚ÌØ‚è‘Ö‚¦•û “r’†‚Å‚à“®“I‚ÉØ‚è‘Ö‚¦‰Â”\
-#if 1
+#if 0
 	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_L))
 	{
 		SplitScreen* ss = ObjectManager::FindGameObject<SplitScreen>();

@@ -180,7 +180,7 @@ void SplitScreen::Draw()
 		// Ｚバッファのみ全クリヤーする。（画面は消さずに、Ｚバッファのみクリヤーする）
 		// この処理は、ここで３Ｄオブジェクトの描画を行うときは必須
 		// ２Ｄスプライトのみ描画を行うときは不要
-		if (GameDevice()->m_pD3D->m_pTarget_DSTexDSV)
+			if (GameDevice()->m_pD3D->m_pTarget_DSTexDSV)
 		{
 		    GameDevice()->m_pD3D->m_pDeviceContext->ClearDepthStencilView(GameDevice()->m_pD3D->m_pTarget_DSTexDSV, D3D11_CLEAR_DEPTH, 1.0f, 0); // 深度バッファクリア
 		}

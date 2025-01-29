@@ -25,8 +25,7 @@ Camera::Camera(bool isEditor)
 		eyePt.emplace_back(v);
 		lookatPt.emplace_back(v);
 	}
-	//float fAspect = (float)WINDOW_WIDTH / WINDOW_HEIGHT;
-	//GameDevice()->m_mProj = XMMatrixPerspectiveFovLH(XMConvertToRadians(38.0f), fAspect, 0.1f, 500.0f);
+	ObjectManager::SetPriority(this, 100);
 }
 
 Camera::~Camera()
@@ -98,18 +97,8 @@ void Camera::Update()
 				switch (i)
 				{
 				case 0:
-					//transform.position = mainCam->Position();
-					//lookPosition = mainCam->GetLookPos();
 					mainCam = ObjectManager::FindGameObject<MainCamera>();
 					updateCamera(i, mainCam->Position(), mainCam->GetLookPos());
-					/*
-					eyePt[i] = transform.position;   // カメラ座標
-					lookatPt[i] = lookPosition;      // 注視点
-					view[i] = XMMatrixLookAtLH(	    // ビューマトリックス
-						transform.position,
-						lookPosition,
-						VECTOR3(0, 1, 0));
-					*/
 					break;
 				case 1:
 					if (subCam == nullptr)
@@ -118,17 +107,6 @@ void Camera::Update()
 
 					}
 					updateCamera(i, subCam->Position(), subCam->GetLookPos());
-					/*
-					transform.position = sub->Position();
-					lookPosition = sub->GetLookPos();
-
-					eyePt[i] = transform.position;   // カメラ座標
-					lookatPt[i] = VECTOR3();      // 注視点
-					view[i] = XMMatrixLookAtLH(	    // ビューマトリックス
-						transform.position,
-						lookPosition,
-						VECTOR3(0, 1, 0));
-					*/
 					break;
 				}
 
@@ -139,9 +117,6 @@ void Camera::Update()
 	{
 		if (!isEditor)
 		{
-			//mainCam = ObjectManager::FindGameObject<MainCamera>();
-			//updateCamera(0, mainCam->Position(), mainCam->GetLookPos());
-
 			updateCamera(0, transform.position, transform.rotation);
 		}
 		else
@@ -149,6 +124,7 @@ void Camera::Update()
 			mainCam = ObjectManager::FindGameObject<MainCamera>();
 			updateCamera(0, mainCam->Position(), mainCam->GetLookPos());
 		}
+		GameDevice()->m_mView = View(0);
 		// １画面のときPlayer視点
 		/*
 		Player* pc = ObjectManager::FindGameObject<Player>();
@@ -162,16 +138,7 @@ void Camera::Update()
 		*/
 	}
 }
-/*
-void Camera::Draw()
-{
-	GameDevice()->m_mView = XMMatrixLookAtLH(
-		transform.position, // カメラ座標
-		lookPosition, // 注視点
-		VECTOR3(0, 1, 0));
-	GameDevice()->m_vEyePt = transform.position;
-}
-*/
+
 void Camera::updateCamera(int counter, VECTOR3 pos, VECTOR3 rot)
 {
 	if (!isEditor)

@@ -179,7 +179,7 @@ private:
 		vRot,		// 回転用表示
 		vScale,		// スケール表示
 	}vGizmo;
-
+	GizmoView tmpGizmoState;
 	CDirectInput* pDI = GameDevice()->m_pDI;	// pDIショートカット
 
 	// 各行列取得

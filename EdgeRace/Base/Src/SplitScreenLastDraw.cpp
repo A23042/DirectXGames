@@ -106,10 +106,7 @@ void SplitScreenLastDraw::Update()
 
 void SplitScreenLastDraw::Draw()
 {
-	if (cm == nullptr)
-	{
-		cm = ObjectManager::FindGameObject<Camera>();
-	}
+	cm = ObjectManager::FindGameObject<Camera>();
 	if (ss->Multi())
 	{
 		// 多画面のとき
@@ -141,7 +138,7 @@ void SplitScreenLastDraw::Draw()
 			// 例えば、枠線スプライトや全体ステータスの描画など
 
 			// PlaySceneとEditSceneで処理を分ける
-			if (data != nullptr)
+			if (!ss->IsEditor())
 			{
 				sp->DrawRect(WINDOW_WIDTH / 2 - 2, 0, 4 , WINDOW_HEIGHT, RGB(255, 255, 255), 1.0f);
 

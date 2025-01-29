@@ -123,7 +123,7 @@ StageEdit::StageEdit()
 	tempE = DEFAULT_E;
 	tempF = DEFAULT_F;
 	tempMass = DEFAULT_MASS;
-
+	tmpGizmoState = vPos;
 	commandManager.SetUp();
 	spr = new CSprite;
 }
@@ -186,21 +186,10 @@ void StageEdit::Update()
 	// カメラが一つ選択されているときだけ右下のウィンドウに投影する
 	if (pDI->CheckKey(KD_TRG, DIK_L))
 	{
-		// セレクトされているオブジェクトが一つの場合かつ
-		// それがカメラオブジェクトだったら
-		if (ObjectManager::GetObjctList<SubCamera>().size() >= 1)
+		ss = ObjectManager::FindGameObject<SplitScreen>();
+		if (ss->Multi())
 		{
-			ss = ObjectManager::FindGameObject<SplitScreen>();
-			if (ss->Multi())
-			{
-				ss->SetSingleScreen();
-			}
-			else
-			{
-				ss->SetMultiSizeEditor();
-				ss->SetMultiScreen();
-			}
-
+			ss->SetSingleScreen();
 		}
 	}
 }
@@ -756,6 +745,13 @@ void StageEdit::SetGizmo()
 
 void StageEdit::SelectObj(Object3D* obj)
 {
+	// 選択されてるオブジェクトのGizmo表示
+	// 初めてGizmoが出る場合posGizmoを出す
+	if (vGizmo == vNone)
+	{
+		vGizmo = tmpGizmoState;
+	}
+
 	//LCtrl押されてたら
 	if (pDI->CheckKey(KD_DAT, DIK_LCONTROL))
 	{
@@ -773,28 +769,14 @@ void StageEdit::SelectObj(Object3D* obj)
 	}
 	else
 	{
-		DeselectObj();
-		selectObj.push_back(obj);
-		if (obj->editObj.name == "Camera")
+		if (selectObj.size() > 0)
 		{
-			Camera* camera = FindGameObject<Camera>();
-			camera->SetSubCamera(dynamic_cast<SubCamera*>(obj));
-			SplitScreen* ss = FindGameObject<SplitScreen>();
-			ss->SetMultiSizeEditor();
-			ss->SetMultiScreen();
+			DeselectObj();
 		}
-
+		selectObj.push_back(obj);
 	}
 	if (isNew)
 	{
-		if (obj->editObj.name == "Camera")
-		{
-			Camera* camera = FindGameObject<Camera>();
-			camera->SetSubCamera(dynamic_cast<SubCamera*>(obj));
-			SplitScreen* ss = FindGameObject<SplitScreen>();
-			ss->SetMultiSizeEditor();
-			ss->SetMultiScreen();
-		}
 		obj->pObj.e = DEFAULT_E;
 		obj->pObj.f = DEFAULT_F;
 		obj->pObj.mass = DEFAULT_MASS;
@@ -802,18 +784,19 @@ void StageEdit::SelectObj(Object3D* obj)
 		HierarchyManager::AddHierarchy(obj);
 		isNew = false;
 	}
+	if (obj->editObj.name == "Camera")
+	{
+		Camera* camera = FindGameObject<Camera>();
+		camera->SetSubCamera(dynamic_cast<SubCamera*>(obj));
+		SplitScreen* ss = FindGameObject<SplitScreen>();
+		ss->SetMultiSizeEditor();
+		ss->SetMultiScreen();
+	}
 	// 選択されたオブジェクトの色を変える
 	//getObj->GetMesh()->m_vDiffuse = VECTOR4(1.0f, 0.2f, 1.0f, 1.0f);
 	for (Object3D* obj : selectObj)
 	{
 		obj->GetMesh()->m_vDiffuse = VECTOR4(1.0f, 0.2f, 1.0f, 1.0f);
-	}
-
-	// 選択されてるオブジェクトのGizmo表示
-	// 初めてGizmoが出る場合posGizmoを出す
-	if (vGizmo == vNone)
-	{
-		vGizmo = vPos;
 	}
 
 	objPos = obj->pObj.center;
@@ -824,6 +807,7 @@ void StageEdit::SelectObj(Object3D* obj)
 	tempF = obj->pObj.f;
 	tempMass = obj->pObj.mass;
 
+	vGizmo = tmpGizmoState;
 	// ステータスによって表示するGizmoを変える
 	SetGizmo();
 
@@ -834,6 +818,13 @@ void StageEdit::SelectObj(Object3D* obj)
 #if 1
 void StageEdit::SelectObj(list<Object3D*> objs)
 {
+	// 選択されてるオブジェクトのGizmo表示
+	// 初めてGizmoが出る場合posGizmoを出す
+	if (vGizmo == vNone)
+	{
+		vGizmo = tmpGizmoState;
+	}
+
 	//LCtrl押されてたら
 	if (pDI->CheckKey(KD_DAT, DIK_LCONTROL))
 	{
@@ -860,14 +851,7 @@ void StageEdit::SelectObj(list<Object3D*> objs)
 	{
 		obj->GetMesh()->m_vDiffuse = VECTOR4(1.0f, 0.2f, 1.0f, 1.0f);
 	}
-
-	// 選択されてるオブジェクトのGizmo表示
-	// 初めてGizmoが出る場合posGizmoを出す
-	if (vGizmo == vNone)
-	{
-		vGizmo = vPos;
-	}
-
+	vGizmo = tmpGizmoState;
 	// ステータスによって表示するGizmoを変える
 	SetGizmo();
 
@@ -899,7 +883,8 @@ void StageEdit::DeselectObj(Object3D* obj)
 	}
 
 	nState = sNone;
-	//vGizmo = vNone;
+	tmpGizmoState = vGizmo;
+	vGizmo = vNone;
 	SetGizmo();
 }
 
@@ -984,7 +969,8 @@ void StageEdit::CloneObj()
 		}
 	}
 	DeselectObj();
-	selectObj = tempList;
+	//selectObj = tempList;
+	SelectObj(tempList);
 	commandManager.Do(make_shared<CreateCommand<Object3D>>(tempList));
 	for (Object3D* obj : selectObj)
 	{

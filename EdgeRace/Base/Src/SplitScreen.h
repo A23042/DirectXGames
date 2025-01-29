@@ -19,6 +19,7 @@ public:
 	void SetMultiSizePlay();
 	int  MultiSize() { return (int)vpMulti.size(); }
 	bool Multi() { return multi; }
+	bool IsEditor() { return isEditor; }
 private:
 	bool multi;
 	bool isEditor = false;

@@ -10,7 +10,6 @@ public:
 	Camera(bool isEditor = false);
 	~Camera();
 	void Update() override;
-	//void Draw() override;
 	void SetSubCamera(SubCamera* camera) { subCam = camera; }
 	MATRIX4X4 View(int counter) { return view[counter]; }
 	VECTOR3 EyePt(int counter) { return eyePt[counter]; }

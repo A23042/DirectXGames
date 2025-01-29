@@ -14,6 +14,8 @@ MapEditScene::MapEditScene()
 	cs = new CSprite;
 	new MainCamera();
 	new Camera(true);
+	ss = ObjectManager::FindGameObject<SplitScreen>();
+	ss->SetMultiSizePlay();
 }
 
 MapEditScene::~MapEditScene()
@@ -25,8 +27,6 @@ void MapEditScene::Update()
 {
 	if (GameDevice()->m_pDI->CheckKey(KD_TRG, DIK_T)) 
 	{
-		ss = ObjectManager::FindGameObject<SplitScreen>();
-		ss->SetMultiSizePlay();
 		ss->SetSingleScreen();
 		SceneManager::ChangeScene("TitleScene");
 	}

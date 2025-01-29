@@ -8,6 +8,7 @@ Gizmo3D::Gizmo3D()
 	mesh->Load("Data/Gizmo/gizmo.mesh");
 	transform.scale = VECTOR3(0.15f, 0.15f, 0.15f);
 	transform.rotation = VECTOR3(0, 180.0f / 180 * XM_PI, 0);
+	ObjectManager::SetPriority(this, -100);
 }
 
 Gizmo3D::~Gizmo3D()
