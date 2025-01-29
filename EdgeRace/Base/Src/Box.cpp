@@ -47,13 +47,17 @@ void Box::Start()
 void Box::Update()
 {
 	transform.position = pObj.center;
-
+	
 	// 衝突判定の関数呼び出しはそれぞれのクラスで行う
 }
 
 void Box::Draw()
 {
 	mesh->Render(transform.matrix());
+	if (meshCol != nullptr)
+	{
+		//meshCol->DrawPolygons(transform.matrix());
+	}
 #if 1
 	// 各辺の頂点パーツ
 	int edgePoint[12][2] = {

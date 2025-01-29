@@ -40,6 +40,8 @@ public:
 	/// <param name="rotSpeed">回転量</param>
 	void Move(VECTOR3 moveSpeed = VECTOR3(), VECTOR3 rotSpeed = VECTOR3());
 
+	SphereCollider Collider();
+
 	// Player番号取得
 	int GetPlNum() { return playerNum; }
 	// Playerステータス取得

@@ -215,8 +215,8 @@ private:
 	Object3D* line = nullptr;
 
 	POINT mousePos = {};	// マウススクリーン座標
-	POINT startPos;		// ドラッグ開始位置
-	POINT endPos;		// ドラッグ終了位置
+	POINT startPos = {};		// ドラッグ開始位置
+	POINT endPos = {};		// ドラッグ終了位置
 
 	VECTOR3 nearWorldPos;	// 近視点
 	VECTOR3 nearWorldPosEx;	// 近視点からdirection方向に伸ばした点
@@ -232,10 +232,10 @@ private:
 	list<VECTOR3> oldScale;
 
 	// ImGu格納用変数
-	VECTOR3 objPos;
-	VECTOR3 objRot;
-	VECTOR3 objScale;
-	VECTOR3 moveVolumu = {};	// MoveBoxの移動量
+	VECTOR3 objPos = VECTOR3();
+	VECTOR3 objRot = VECTOR3();
+	VECTOR3 objScale = VECTOR3();
+	VECTOR3 moveVolumu = VECTOR3();	// MoveBoxの移動量
 
 	float moveSpeed = 0;	// MoveBoxの移動速度
 	float tempE;

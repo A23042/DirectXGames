@@ -19,8 +19,8 @@ private:
 
 	CSprite* Button[3] = {};
 
-	float moveTime = 0.2;
-	float time = 0;
+	float moveTime = 0.2f;
+	float time = 0.0f;
 
 	int selectNum = 0;
 };

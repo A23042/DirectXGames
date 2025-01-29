@@ -210,7 +210,7 @@ VECTOR3 BoxCollisionBase::HitSphereToCubeVertices(PhysicsObject& tObj, VECTOR3& 
 VECTOR3 BoxCollisionBase::ReflectionVec(PhysicsObject& tObj, VECTOR3 normal)
 {
 	// 法線方向に反発係数をかける
-// 法線方向に垂直なベクトルに摩擦係数を計算
+	// 法線方向に垂直なベクトルに摩擦係数を計算
 	VECTOR3 refNormal = dot(tObj.velocity, normal) * normal;
 
 	VECTOR3 refSessen = tObj.velocity - refNormal;

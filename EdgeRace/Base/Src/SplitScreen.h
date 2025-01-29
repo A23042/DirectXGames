@@ -26,5 +26,4 @@ private:
 	std::vector<D3D11_VIEWPORT> vpMulti;
 	int  multiNo;
 	CSprite* spr;
-	CSpriteImage* black;
 };

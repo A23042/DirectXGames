@@ -66,7 +66,7 @@ SphereCollider Object3D::Collider()
 	sphere.radius = 0.5f;
 	return sphere;
 }
-
+#if 1
 bool Object3D::HitSphereToMesh(const SphereCollider& sphere, VECTOR3* push)
 {
 	if (meshCol == nullptr)
@@ -96,7 +96,58 @@ bool Object3D::HitSphereToMesh(const SphereCollider& sphere, VECTOR3* push)
 	}
 	return true;
 }
+#endif
+#if 1
+bool Object3D::HitSphereToMesh(const PhysicsObject& pObj, VECTOR3* push, VECTOR3* ref)
+{
+	if (meshCol == nullptr)
+		return false;
+	MATRIX4X4 mat = transform.matrix();
+	std::list<MeshCollider::CollInfo> meshes = meshCol->CheckCollisionSphereList(mat, pObj.center, pObj.radius);
+	if (meshes.size() == 0)
+		return false;
+	if (push != nullptr) { // 座標が必要なのであれば
+		VECTOR3 pushVec = VECTOR3(0, 0, 0); // 最終的に押すベクトル
+		VECTOR3 refVec = VECTOR3(0, 0, 0);	// 最終的に反射させるベクトル
 
+		// 衝突したふたつのオブジェクトの反発係数と摩擦を考慮する
+		float e2 = (this->pObj.e + pObj.e) / 2;
+		float f2 = (this->pObj.f + pObj.f) / 2;
+
+		for (const MeshCollider::CollInfo& m : meshes) { // 当たっているすべてのポリゴンで
+			VECTOR3 move = pObj.center - m.hitPosition;
+			float len = move.Length(); // 当たった点から中心への距離
+			move = move * ((pObj.radius - len) / len);
+
+			VECTOR3 refNormal = dot(pObj.velocity, m.normal) * m.normal;	// 反射方向の法線ベクトル
+			VECTOR3 refSessen = pObj.velocity - refNormal;				// 反射方向の接線ベクトル
+			VECTOR3 ref = -refNormal * e2 + refSessen * (1 - f2);		// 反射ベクトル
+			VECTOR3 refVecNorm = XMVector3Normalize(ref);
+			float refDot = Dot(ref, refVecNorm);
+			if (refDot < pushVec.Length()) {
+				refVec += ref - refVecNorm * refDot; // その成分を減らしていい
+			}
+			else {
+				refVec = ref;
+			}
+
+			VECTOR3 push = m.normal * Dot(move, m.normal); // 押し返したいベクトル
+			// 今のpushVecと合成する
+			VECTOR3 pushVecNorm = XMVector3Normalize(pushVec); // 合成済みベクトルの向き
+			float dot = Dot(push, pushVecNorm);	// その成分の長さ
+			if (dot < pushVec.Length()) {
+				pushVec += push - pushVecNorm * dot; // その成分を減らしていい
+			}
+			else {
+				pushVec = push;
+			}
+		}
+		*push = pushVec;
+		*ref = refVec;
+	}
+	return true;
+}
+#endif
 bool Object3D::HitLineToMesh(const VECTOR3& from, const VECTOR3& to, VECTOR3* hit)
 {
 	if (meshCol == nullptr)

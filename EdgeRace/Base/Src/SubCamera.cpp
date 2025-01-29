@@ -13,6 +13,7 @@ SubCamera::SubCamera(bool autoNum) : isAuto(autoNum)
 	//transform.position = VECTOR3(0, 5, -15);
 	ObjectManager::AddObj(this);
 	cmNum = ObjectManager::GetObjctList<SubCamera>().size();
+	lookPosition = transform.position + VECTOR3(0, 0, 10);
 }
 
 SubCamera::~SubCamera()

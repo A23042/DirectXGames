@@ -14,7 +14,7 @@ TitleScene::TitleScene()
 	positionX = 0;
 	speedX = 1;
 	panel = new MenuPanel();
-#if 1
+#if 0
 	// テキストファイルの読み方
 	char name[64];
 	// TestMapを使用する場合は0にする
@@ -88,7 +88,7 @@ TitleScene::TitleScene()
 			}
 		}
 	}
-	SAFE_DELETE(csv);
+	//SAFE_DELETE(csv);
 	Instantiate<Camera>();
 	Instantiate<CollisonManager>();
 #endif
@@ -134,9 +134,9 @@ void TitleScene::Update()
 		}
 	}
 
-	ImGui::Begin("STAGENUM");
+	/*ImGui::Begin("STAGENUM");
 	ImGui::InputInt("Number", &stageNum);
-	ImGui::End();
+	ImGui::End();*/
 }
 
 void TitleScene::Draw()

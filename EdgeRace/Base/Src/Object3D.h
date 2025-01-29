@@ -96,6 +96,7 @@ public:
 	/// <param name="push">‰Ÿ‚µ•Ô‚·êŠ‚ğŠi”[‚·‚éêŠ</param>
 	/// <returns>“–‚½‚Á‚½ê‡‚Étrue</returns>
 	virtual bool HitSphereToMesh(const SphereCollider& sphere, VECTOR3* push = nullptr);
+	virtual bool HitSphereToMesh(const PhysicsObject& pObj, VECTOR3* push = nullptr, VECTOR3* refVec = nullptr);
 
 	/// <summary>
 	/// ’¼ü‚ÆƒƒbƒVƒ…‚Ì“–‚½‚è”»’è‚ğ‚·‚é

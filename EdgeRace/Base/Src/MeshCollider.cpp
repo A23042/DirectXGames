@@ -47,6 +47,7 @@ void MeshCollider::MakeFromMesh(CFbxMesh* mesh)
         }
         vTop += vNum;
     }
+    newVertices = vertices;
     bBox.min = vertices[0];
     bBox.max = vertices[0];
     bBall.center = vertices[0];
@@ -169,12 +170,54 @@ bool MeshCollider::CheckCollisionSphere(const MATRIX4X4& trans, const VECTOR3& c
     return true;
 }
 
+void MeshCollider::DrawPolygons(const MATRIX4X4& trans)
+{
+    CSprite* spr = new CSprite();
+    
+    auto verIt = newVertices.begin();
+    for (VECTOR3 ver : vertices)
+    {
+        ver *= trans;
+        *verIt = ver;
+        verIt++;
+    }
+    for (const PolygonInfo& pol : polygons)
+    {
+        spr->DrawLine3D(newVertices[pol.indices[0]], newVertices[pol.indices[1]], RGB(0, 255, 0), 1.0f);
+        spr->DrawLine3D(newVertices[pol.indices[1]], newVertices[pol.indices[2]], RGB(0, 255, 0), 1.0f);
+        spr->DrawLine3D(newVertices[pol.indices[2]], newVertices[pol.indices[0]], RGB(0, 255, 0), 1.0f);
+    }
+    bBox.min = newVertices[0];
+    bBox.max = newVertices[0];
+    bBall.center = newVertices[0];
+    for (int v = 1; v < newVertices.size(); v++) {
+        if (bBox.min.x > newVertices[v].x) bBox.min.x = newVertices[v].x;
+        if (bBox.max.x < newVertices[v].x) bBox.max.x = newVertices[v].x;
+        if (bBox.min.y > newVertices[v].y) bBox.min.y = newVertices[v].y;
+        if (bBox.max.y < newVertices[v].y) bBox.max.y = newVertices[v].y;
+        if (bBox.min.z > newVertices[v].z) bBox.min.z = newVertices[v].z;
+        if (bBox.max.z < newVertices[v].z) bBox.max.z = newVertices[v].z;
+        bBall.center += newVertices[v];
+    }
+    //spr->DrawLine3D(bBox.max, bBox.min, RGB(0, 0, 255), 1.0f);
+    bBall.center /= newVertices.size(); // ここが中心になる
+    bBall.radius = 0.0f; // まずは距離の二乗の最大値を求める
+    for (int v = 1; v < newVertices.size(); v++) {
+        float lenSq = (newVertices[v] - bBall.center).LengthSquare();
+        if (bBall.radius < lenSq)
+            bBall.radius = lenSq;
+    }
+    bBall.radius = sqrtf(bBall.radius);
+    
+    SAFE_DELETE(spr);
+}
+
 std::list<MeshCollider::CollInfo> MeshCollider::CheckCollisionSphereList(const MATRIX4X4& trans, const VECTOR3& center, float radius)
 {
     MATRIX4X4 invTrans = XMMatrixInverse(nullptr, trans);
     VECTOR3 invCenter = center * invTrans;
     std::list<CollInfo> meshes;
-
+ 
     // バウンディングボール
     if ((invCenter - bBall.center).LengthSquare() > (bBall.radius + radius) * (bBall.radius + radius)) return meshes;
 
@@ -315,9 +358,9 @@ bool MeshCollider::checkPolygonToSphere(const PolygonInfo& info, const VECTOR3& 
         return false;
     // 中心からポリゴンを含む平面への垂線の長さを求める
     VECTOR3 v[3];
-    v[0] = vertices[info.indices[0]];
-    v[1] = vertices[info.indices[1]];
-    v[2] = vertices[info.indices[2]];
+    v[0] = newVertices[info.indices[0]];
+    v[1] = newVertices[info.indices[1]];
+    v[2] = newVertices[info.indices[2]];
     float len = Dot(center - v[0], info.normal);
     if (len < 0 || len > radius) return false; // 垂線の長さが半径より大きい
 

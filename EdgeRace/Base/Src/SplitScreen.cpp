@@ -88,14 +88,11 @@ SplitScreen::SplitScreen()
 	multiNo = 0;
 	GameDevice()->m_pD3D->m_pDeviceContext->RSSetViewports(1, &vpSingle);
 	spr = new CSprite();
-	black = new CSpriteImage();
-	black->Load("Data/Image/BlackGround.png");
 }
 
 SplitScreen::~SplitScreen()
 {
 	SAFE_DELETE(spr);
-	SAFE_DELETE(black);
 }
 
 void SplitScreen::Start()
@@ -191,7 +188,7 @@ void SplitScreen::Draw()
 		if (isEditor)
 		{
 			// Editor‰æ–Ê‚Ì•ªŠ„‚Ìê‡d‚È‚é‚Æ‚±‚ë‚É•‘}“ü
-			spr->Draw(black, vpMulti.back().TopLeftX, vpMulti.back().TopLeftY, 0, 0, vpMulti.back().Width, vpMulti.back().Height, 1.0f);
+			spr->DrawRect(vpMulti.back().TopLeftX - 3, vpMulti.back().TopLeftY - 3, vpMulti.back().Width + 6, vpMulti.back().Height + 6, RGB(0, 0, 0));
 		}
 
 		// ‘½‰æ–Ê

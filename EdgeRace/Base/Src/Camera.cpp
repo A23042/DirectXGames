@@ -41,6 +41,7 @@ void Camera::Update()
 		{
 			std::list<Player*> pcs = ObjectManager::FindGameObjects<Player>();
 			for (Player* pc : pcs)
+			{
 				// ‘½‰æ–Ê‚Ì‚Æ‚«
 				for (int i = 0; i < ssObj->MultiSize(); i++)
 				{
@@ -78,8 +79,7 @@ void Camera::Update()
 							else {
 								updateCamera(i, VECTOR3(0, 0, 0), VECTOR3(0, 0, 0));
 							}
-#else
-							updateCamera(i, VECTOR3(0, 2, -15), VECTOR3(0, 0, 0));
+							//updateCamera(i, VECTOR3(0, 2, -15), VECTOR3(0, 0, 0));
 #endif
 						}
 					}
@@ -87,6 +87,8 @@ void Camera::Update()
 					}
 
 				}
+
+			}
 		}
 		else
 		{
@@ -203,7 +205,6 @@ void Camera::updateCamera(int counter, VECTOR3 pos, VECTOR3 rot)
 		camVec = XMVector3Normalize(camVec) * (camVec.Length() + 0.2f);
 		end = start + camVec;
 		{
-
 			std::list<Object3D*> objList = ObjectManager::FindGameObjectsWithTag<Object3D>("STAGEOBJ");
 			for (Object3D* g : objList)
 			{

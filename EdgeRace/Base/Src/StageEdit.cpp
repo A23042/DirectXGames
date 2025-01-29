@@ -115,8 +115,8 @@ StageEdit::StageEdit()
 	HierarchyManager::AddHierarchy(fallCheck);
 
 	//cameraObj = new SubCamera();
-	HierarchyManager::AddHierarchy(new SubCamera());
-	HierarchyManager::AddHierarchy(new Box());
+	//HierarchyManager::AddHierarchy(new SubCamera());
+	//HierarchyManager::AddHierarchy(new Box());
 	nState = sNone;
 	gState = sNoneGizmo;
 
@@ -787,6 +787,14 @@ void StageEdit::SelectObj(Object3D* obj)
 	}
 	if (isNew)
 	{
+		if (obj->editObj.name == "Camera")
+		{
+			Camera* camera = FindGameObject<Camera>();
+			camera->SetSubCamera(dynamic_cast<SubCamera*>(obj));
+			SplitScreen* ss = FindGameObject<SplitScreen>();
+			ss->SetMultiSizeEditor();
+			ss->SetMultiScreen();
+		}
 		obj->pObj.e = DEFAULT_E;
 		obj->pObj.f = DEFAULT_F;
 		obj->pObj.mass = DEFAULT_MASS;

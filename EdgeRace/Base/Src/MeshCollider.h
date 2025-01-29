@@ -66,6 +66,8 @@ public:
 	/// <returns>当たっていればtrue</returns>
 	bool CheckCollisionSphere(const MATRIX4X4& trans, const VECTOR3& center, float radius, CollInfo* hitOut = nullptr);
 
+	void DrawPolygons(const MATRIX4X4& trans);
+
 	/// <summary>
 	/// 球体との当たり判定を行う
 	/// ポリゴンの表面のみ判定し、裏面は判定しません
@@ -155,6 +157,7 @@ private:
 	};
 	std::vector<PolygonInfo> polygons;
 	std::vector<VECTOR3> vertices;
+	std::vector<VECTOR3> newVertices;
 	BoundingBox bBox;
 	BoundingBall bBall;
 

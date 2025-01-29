@@ -22,7 +22,7 @@ void Frustum::CreateFrustum(POINT startPos, POINT endPos)
 	{
 		ss = ObjectManager::FindGameObject<SplitScreen>();
 	}
-	else
+	if (ss != nullptr)
 	{
 		if (ss->Multi())
 		{

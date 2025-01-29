@@ -200,11 +200,7 @@ void LoadStage::Load(int num)
 			}
 			else if (str == "Line")
 			{
-				Line* line = ObjectManager::FindGameObject<Line>();
-				if (line == nullptr)
-				{
-					line = new Line(true);
-				}
+				Line* line = new Line(true);
 				obj = line;
 				VECTOR3 size = csv->GetVector3(i, 5);
 				obj->SetScale(size);

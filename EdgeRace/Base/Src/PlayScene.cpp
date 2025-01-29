@@ -17,7 +17,7 @@ PlayScene::PlayScene(int num)
 {
 	// Œõ‚Ì•ûŒü‚ð‚È‚­‚·‚±‚Æ‚Å‰e‚ª‚È‚­‚È‚é
 	//GameDevice()->m_vLightDir = VECTOR3();
-	Instantiate<Camera>();
+	SingleInstantiate<Camera>();
 	sc = ObjectManager::FindGameObject<Score>();
 	if (sc == nullptr) 
 	{
@@ -34,7 +34,7 @@ PlayScene::PlayScene(int num)
 	data = SingleInstantiate<DataHolder>();
 	data->DontDestroyMe();
 	data->SetPlay(true);
-	loadStage->Load(2);
+	loadStage->Load(1);
 	//SAFE_DELETE(csv);
 }
 

@@ -10,14 +10,15 @@ namespace
 {	// このcpp以外では使えない
 	// C++の定数定義（型が付く）
 
-	static const float Gravity = 9.8f * 4.0f;	// 重力加速度(正の値)
+	//static const float Gravity = 9.8f * 4.0f;	// 重力加速度(正の値)
+	float Gravity = 9.8f * 4.0f;
 	static const float JumpPower = 12.0f;		// ジャンプ力
 	static const float RotationSpeed = 1.2f;	// 回転速度(度)
 	static const float MoveSpeed = 0.3f;		// 移動速度
 	static const float MaxPushTime = 1.0f;		// 長押し上限
 	static const float StopSpeed = 0.04f;		// 速度が遅くなったら0にするための基準
-	static const float RDeadZone = 0.1f;			// Rスティックのデッドゾーン
-	static const float LDeadZone = 0.2f;			// Lスティックのデッドゾーン
+	static const float RDeadZone = 0.1f;		// Rスティックのデッドゾーン
+	static const float LDeadZone = 0.2f;		// Lスティックのデッドゾーン
 	static const int Power = 180;				// 長押し発射の威力基準
 	static const int RestShot = 3;				// 打てる回数
 	static const float preE = 0.6f;				// 発射前操作時の反発係数	
@@ -28,7 +29,7 @@ Player::Player(int num, bool isPhysic) : playerNum(num), isPhysic(isPhysic)
 {
 	SetTag("PLAYER");
 	editObj.name = "Player";
-
+	Gravity = 9.8f * 4.0f;
 	mesh = new CFbxMesh();
 	if (playerNum == 0)
 	{
@@ -101,7 +102,7 @@ void Player::Update()
 	if (isPhysic)
 	{
 		// 各Boxとの衝突判定
-		//for (Object3D* obj : collManager->GetBoxes())
+		
 		for (Box* obj : ObjectManager::anyObjList<Box>)
 		{
 			// 先にAABBと簡易的な衝突判定をして衝突していればHitSphereCubeplaneを回す
@@ -116,7 +117,21 @@ void Player::Update()
 				}
 			}
 		}
-
+		
+		/*
+		for (Box* obj : ObjectManager::anyObjList<Box>)
+		{
+			VECTOR3 refVec = VECTOR3(0, 0, 0);
+			VECTOR3 pushVec = VECTOR3(0, 0, 0);
+			//if (obj->HitSphereToMesh(Collider(), &pushVec))
+			if(obj->HitSphereToMesh(pObj, &pushVec, &refVec))
+			{
+				pObj.center += pushVec;
+				transform.position = pObj.center;
+				//pObj.velocity = refVec;
+			}
+		}
+		*/
 		// ステータスで行う処理分け
 		switch (state)
 		{
@@ -187,18 +202,44 @@ void Player::UpdateWait()
 		return;
 	}
 
+	// 複数のAreaに接触していたら距離が一番近いものの点にする
+	ScoreArea* tempArea = nullptr;
+	float minDistance = 0.0f;
+	bool firstFlag = true;
+	bool isTouch = false;
 	// スコアエリアの中にいるか
 	for (ScoreArea* area : ObjectManager::scArea<ScoreArea>)
 	{
-		if (area->CheckSphereAABBCollision(this->pObj))
+		if (area == nullptr) continue;
+		float distance = 0.0f;
+		if (area->CheckSphereAABBCollision(pObj, distance))
 		{
-			area->ScoreCount(this->pObj);
-			break;
+			isTouch = true;
+			if (firstFlag)
+			{
+				tempArea = area;
+				minDistance = distance;
+				firstFlag = false;
+			}
+			else if (distance < minDistance)
+			{
+				tempArea = area;
+				minDistance = distance;
+			}
 		}
-		else
+	}
+	if (!isTouch)
+	{
+		pObj.score = 0;
+	}
+	else
+	{
+		tempArea->ScoreCount(pObj);
+		if (tempArea->editObj.name == "scoreArea3")
 		{
-			pObj.score = 0;
+
 		}
+		//break;
 	}
 
 	auto pDI = GameDevice()->m_pDI;
@@ -211,7 +252,9 @@ void Player::UpdateWait()
 	float RY = -pDI->GetJoyState(playerNum).lRz / 32768.0f - 1;
 
 	// コントローラーの接続数
-	switch (pDI->GetJoyNum())
+	int num = pDI->GetJoyNum();
+	num = 0;
+	switch (num)
 	{
 	case 0:
 		if (playerNum == 0)
@@ -354,6 +397,14 @@ void Player::Move(VECTOR3 moveSpeed, VECTOR3 rotSpeed)
 	transform.rotation.y += (RotationSpeed * rotSpeed.y) / 180.0f * XM_PI;
 }
 
+SphereCollider Player::Collider()
+{
+	SphereCollider coll;
+	coll.center = pObj.center;
+	coll.radius = 0.5f;
+	return coll;
+}
+
 // Playerの操作はコントローラーに変える
 void Player::UpdateNormal()
 {
@@ -394,31 +445,6 @@ void Player::UpdateNormal()
 		isWait = false;
 	}
 
-#if 0
-	// XInput
-	XInputGetState(playerNum, &m_state);
-
-	// 左スティックの生の値
-	SHORT lx = m_state.Gamepad.sThumbLX;
-	SHORT ly = m_state.Gamepad.sThumbLY;
-	// 右スティックの生の値
-	SHORT rx = m_state.Gamepad.sThumbRX;
-	SHORT ry = m_state.Gamepad.sThumbRY;
-
-	// 正規化（-32768 ～ 32767 を -1.0 ～ 1.0 に変換）
-	float Lx = lx / 32768.0f;
-	float Ly = ly / 32768.0f;
-	float Rx = rx / 32768.0f;
-	float Ry = ry / 32768.0f;
-
-	ImGui::Begin("JoyL");
-	ImGui::InputFloat("LX", &Lx);
-	ImGui::InputFloat("LY", &Ly);
-	ImGui::InputFloat("RX", &Rx);
-	ImGui::InputFloat("RY", &Ry);
-	ImGui::End();
-#endif
-
 	// 振動のやり方
 	// 有効な値の範囲は 0 ~ 65,535 です。
 	//XINPUT_VIBRATION a;
@@ -428,7 +454,9 @@ void Player::UpdateNormal()
 	//XInputGetKeystroke(playerNum, 0, &m_keystroke);
 
 	// コントローラーの接続数
-	switch (pDI->GetJoyNum())
+	int num = pDI->GetJoyNum();
+	num = 0;
+	switch (num)
 	{
 		// コントローラー接続数0の場合
 		// Player0はWASD

@@ -143,6 +143,8 @@ void SplitScreenLastDraw::Draw()
 			// PlaySceneÇ∆EditSceneÇ≈èàóùÇï™ÇØÇÈ
 			if (data != nullptr)
 			{
+				sp->DrawRect(WINDOW_WIDTH / 2 - 2, 0, 4 , WINDOW_HEIGHT, RGB(255, 255, 255), 1.0f);
+
 				// ÉQÅ[ÉWï\é¶
 				pls = ObjectManager::FindGameObjects<Player>();
 				for (Player* pl : pls)
