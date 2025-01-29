@@ -4,7 +4,8 @@ SkyBox::SkyBox()
 {
 	mesh = new CFbxMesh;
 	mesh->Load("Data/Map/sky2.mesh");
-	transform.scale = VECTOR3(10, 10, 10);
+	transform.scale = VECTOR3(5, 5, 5);
+	lightDir = GameDevice()->m_vLightDir;
 }
 
 SkyBox::~SkyBox()
@@ -14,4 +15,11 @@ SkyBox::~SkyBox()
 
 void SkyBox::Update()
 {
+}
+
+void SkyBox::Draw()
+{
+	GameDevice()->m_vLightDir = VECTOR3();
+	mesh->Render(transform.matrix());
+	GameDevice()->m_vLightDir = lightDir;
 }

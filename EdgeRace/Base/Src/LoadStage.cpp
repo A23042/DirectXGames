@@ -36,12 +36,13 @@ void LoadStage::Start()
 
 void LoadStage::Update()
 {
+	float rate = 0;
 	if (!ss->Multi())
 	{
 		if (isLoad)
 		{
 			timeCount += SceneManager::DeltaTime();
-			float rate = timeCount / moveTime;	// Š„‡ˆÚ“®
+			rate = timeCount / moveTime;	// Š„‡ˆÚ“®
 			if (rate >= 1)
 			{
 				rate = 1;
@@ -52,7 +53,7 @@ void LoadStage::Update()
 			camera->SetRotation(rotation);
 		}
 		VECTOR3 pos = camera->Position();
-		if (pos == endPos)
+		if (rate == 1)
 		{
 			ss->SetMultiScreen();
 			isLoad = false;
@@ -64,6 +65,7 @@ void LoadStage::Update()
 void LoadStage::Load(int num)
 {
 	isLoad = true;
+	ss = ObjectManager::FindGameObject<SplitScreen>();
 	if (ss != nullptr)
 	{
 		ss->SetSingleScreen();

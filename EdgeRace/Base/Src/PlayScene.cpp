@@ -28,19 +28,20 @@ PlayScene::PlayScene(int num)
 	sc->Clear();
 	Instantiate<ScoreDraw>();
 	Instantiate<CollisonManager>();
-	//Instantiate<SkyBox>();
+	Instantiate<SkyBox>();
 	loadStage = Instantiate<LoadStage>();
 	resultPanel = SingleInstantiate<SplitScreenLastDraw>();
 	resultPanel->DontDestroyMe();
 	data = SingleInstantiate<DataHolder>();
 	data->DontDestroyMe();
 	data->SetPlay(true);
-	loadStage->Load(1);
+	
 	//SAFE_DELETE(csv);
 
 	SplitScreen* ss = ObjectManager::FindGameObject<SplitScreen>();
 	ss->SetMultiSizePlay();
 	ss->SetMultiScreen();
+	loadStage->Load(1);
 }
 
 PlayScene::~PlayScene()

@@ -8,4 +8,7 @@ public:
 	SkyBox();
 	~SkyBox();
 	void Update() override;
+	void Draw() override;
+private:
+	VECTOR3 lightDir;
 };
