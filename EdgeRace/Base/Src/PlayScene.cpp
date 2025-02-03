@@ -41,7 +41,7 @@ PlayScene::PlayScene(int num)
 	SplitScreen* ss = ObjectManager::FindGameObject<SplitScreen>();
 	ss->SetMultiSizePlay();
 	ss->SetMultiScreen();
-	loadStage->Load(1);
+	loadStage->Load(num);
 }
 
 PlayScene::~PlayScene()

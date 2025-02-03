@@ -137,7 +137,7 @@ StageEdit::~StageEdit()
 void StageEdit::Update()
 {
 	// 各行列とカーソルのワールド座標取得
-	SplitScreen* ss = FindGameObject<SplitScreen>();
+	if(!ss) ss = FindGameObject<SplitScreen>();
 	if (ss->Multi())
 	{
 		Camera* cm = FindGameObject<Camera>();
@@ -186,7 +186,6 @@ void StageEdit::Update()
 	// カメラが一つ選択されているときだけ右下のウィンドウに投影する
 	if (pDI->CheckKey(KD_TRG, DIK_L))
 	{
-		ss = ObjectManager::FindGameObject<SplitScreen>();
 		if (ss->Multi())
 		{
 			ss->SetSingleScreen();
@@ -788,9 +787,12 @@ void StageEdit::SelectObj(Object3D* obj)
 	{
 		Camera* camera = FindGameObject<Camera>();
 		camera->SetSubCamera(dynamic_cast<SubCamera*>(obj));
-		SplitScreen* ss = FindGameObject<SplitScreen>();
-		ss->SetMultiSizeEditor();
-		ss->SetMultiScreen();
+		if(!ss) ss = FindGameObject<SplitScreen>();
+		else
+		{
+			ss->SetMultiSizeEditor();
+			ss->SetMultiScreen();
+		}
 	}
 	// 選択されたオブジェクトの色を変える
 	//getObj->GetMesh()->m_vDiffuse = VECTOR4(1.0f, 0.2f, 1.0f, 1.0f);
@@ -897,6 +899,10 @@ void StageEdit::DeleteObj()
 		{
 			HierarchyManager::RemoveHierarchy(obj);
 			isDelete = true;
+		}
+		if (obj->editObj.name == "Camera")
+		{
+			ss->SetSingleScreen();
 		}
 	}
 	if (isDelete)
@@ -1110,6 +1116,9 @@ void StageEdit::Save(int n)
 
 void StageEdit::Load(int n)
 {
+	// 1画面に戻す
+	ss->SetSingleScreen();
+
 	// 選択されてるオブジェクトがあれば選択解除
 	DeselectObj();
 	

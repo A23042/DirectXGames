@@ -10,6 +10,7 @@
 using namespace std;
 using namespace ObjectManager;
 
+class SplitScreen;
 class SubCamera;
 class StageEdit : public Object3D {
 public:
@@ -191,7 +192,7 @@ private:
 	//Object3D* getObj = nullptr;	
 	list<Object3D*> selectObj;
 
-	//list<SubCamera*> subCm;
+	SplitScreen* ss;
 
 	// ‘I‘ğó‘Ô‚ÌGizmo
 	Object3D* getGizmo = nullptr;

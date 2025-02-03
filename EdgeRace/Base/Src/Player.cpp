@@ -253,7 +253,7 @@ void Player::UpdateWait()
 
 	// コントローラーの接続数
 	int num = pDI->GetJoyNum();
-	num = 0;
+	// num = 0;
 	switch (num)
 	{
 	case 0:
@@ -455,7 +455,7 @@ void Player::UpdateNormal()
 
 	// コントローラーの接続数
 	int num = pDI->GetJoyNum();
-	num = 0;
+	// num = 0;
 	switch (num)
 	{
 		// コントローラー接続数0の場合

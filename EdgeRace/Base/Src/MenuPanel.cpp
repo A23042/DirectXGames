@@ -41,19 +41,19 @@ void MenuPanel::Update()
 	float LX = pDI->GetJoyState().lX / 1000.0f;
 	float LY = -pDI->GetJoyState().lY / 1000.0f;
 
-	if (abs(LY) >= 0.8f)
+	if (abs(LY) >= 0.8f || GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_UP) || GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_DOWN))
 	{
 		time += SceneManager::DeltaTime();
 		if (time >= moveTime)
 		{
-			if (LY < 0)
+			if (LY < 0 || GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_DOWN))
 			{
 				if (++selectNum >= 3)
 				{
 					selectNum = 0;
 				}
 			}
-			else
+			else if(LY > 0 || GameDevice()->m_pDI->CheckKey(KD_DAT, DIK_UP))
 			{
 				if (--selectNum < 0)
 				{
